@@ -143,10 +143,10 @@ DATA_SECTION
   // |  
   // | -Thresh     ->  Threshold (in short tons) below which no fishery occurs
            
-     init_number Thresh
-     init_number Thresh_denom			   
-     init_vector Threshold(1,myrs)
-     init_vector fw_a_a(1,nages) 
+     init_number Thresh;
+     init_number Thresh_denom;
+     init_vector Threshold(1,myrs);
+     init_vector fw_a_a(1,nages);
    !!cout <<myrs<<endl; 
   // |--------------------------------------------------------------------------|
   // | ARRAY INDEXING                                                           |
@@ -406,10 +406,10 @@ PARAMETER_SECTION
   // |- log_alpha: this is a natural log-scale parameter 
   // |- log_beta:  this is a natural log-scale parameter 
 
-  init_bounded_number log_alpha(-10,0,ph_Ric)                 
-  init_number log_beta(ph_Ric)                                  
-  number alpha
-  number beta 
+  init_bounded_number log_alpha(-10,0,ph_Ric);
+  init_number log_beta(ph_Ric);                                  
+  number alpha;
+  number beta;
  // init_bounded_number md_c(200,600,ph_md)	    //Mile-days coefficient
  
 
@@ -422,10 +422,10 @@ PARAMETER_SECTION
   // |- survival vector
   // |- mean survival (for forecasting)
 
-  init_bounded_vector M(1,S_Bk,.0001,1,ph_S)                   
-  matrix Sur(1,myrs,1,nages)    
-  vector S(1,S_Bk)               
-  number S_for   
+  init_bounded_vector M(1,S_Bk,.0001,1,ph_S);                   
+  matrix Sur(1,myrs,1,nages);    
+  vector S(1,S_Bk);               
+  number S_for;   
               
 
   // |---------------------------------------------------------------------------------|
@@ -438,18 +438,18 @@ PARAMETER_SECTION
   // |- selectivity-at-age slope
   // |- mile-days coefficient
 
-  init_bounded_vector mat_a(1,mat_Bk,1,10,ph_mat_a)    
-  init_bounded_vector mat_b(1,mat_Bk,0,5,ph_mat_b)                    
-  init_bounded_vector gs_a(1,gs_Bk,2,10,ph_gs_a)
-  init_bounded_vector gs_b(1,gs_Bk,0,5,ph_gs_b)
-  init_bounded_number md_c(200,600,ph_Int)
-  matrix GS(1,myrs,1,nages)
-  matrix GS_Sc(1,myrs,1,nages)
-  matrix Mat(1,myrs,1,nages)
-  vector int1(1,myrs)              //Maximum of gear selectivity, used to scale
-  matrix int2(1,myrs,1,nages)      //Proportion of pop rec to gear*Weight_at_age
-  vector int3(1,myrs)              //sum over age of int2
-  vector mat_for(1,nages)
+  init_bounded_vector mat_a(1,mat_Bk,1,10,ph_mat_a);    
+  init_bounded_vector mat_b(1,mat_Bk,0,5,ph_mat_b);                    
+  init_bounded_vector gs_a(1,gs_Bk,2,10,ph_gs_a);
+  init_bounded_vector gs_b(1,gs_Bk,0,5,ph_gs_b);
+  init_bounded_number md_c(200,600,ph_Int);
+  matrix GS(1,myrs,1,nages);
+  matrix GS_Sc(1,myrs,1,nages);
+  matrix Mat(1,myrs,1,nages);
+  vector int1(1,myrs);              //Maximum of gear selectivity, used to scale
+  matrix int2(1,myrs,1,nages);      //Proportion of pop rec to gear*Weight_at_age
+  vector int3(1,myrs);              //sum over age of int2
+  vector mat_for(1,nages);
 
 
   // |---------------------------------------------------------------------------------|
@@ -469,17 +469,17 @@ PARAMETER_SECTION
   // |- est_egg_naa    egg production-at-age                              [trillions]     
 
 
-  matrix naa(1,myrs,1,nages)           
-  matrix sel_naa(1,myrs,1,nages)       
-  matrix sel_naa_prop(1,myrs,1,nages)   
-  matrix est_c_naa(1,myrs,1,nages)   
-  matrix est_sp_naa(1,myrs,1,nages)    
-  matrix est_sp_comp(1,myrs,1,nages)    
-  matrix est_sp_baa(1,myrs,1,nages)  
-  matrix est_mat_naa(1,myrs,1,nages)      
-  matrix est_mat_baa(1,myrs,1,nages)     
-  matrix post_naa(1,myrs,1,nages)       
-  matrix est_egg_naa(1,myrs,1,nages) 
+  matrix naa(1,myrs,1,nages);           
+  matrix sel_naa(1,myrs,1,nages);
+  matrix sel_naa_prop(1,myrs,1,nages);
+  matrix est_c_naa(1,myrs,1,nages);
+  matrix est_sp_naa(1,myrs,1,nages);
+  matrix est_sp_comp(1,myrs,1,nages);
+  matrix est_sp_baa(1,myrs,1,nages);
+  matrix est_mat_naa(1,myrs,1,nages);
+  matrix est_mat_baa(1,myrs,1,nages);
+  matrix post_naa(1,myrs,1,nages);
+  matrix est_egg_naa(1,myrs,1,nages;
      
   
   // |---------------------------------------------------------------------------------|
@@ -498,16 +498,16 @@ PARAMETER_SECTION
   // |- Ricker spawner-recruit
   // |- Mile days of milt
  
-  vector          tot_sel_N(1,myrs)
-  vector          tot_sp_B(1,myrs)               
-  vector          tot_mat_N(1,myrs)             
-  sdreport_vector tot_sp_N(1,myrs)     
-  sdreport_vector tot_mat_B(1,myrs) 
-  sdreport_vector tot_post_N(1,myrs) 
-  sdreport_vector tot_est_egg(1,myrs)
-  sdreport_vector N(1,myrs)
-  vector          SR(1,myrs-3)                 //Ricker Spawner-Recruit
-  vector M_D(1,myrs)	 	      //Estimated Mile-days of milt
+  vector          tot_sel_N(1,myrs);
+  vector          tot_sp_B(1,myrs);               
+  vector          tot_mat_N(1,myrs);             
+  sdreport_vector tot_sp_N(1,myrs);     
+  sdreport_vector tot_mat_B(1,myrs); 
+  sdreport_vector tot_post_N(1,myrs); 
+  sdreport_vector tot_est_egg(1,myrs);
+  sdreport_vector N(1,myrs);
+  vector          SR(1,myrs-3);                 //Ricker Spawner-Recruit
+  vector M_D(1,myrs);	 	      //Estimated Mile-days of milt
  
 
   // |---------------------------------------------------------------------------------|
@@ -536,7 +536,7 @@ PARAMETER_SECTION
   number for_tot_mat_N
   number HR		         
   number HR_p                  
-  number GHL                  
+  number GHL ;                 
 
   // |---------------------------------------------------------------------------------|
   // | GRAPHICAL CONSTRUCTS
@@ -547,8 +547,8 @@ PARAMETER_SECTION
   // |- FIGDATAAGE
   // |- FIGDATA2
 
-   matrix FIGDATA(1,myrs,1,42)
-   matrix FIGDATAAGE(1,nages,1,3)
+   matrix FIGDATA(1,myrs,1,42);
+   matrix FIGDATAAGE(1,nages,1,3);
 
 
   // |---------------------------------------------------------------------------------|
@@ -617,8 +617,8 @@ PARAMETER_SECTION
   // |- number of parameters
   // |
 
-  matrix n_obs_c_comp(1,myrs,1,nages)
-  matrix n_obs_sp_comp(1,myrs,1,nages) 
+  matrix n_obs_c_comp(1,myrs,1,nages);
+  matrix n_obs_sp_comp(1,myrs,1,nages); 
   vector n_tot_obs_egg(1,myrs)
 
   vector n_d(1,myrs+3)
@@ -1622,4 +1622,38 @@ FINAL_SECTION
         cout<<"                 %%%%%*%%%%              "<<endl;
         cout<<"            ,,,,,,||,,,,||,,,,,         "<<endl;
         cout<<""<<endl;
+
+
+		cout<<"            ▄▄▄▄▄▄▄▄▄▄▄▄▄ "<<endl;
+		cout<<"         ▄▀▀═════════════▀▀▄ "<<endl;
+		cout<<"        █═══════════════════█ "<<endl;
+		cout<<"       █═════════════════════█ "<<endl;
+		cout<<"      █═══▄▄▄▄▄▄▄═══▄▄▄▄▄▄▄═══█ "<<endl;
+		cout<<"     █═══█████████═█████████═══█ "<<endl;
+		cout<<"     █══██▀    ▀█████▀    ▀██══█ "<<endl;
+		cout<<"    ██████  █▀█  ███  █▀█  ██████ "<<endl;
+		cout<<"    ██████  ▀▀▀  ███  ▀▀▀  ██████ "<<endl;
+		cout<<"     █══▀█▄    ▄██ ██▄    ▄█▀══█ "<<endl;
+		cout<<"     █════▀█████▀   ▀█████▀════█ "<<endl;
+		cout<<"     █═════════════════════════█ "<<endl;
+		cout<<"     █═════════════════════════█ "<<endl;
+		cout<<"     █═══════▀▄▄▄▄▄▄▄▄▄▀═══════█ "<<endl;
+		cout<<"     █═════════════════════════█ "<<endl;
+		cout<<"    ▐▓▓▌═════════════════════▐▓▓▌ "<<endl;
+		cout<<"    ▐▐▓▓▌▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▐▓▓▌▌ "<<endl;
+		cout<<"    █══▐▓▄▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▄▓▌══█ "<<endl;
+		cout<<"   █══▌═▐▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▌═▐══█ "<<endl;
+		cout<<"   █══█═▐▓▓▓▓▓▓▄▄▄▄▄▄▄▓▓▓▓▓▓▌═█══█ "<<endl;
+		cout<<"   █══█═▐▓▓▓▓▓▓▐██▀██▌▓▓▓▓▓▓▌═█══█ "<<endl;
+		cout<<"   █══█═▐▓▓▓▓▓▓▓▀▀▀▀▀▓▓▓▓▓▓▓▌═█══█ "<<endl;
+		cout<<"   █══█▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█══█ "<<endl;
+		cout<<"  ▄█══█▐▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▌█══█▄ "<<endl;
+		cout<<"  █████▐▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█ █████ "<<endl;
+		cout<<"  ██████▐▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▌███████ "<<endl;
+		cout<<"   ▀█▀█  ▐▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▌   █▀█▀ "<<endl;
+		cout<<"          ▐▓▓▓▓▓▓▌▐▓▓▓▓▓▓▌ "<<endl;
+		cout<<"           ▐▓▓▓▓▌  ▐▓▓▓▓▌ "<<endl;
+		cout<<"          ▄████▀    ▀████▄ "<<endl;
+		cout<<"          ▀▀▀▀        ▀▀▀▀ "<<endl;
+
 	
