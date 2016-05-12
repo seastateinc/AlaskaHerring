@@ -9,6 +9,6 @@ This Repository docments changes made to the Age-structured Model for Alaska her
 
 To Do List
 
-- [ ] Improve Numerical Stability.
-	- [ ] Parameter transformations to log-space.
+- [ ] Improve Numerical Stability:
+	- [ ] Parameter transformations to log-space
 	- [ ] Design matrix for estimated parameters (ival, lb, ub, phz, bayes)
