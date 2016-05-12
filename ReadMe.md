@@ -12,3 +12,13 @@ To Do List
 - [ ] Improve Numerical Stability:
 	- [ ] Parameter transformations to log-space
 	- [ ] Design matrix for estimated parameters (ival, lb, ub, phz, bayes)
+
+- [ ] Code reorganization:
+	- [ ] BIOL::initializeModelParameters
+	- [ ] BIOL::initializeAgeSchedule
+		- [ ] BIOL::getNaturalMortality
+		- [ ] OBSM::getSelex
+	- [ ] BIOL::initializeStateVariables
+	- [ ] BIOL::updateStateVariables
+	- [ ] OBSM::
+	- [ ] OBSM::catchObservationModel

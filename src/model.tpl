@@ -479,7 +479,7 @@ PARAMETER_SECTION
   matrix est_mat_naa(1,myrs,1,nages);
   matrix est_mat_baa(1,myrs,1,nages);
   matrix post_naa(1,myrs,1,nages);
-  matrix est_egg_naa(1,myrs,1,nages;
+  matrix est_egg_naa(1,myrs,1,nages);
      
   
   // |---------------------------------------------------------------------------------|
