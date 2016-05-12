@@ -38,7 +38,7 @@
 //--               :intra-annual calendar                                      --//
 //--               :standardization of units across stocks                     --//
 //--               :modification for potential code distribution               --//
-//--                                                                           --//
+//--  May 2015 - added code and scripts to a git-hub repo.                     --//
 //--                                                                           --//
 // ----------------------------------------------------------------------------- //
 
