@@ -1,0 +1,202 @@
+\documentclass[12pt,letterpaper]{article}
+
+% Use utf-8 encoding for foreign characters
+\usepackage[utf8]{inputenc}
+
+% Setup for fullpage use
+\usepackage{fullpage}
+\usepackage{lscape}
+
+% Uncomment some of the following if you use the features
+%
+% Running Headers and footers
+\usepackage{fancyhdr}
+
+% Multipart figures
+%\usepackage{subfigure}
+
+% Multicols
+\usepackage{multicol}
+\setlength{\columnseprule}{0.5pt}
+\setlength{\columnsep}{15pt}
+
+% More symbols
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{bm}
+
+% Surround parts of graphics with box
+\usepackage{boxedminipage}
+
+% Longtables
+\usepackage{longtable}
+
+% Package for including code in the document
+\usepackage{listings}
+\usepackage{alltt}
+
+% If you want to generate a toc for each chapter (use with book)
+% \usepackage{minitoc}
+
+% This is now the recommended way for checking for PDFLaTeX:
+\usepackage{ifpdf}
+
+% Natbib
+\usepackage[round]{natbib}
+
+
+%% -math-
+\def\bs#1{\boldsymbol{#1}}
+
+\newcounter{saveEq}
+  \def\putEq{\setcounter{saveEq}{\value{equation}}}
+  \def\getEq{\setcounter{equation}{\value{saveEq}}}
+  \def\tableEq{ % equations in tables
+    \putEq \setcounter{equation}{0}
+    \renewcommand{\theequation}{T\arabic{table}.\arabic{equation}}
+    \vspace{-5mm}
+    }
+  \def\normalEq{ % renew normal equations
+    \getEq
+    \renewcommand{\theequation}{\arabic{section}.\arabic{equation}}}
+
+  \def\puthrule{ %thick rule lines for equation tables
+    \hrule \hrule \hrule \hrule \hrule}
+
+% Hyperref
+% \usepackage{url}
+\usepackage[colorlinks,bookmarks,citecolor=magenta,linkcolor=blue]{hyperref}
+% \usepackage{hyperref}
+
+%\newif\ifpdf
+%\ifx\pdfoutput\undefined
+%\pdffalse % we are not running PDFLaTeX
+%\else
+%\pdfoutput=1 % we are running PDFLaTeX
+%\pdftrue
+%\fi
+
+\ifpdf
+\usepackage[pdftex]{graphicx}
+\else
+\usepackage{graphicx}
+\fi
+
+
+\usepackage{tikz-uml}
+
+
+\title{Age-structured model for Alaska herring stocks}
+\author{Steve Martell}
+
+
+
+% my macros
+\newcommand{\fspr}{$F_{\textnormal{SPR}}$}
+\newcommand{\bspr}{$B_{\textnormal{SPR\%}}$}
+
+\newcommand{\fmsy}{$F_{\textnormal{MSY}}$}
+\newcommand{\bmsy}{$B_{\textnormal{MSY}}$}
+
+\begin{document}
+  \maketitle
+
+  \begin{abstract}
+    
+
+  \end{abstract}
+
+
+  \section{Introduction} % (fold)
+  \label{sec:introduction}
+
+  
+  % section introduction (end)
+
+  \section{Methods} % (fold)
+  \label{sec:methods}
+  
+  \subsection{Input Data} % (fold)
+  \label{sub:input_data}
+  
+  % subsection input_data (end)
+
+  \subsection{Population dynamics} % (fold)
+  \label{sub:population_dynamics}
+  
+  Estimated parameters for the population dynamics model include the initial abundance of ages 3-9+ for the intial year, abundance of age-3 recruits each year, and the natural mortality rate. In the original parameterizeation of the model, these initial recruitments and the vector of initial numbers-at-age result in creating $(N + A-1)$ scaling parameters.  To reduce the potential confounding with other global scaling parmaters, updates to the model code include estimation of two recruitment scaling parameters, and two vectors of deviates that represent deviations from the mean. This modification reduces the potential for parameter confounding among the many paraemters that affect global scaling (i.e., catchabiltiy coefficients, natural mortlaity rates).
+
+  \begin{table}
+    \centering
+    \caption{Notation and equations for population dynamics model.}
+    \label{tab:PopulationDynamics}
+    \tableEq
+    \begin{align}
+      \hline \nonumber
+      & \mbox{Model parameters} \nonumber\\
+      & \theta = \{\ln(M),\ln(\bar{R}),\ln(\ddot{R}), \ln(\alpha),\ln(\beta)\} \\[1ex]
+      %%
+      & \mbox{Initial States ($t=1$)} \nonumber \\
+      %%
+      \hline \nonumber
+    \end{align}
+  \end{table}
+
+  % subsection population_dynamics (end)
+
+
+\begin{table}
+  \centering
+  \caption{Mathematical notation, symbols and descriptions.}
+  \label{tab:notation}
+  \begin{tabular}{cl}
+  \hline
+  Symbol  & Description \\
+  \hline
+  \multicolumn{2}{l}{\underline{Index}}\\
+      $g$ & group \\
+      $h$ & sex \\
+      $i$ & year \\
+      $j$ & time step (years) \\
+      $k$ & gear or fleet \\
+      $l$ & index for length class \\
+      $m$ & index for maturity state \\
+      $o$ & index for shell condition. \\
+  \multicolumn{2}{l}{\underline{Leading Model Parameters}}\\
+      $M$         & Instantaneous natural mortality rate\\
+      $\bar{R}$   & Average recruitment\\
+      $\ddot{R}$  & Initial recruitment\\
+      $\alpha_r$  & Mode of size-at-recruitment\\
+      $\beta_r $  & Shape parameter for size-at-recruitment\\
+      $R_0$       & Unfished average recruitment\\
+      $\kappa$    & Recruitment compensation ratio\\
+  \multicolumn{2}{l}{\underline{Size schedule information}}\\
+      $w_{h,l}$   & Mean weight-at-length $l$ \\
+      $m_{h,l}$   & Average proportion mature-at-length $l$ \\
+  \multicolumn{2}{l}{\underline{Per recruit incidence functions}} \\
+      $\phi_B$    & Spawning biomass per recruit \\
+      $\phi_{Q_k}$& Yield per recruit for fishery $k$\\
+      $\phi_{Y_k}$& Retained catch per recruit for fishery $k$ \\
+      $\phi_{D_k}$& Discarded catch per recruit for fishery $k$ \\
+  \multicolumn{2}{l}{\underline{Selectivity parameters}} \\
+      $a_{h,k,l}$ & Length at 50\% selectivity in length interval $l$\\
+      $\sigma_{s_{h,k}}$ & Standard deviation in length-at-selectivity\\
+      $r_{h,k,l}$ & Length at 50\% retention\\
+      $\sigma_{y_{h,k}}$ & Standard deviation in length-at-retention\\
+      $\xi_{h,k}$ & Discard mortality rate for gear $k$ and sex $h$\\
+  \hline
+  \end{tabular}
+\end{table}
+
+
+  
+
+
+  
+
+
+  \bibliographystyle{apalike}
+  \bibliography{$HOME/Documents/ARTICLES/Articles-1}
+
+\end{document}

@@ -42,7 +42,6 @@
 //--                                                                           --//
 // ----------------------------------------------------------------------------- //
 
-
 DATA_SECTION
 
   // |--------------------------------------------------------------------------|
@@ -88,6 +87,19 @@ DATA_SECTION
   // | and anything else that is NOT observed data (catch, weight, eggs, etc.)
 
   !! ad_comm::change_datafile_name(ControlFile);
+
+  // |-------------------------------------------------------------------------|
+  // | DESIGN MATRIX FOR PARAMETER CONTROLS                                    |
+  // |-------------------------------------------------------------------------|
+  // | - theta_DM -> theta is a vector of estimated parameters.
+
+    init_matrix theta_DM(1,3,1,4);
+    vector theta_lb(1,3);
+    vector theta_ub(1,3);
+    ivector theta_phz(1,3);
+    !! theta_lb = column(theta_DM,2);
+    !! theta_ub = column(theta_DM,3);
+    !! theta_phz = ivector(column(theta_DM,4));
 
   // |--------------------------------------------------------------------------|
   // | MODEL STRUCTURAL DIMENSIONS                                              |
@@ -383,9 +395,19 @@ DATA_SECTION
     }
 
    
- END_CALCS
+ END_CALCS 
+
+
 
 PARAMETER_SECTION
+  // |-------------------------------------------------------------------------|
+  // | POPULATION PARAMETERS
+  // |-------------------------------------------------------------------------|
+  // | - theta(1) -> log natural mortality
+  // | - theta(2) -> log initial average age-3 recruitment for ages 4-9+ in dat_styr
+  // | - theta(3) -> log average age-3 recruitment from dat_styr to dat_endyr
+  init_bounded_number_vector theta(1,3,theta_lb,theta_ub,theta_phz);
+
 
   // |---------------------------------------------------------------------------------|
   // | INITIAL POPULATION PARAMETERS
