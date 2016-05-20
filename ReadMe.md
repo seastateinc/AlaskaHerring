@@ -22,3 +22,13 @@ To Do List
 	- [ ] BIOL::updateStateVariables
 	- [ ] OBSM::
 	- [ ] OBSM::catchObservationModel
+
+- [ ] Simulation model:
+	- [ ] Add command line argument to turn on simulation model.
+	- [ ] Add FUNCTION runSimulationModel
+		- [ ] Get and use True Parameter values
+		- [ ] Generate random variables | random number seed.
+		- [ ] Run population dynamics model conditioned on catch & process errors.
+		- [ ] Cache observation model results into data variables.
+		- [ ] Add observation errors.
+		- [ ] Allow Alaska Herring Assessment to continue with parameter estimation.
