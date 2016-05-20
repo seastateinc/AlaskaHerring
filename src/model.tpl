@@ -44,6 +44,22 @@
 
 DATA_SECTION
 
+
+  // ADD COMMAND LINE ARGUMENT FOR SIMULATION MODEL.
+  int b_simulation_flag;
+ LOCAL_CALCS
+  int on = 0;
+  if (ad_comm::argc > 1)
+  {
+    int on = 0;
+    if ( (on=option_match(ad_comm::argc,ad_comm::argv,"-sim")) > -1 )
+    {
+      b_simulation_flag = 1;
+      rseed = atoi(ad_comm::argv[on+1]);
+    }
+  }
+ END_CALCS
+
   // |--------------------------------------------------------------------------|
   // |MCMC OUTPUT FILE
   // |--------------------------------------------------------------------------|
