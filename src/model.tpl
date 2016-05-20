@@ -44,14 +44,16 @@
 
 DATA_SECTION
 
-
+  // --- SJDM ---
   // ADD COMMAND LINE ARGUMENT FOR SIMULATION MODEL.
   int b_simulation_flag;
+  int rseed;
  LOCAL_CALCS
   int on = 0;
   if (ad_comm::argc > 1)
   {
     int on = 0;
+    rseed  = 0;
     if ( (on=option_match(ad_comm::argc,ad_comm::argv,"-sim")) > -1 )
     {
       b_simulation_flag = 1;
@@ -59,6 +61,7 @@ DATA_SECTION
     }
   }
  END_CALCS
+
 
   // |--------------------------------------------------------------------------|
   // |MCMC OUTPUT FILE
