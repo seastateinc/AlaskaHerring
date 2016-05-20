@@ -1,14 +1,14 @@
 # Fdb version 3
-["bibtex HerringModelDocumentation"] 1463103633 "HerringModelDocumentation.aux" "HerringModelDocumentation.bbl" "HerringModelDocumentation" 1463104554
+["bibtex HerringModelDocumentation"] 1463204784 "HerringModelDocumentation.aux" "HerringModelDocumentation.bbl" "HerringModelDocumentation" 1463205565
   "/Users/stevenmartell1/Documents/ARTICLES/Articles-1.bib" 1454351118 361451 353ac44f83f5514834fc0020928e6600 ""
   "/usr/local/texlive/2015/texmf-dist/bibtex/bst/base/apalike.bst" 1292289607 24635 604dafcc79f521a11ea73e506e1fbd98 ""
-  "HerringModelDocumentation.aux" 1463104554 1823 a41cb21c5d24704ef56555d76221a2f1 ""
+  "HerringModelDocumentation.aux" 1463205554 2332 0e7242c731d8bb2196f4fdd697099edb ""
   "HerringModelDocumentation.bcf" 0 -1 0 ""
   (generated)
-  "HerringModelDocumentation.bbl"
   "HerringModelDocumentation.blg"
-["pdflatex"] 1463104553 "HerringModelDocumentation.tex" "HerringModelDocumentation.pdf" "HerringModelDocumentation" 1463104554
-  "./HerringModelDocumentation.out" 1463104554 216 942ea6c7270b25e8be6e4a059f30ec98 ""
+  "HerringModelDocumentation.bbl"
+["pdflatex"] 1463205565 "HerringModelDocumentation.tex" "HerringModelDocumentation.pdf" "HerringModelDocumentation" 1463205565
+  "./HerringModelDocumentation.out" 1463205554 271 bcbd75edd7879fe50cf88a11de611aa0 ""
   "/Users/stevenmartell1/Library/texmf/tex/latex/tikzuml-v1.0b/tikz-uml.sty" 1359744139 211430 eac0f9dc7c1f83dd13dd86c58b009eb9 ""
   "/usr/local/texlive/2015/texmf-dist/fonts/map/fontname/texfonts.map" 1272929888 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
   "/usr/local/texlive/2015/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy6.tfm" 1246382020 1124 14ccf5552bc7f77ca02a8a402bea8bfb ""
@@ -49,6 +49,7 @@
   "/usr/local/texlive/2015/texmf-dist/fonts/tfm/public/latex-fonts/lasyb10.tfm" 1136768653 520 4bf1455197d190cb95c579bde4c2f0ba ""
   "/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb" 1248133631 34811 78b52f49e893bcba91bd7581cdc144c0 ""
   "/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb" 1248133631 32080 340ef9bf63678554ee606688e7b5339d ""
+  "/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb" 1248133631 30251 6afa5cb1d0204815a708a080681d4674 ""
   "/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb" 1248133631 36741 fa121aac0049305630cf160b86157ee4 ""
   "/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb" 1248133631 37166 8ab3487cbe3ab49ebce74c29ea2418db ""
   "/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb" 1248133631 35469 70d41d2b9ea31d5d813066df7c99281c ""
@@ -208,12 +209,12 @@
   "/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1432479641 1764542 91654ba72bdb667e84ea24f076ae16d8 ""
   "/usr/local/texlive/2015/texmf-var/web2c/pdftex/pdflatex.fmt" 1432479681 3849859 39a7d258195bde2394e244961601fbc5 ""
   "/usr/local/texlive/2015/texmf.cnf" 1432479636 577 0d611272082f3cdb8e80e09a3c69cf07 ""
-  "HerringModelDocumentation.aux" 1463104554 1823 a41cb21c5d24704ef56555d76221a2f1 ""
-  "HerringModelDocumentation.bbl" 1463103634 49 0eba253fc001332e731e8aba3f23127b "bibtex HerringModelDocumentation"
-  "HerringModelDocumentation.out" 1463104554 216 942ea6c7270b25e8be6e4a059f30ec98 ""
-  "HerringModelDocumentation.tex" 1463104553 5681 d6c83e28b909c57472e6cd9db9f3ae9f ""
+  "HerringModelDocumentation.aux" 1463205554 2332 0e7242c731d8bb2196f4fdd697099edb ""
+  "HerringModelDocumentation.bbl" 1463204784 49 0eba253fc001332e731e8aba3f23127b "bibtex HerringModelDocumentation"
+  "HerringModelDocumentation.out" 1463205554 271 bcbd75edd7879fe50cf88a11de611aa0 ""
+  "HerringModelDocumentation.tex" 1463205564 7701 67e90c6f63b342135e32dcaf5bb0eba1 ""
   (generated)
-  "HerringModelDocumentation.pdf"
   "HerringModelDocumentation.aux"
+  "HerringModelDocumentation.pdf"
   "HerringModelDocumentation.out"
   "HerringModelDocumentation.log"

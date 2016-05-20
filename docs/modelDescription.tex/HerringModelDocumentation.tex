@@ -114,6 +114,55 @@
   
   % section introduction (end)
 
+  \section{Model deconstruction} % (fold)
+  \label{sec:model_deconstruction}
+  This section is intended to serve three purposes: 1) to document the model structure given the code in model.tpl,  2) to detail proposed changes to the model code to improve overall numerical stability, and 3) provide statistical approach that is amenable to maximum likelihood and Bayesian methods.
+
+  In Table \ref{tab:ModelDeconstruction}, I start with the objective function that is being minimized, then with each component of the objective function work backwards to the parameters that are being estimated given the data. There are four components defined in \eqref{eq.f}, where three of the four components are scaled by coefficients $\lambda$.
+
+  \begin{table}
+    \centering
+    \caption{Model equations implied from the code in model.tpl.}
+    \label{tab:ModelDeconstruction}
+    \tableEq
+    \begin{align}
+      \hline \nonumber
+      &\mbox{Objective function} \nonumber\\
+      & f = \lambda_C QC + \lambda_S QS + WQE + \lambda_R QR \label{eq.f}\\
+      %%
+      & QC = \sum_i res_c_comp & \mbox{catch-at-age residuals}\\
+      %%
+      & QS = \sum_i res_sp_comp & \mbox{spawning catch-age residuals}\\
+      %%
+      & WQE  & \mbox{Egg deposition residuals}\\
+      %%
+      & QR = \sum_i r_i - \alpha S_i \exp(-\beta S_i) &\mbox{recruitment residuals}\\
+      &\mbox{Estimated parameters} \nonumber \\
+      &\vec{r}, \vec{\ddot{n}}, \\
+      %%
+      %%
+      &\mbox{Initial states ($i=1$)} \nonumber \\
+      %%
+      & N_{i,j} = \begin{cases}
+        r_i & j = 1 \\
+        \ddot{n}_j & j\in\{2,\ldots,A\}
+      \end{cases} & \mbox{Numbers-at-age} \\
+      %%
+      & O_{i,j} = N_{i,j} \varphi_{i,j}  & \mbox{Vulnerable numbers-at-age} \\
+      %%
+      & o_{i} = \sum_j O_{i,j} & \mbox{Vulnerable population numbers}\\
+      %%
+      & P_{i,j} = O_{i,j}/o_{i} & \mbox{Vulnerable proportion-at-age} \\
+      %%
+    \end{align}
+    \normalEq
+  \end{table}
+
+
+  % section model_deconstruction (end)
+
+
+
   \section{Methods} % (fold)
   \label{sec:methods}
   
@@ -135,12 +184,14 @@
     \begin{align}
       \hline \nonumber
       & \mbox{Model parameters} \nonumber\\
-      & \theta = \{\ln(M),\ln(\bar{R}),\ln(\ddot{R}), \ln(\alpha),\ln(\beta)\} \\[1ex]
+      & \theta = \{\ln(M),\ln(\bar{R}),\ln(\ddot{R}), 
+        \ln(\alpha),\ln(\beta)\} \\[1ex]
       %%
       & \mbox{Initial States ($t=1$)} \nonumber \\
       %%
       \hline \nonumber
     \end{align}
+    \normalEq
   \end{table}
 
   % subsection population_dynamics (end)

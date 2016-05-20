@@ -261,7 +261,10 @@ DATA_SECTION
     exit(1); 
     }
 
-
+   // |––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––|
+   // |  RED ALERT CAPITAN                                                     |
+   // |––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––|
+   // |
 
    // | The lines below populate the indices for fecundity, mortality,
    // | selectivity and maturity
@@ -746,6 +749,9 @@ PROCEDURE_SECTION
           <<init_pop<<" "<<endl;
     }
 
+FUNCTION void initializeModelParameters()
+
+
 
 FUNCTION get_parameters
 
@@ -862,7 +868,8 @@ FUNCTION Time_Loop
        }
    
      tot_sel_N=rowsum(sel_naa);               //total numbers vulnerable to gear
-
+     //cout<<sel_naa<<endl;
+     //exit(1);
    
     for(int j=1;j<=nages;j++)
      {
@@ -873,6 +880,9 @@ FUNCTION Time_Loop
      int3=rowsum(int2);
 
 
+     //catch in metric tons here.
+     //converting to catch in numbers-at-age using:
+     // c_a = catchbiomass * vulnerable-proportion-at-age/
     for(int j=1;j<=nages;j++)
       {
         est_c_naa(i,j)=tcbm(i+md_offset)*sel_naa_prop(i,j)/int3(i); //est. caa as % from tcbm

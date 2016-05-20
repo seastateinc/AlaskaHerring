@@ -1,4 +1,4 @@
-## ADF&G Pacific Herring Assessment Model
+## Alaska Herring Assessment Model
 Steve Martell.
 May 12, 2015
 
@@ -14,7 +14,7 @@ To Do List
 	- [ ] Design matrix for estimated parameters (ival, lb, ub, phz, bayes)
 
 - [ ] Code reorganization:
-	- [ ] BIOL::initializeModelParameters
+	- [ ] HEAD::initializeModelParameters
 	- [ ] BIOL::initializeAgeSchedule
 		- [ ] BIOL::getNaturalMortality
 		- [ ] OBSM::getSelex
