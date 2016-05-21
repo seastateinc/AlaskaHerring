@@ -24,7 +24,7 @@ To Do List
 	- [ ] OBSM::catchObservationModel
 
 - [ ] Simulation model:
-	- [ ] Add command line argument to turn on simulation model.
+	- [x] Add command line argument to turn on simulation model.
 	- [ ] Add FUNCTION runSimulationModel
 		- [ ] Get and use True Parameter values
 		- [ ] Generate random variables | random number seed.

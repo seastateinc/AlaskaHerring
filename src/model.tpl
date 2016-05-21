@@ -50,6 +50,7 @@ DATA_SECTION
   int rseed;
  LOCAL_CALCS
   int on = 0;
+  b_simulation_flag = 0;
   if (ad_comm::argc > 1)
   {
     int on = 0;
@@ -735,6 +736,14 @@ PRELIMINARY_CALCS_SECTION
 
   log_beta=-10;                       
   mat_b=1;
+  
+  if(b_simulation_flag)
+  {
+    cout<<"In Simulation Model.  Random Number seed = "<<rseed<<endl;
+    exit(1);
+  }
+
+
 
 
 PROCEDURE_SECTION
