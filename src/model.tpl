@@ -87,6 +87,7 @@ DATA_SECTION
   init_adstring ControlFile;
   init_adstring Graphics;    
 
+  init_int DEBUG_FLAG;
   // | BaseFileName           : file prefix used for all  model output
   // | ReportFileName         : file name to which report file is printed
 
@@ -112,15 +113,16 @@ DATA_SECTION
   // | DESIGN MATRIX FOR PARAMETER CONTROLS                                    |
   // |-------------------------------------------------------------------------|
   // | - theta_DM -> theta is a vector of estimated parameters.
-
-    init_matrix theta_DM(1,3,1,4);
-    vector theta_lb(1,3);
-    vector theta_ub(1,3);
-    ivector theta_phz(1,3);
+    int n_theta;
+    !! n_theta = 5;
+    init_matrix theta_DM(1,n_theta,1,4);
+    vector theta_lb(1,n_theta);
+    vector theta_ub(1,n_theta);
+    ivector theta_phz(1,n_theta);
     !! theta_lb = column(theta_DM,2);
     !! theta_ub = column(theta_DM,3);
     !! theta_phz = ivector(column(theta_DM,4));
-
+    
   // |--------------------------------------------------------------------------|
   // | MODEL STRUCTURAL DIMENSIONS                                              |
   // |--------------------------------------------------------------------------|
@@ -429,7 +431,15 @@ PARAMETER_SECTION
   // | - theta(1) -> log natural mortality
   // | - theta(2) -> log initial average age-3 recruitment for ages 4-9+ in dat_styr
   // | - theta(3) -> log average age-3 recruitment from dat_styr to dat_endyr
-  init_bounded_number_vector theta(1,3,theta_lb,theta_ub,theta_phz);
+  // | - theta(4) -> log of unfished recruitment.
+  // | - theta(5) -> log of recruitment compensation (reck > 1.0)
+  init_bounded_number_vector theta(1,n_theta,theta_lb,theta_ub,theta_phz);
+  number log_natural_mortality;
+  number log_rinit;
+  number log_rbar;
+  number log_ro;
+  number log_reck;
+  
 
 
   // |---------------------------------------------------------------------------------|
@@ -748,10 +758,37 @@ PRELIMINARY_CALCS_SECTION
 
 PROCEDURE_SECTION
 
+// |---------------------------------------------------------------------------|
+// | RUN STOCK ASSEAAMENT MODEL ROUTINES
+// |---------------------------------------------------------------------------|
+// | PSUEDOCODE:
+// | - initialize model parameters.
+// | - initialize Age Schedule information.
+// |    - get natural mortality schedules.
+// |    - get fisheries selectivity schedules.
+// | - initialize State variables
+// | - update State variables
+// |---------------------------------------------------------------------------|
+  initializeModelParameters();
+  if(DEBUG_FLAG) cout<<"--> Ok after initializeModelParameters <--"<<endl;
+
+  initializeAgeSchedules();
+  if(DEBUG_FLAG) cout<<"--> Ok after initializeAgeSchedules    <--"<<endl;
+
+// |---------------------------------------------------------------------------|
+  
+
+// |---------------------------------------------------------------------------|
+// | Old function calls
+// |---------------------------------------------------------------------------|
   get_parameters();
+  
   Time_Loop();
+  
   get_residuals();
+  
   evaluate_the_objective_function();
+// |---------------------------------------------------------------------------|
   if(last_phase())
     {
       get_forecast();
@@ -777,9 +814,33 @@ PROCEDURE_SECTION
           <<init_pop<<" "<<endl;
     }
 
+
 FUNCTION void initializeModelParameters()
+  log_natural_mortality = theta(1);
+  log_rinit             = theta(2);
+  log_rbar              = theta(3);
+  log_ro                = theta(4);
+  log_reck              = theta(5);
 
 
+FUNCTION void initializeAgeSchedules() 
+  //
+   //
+  Mat.initialize();
+  for (int t=1;t<=mat_Bk;t++)
+  {
+    for (int i=mat_Bk_Idx(t);i<=mat_Bk_Idx(t+1);i++)
+    {
+      for (int j=1;j<=nages;j++)
+      {
+        Mat(i,j)=1/(1+exp(-1.0*mat_b(t)*((j+2)-mat_a(t))));
+      }
+    }
+  }
+
+  mat_for.initialize();
+  mat_for = Mat(myrs);
+   
 
 FUNCTION get_parameters
 
@@ -790,12 +851,10 @@ FUNCTION get_parameters
   **/
 
   Sur.initialize();
-  Mat.initialize();
   GS.initialize();
   GS_Sc.initialize();
   int1.initialize();
   S_for.initialize();
-  mat_for.initialize();
 
   //Survival
   for (int t=1;t<=S_Bk;t++)
@@ -812,19 +871,7 @@ FUNCTION get_parameters
 
   S_for=Sur(myrs,1);
 
-  //Maturity
-  for (int t=1;t<=mat_Bk;t++)
-  {
-    for (int i=mat_Bk_Idx(t);i<=mat_Bk_Idx(t+1);i++)
-       {
-         for (int j=1;j<=nages;j++)
-          {
-            Mat(i,j)=1/(1+exp(-1.0*mat_b(t)*((j+2)-mat_a(t))));
-          }
-       }
-   }
-
-   mat_for = Mat(myrs);
+  
 
   //Gear selectivity-at-age (scaled)
   for (int t=1;t<=gs_Bk;t++)
@@ -906,7 +953,6 @@ FUNCTION Time_Loop
      }
 
      int3=rowsum(int2);
-
 
      //catch in metric tons here.
      //converting to catch in numbers-at-age using:
@@ -1060,9 +1106,11 @@ FUNCTION Time_Loop
             {
               est_egg_naa(i,j)=0.5*est_sp_naa(i,j)*(F_slope(t)*obs_sp_waa(i+md_offset,j)-F_inter(t))*0.000001;
             }
+          //cout<<est_egg_naa(i)<<endl;
         }
     }
-
+     //cout<<"Ok to here"<<endl;
+    //exit(1);
   tot_est_egg=rowsum(est_egg_naa);
 
   //----------------------------------------------------------------------------
@@ -1617,6 +1665,15 @@ GLOBALS_SECTION
 	#include <time.h>
         adstring model_name;
         adstring data_file;
+
+
+  #undef REPORT
+  #define REPORT(object) report << #object "\n" << setw(8) \
+  << setprecision(4) << setfixed() << object << endl;
+
+  #undef COUT
+  #define COUT(object) cout << #object "\n" << setw(6) \
+  << setprecision(3) << setfixed() << object << endl;
 
 
 	time_t start,finish;

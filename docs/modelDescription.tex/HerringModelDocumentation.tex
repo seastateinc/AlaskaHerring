@@ -84,7 +84,7 @@
 \fi
 
 
-\usepackage{tikz-uml}
+% \usepackage{tikz-uml}
 
 
 \title{Age-structured model for Alaska herring stocks}
@@ -118,51 +118,65 @@
   \label{sec:model_deconstruction}
   This section is intended to serve three purposes: 1) to document the model structure given the code in model.tpl,  2) to detail proposed changes to the model code to improve overall numerical stability, and 3) provide statistical approach that is amenable to maximum likelihood and Bayesian methods.
 
-  In Table \ref{tab:ModelDeconstruction}, I start with the objective function that is being minimized, then with each component of the objective function work backwards to the parameters that are being estimated given the data. There are four components defined in \eqref{eq.f}, where three of the four components are scaled by coefficients $\lambda$.
+    \subsection{Model Structure} % (fold)
+    \label{sub:model_structure}
+    
+    Table \ref{tab:ModelDeconstruction} begins with the objective function that is being minimized.   There are four components defined in \eqref{eq.f}, where three of the four components are scaled by user defined coefficients $\lambda$.  The first component is the commercial age-composition data ($QC$), the second is the spawnig biomass age-composition ($QS$), the third is egg deposition data ($WQE$), and finally the fourth component is a penalty on the recruitment deviations from the underlying Ricker stock-recruitment model ($QR$).
 
-  \begin{table}
-    \centering
-    \caption{Model equations implied from the code in model.tpl.}
-    \label{tab:ModelDeconstruction}
-    \tableEq
-    \begin{align}
-      \hline \nonumber
-      &\mbox{Objective function} \nonumber\\
-      & f = \lambda_C QC + \lambda_S QS + WQE + \lambda_R QR \label{eq.f}\\
-      %%
-      & QC = \sum_i res_c_comp & \mbox{catch-at-age residuals}\\
-      %%
-      & QS = \sum_i res_sp_comp & \mbox{spawning catch-age residuals}\\
-      %%
-      & WQE  & \mbox{Egg deposition residuals}\\
-      %%
-      & QR = \sum_i r_i - \alpha S_i \exp(-\beta S_i) &\mbox{recruitment residuals}\\
-      &\mbox{Estimated parameters} \nonumber \\
-      &\vec{r}, \vec{\ddot{n}}, \\
-      %%
-      %%
-      &\mbox{Initial states ($i=1$)} \nonumber \\
-      %%
-      & N_{i,j} = \begin{cases}
-        r_i & j = 1 \\
-        \ddot{n}_j & j\in\{2,\ldots,A\}
-      \end{cases} & \mbox{Numbers-at-age} \\
-      %%
-      & O_{i,j} = N_{i,j} \varphi_{i,j}  & \mbox{Vulnerable numbers-at-age} \\
-      %%
-      & o_{i} = \sum_j O_{i,j} & \mbox{Vulnerable population numbers}\\
-      %%
-      & P_{i,j} = O_{i,j}/o_{i} & \mbox{Vulnerable proportion-at-age} \\
-      %%
-    \end{align}
-    \normalEq
-  \end{table}
+    For the commercial age-composition data, observation errors in the age-proportions are assumed to be normal \eqref{eq.SSQC}, where the predicted proportion-at-age \eqref{eq.Qij} is a function of the numbers-at-age \eqref{eq.Vij} and selectivity \eqref{eq.Sij}. Note that in \eqref{eq.Vij} that the function is not continous. In this case the selectivity curve is rescaled to have a maximum value of 1.0. The \texttt{max} operation in the denominator of this function breaks the derivative chain in AD Model Builder and can result in numerical problems during parameter optimization associated with corrupt derivative information. 
 
+    The same normal error distribution is also assumed for the age-proportions in the spawner catch composition samples \eqref{eq.QS}.  In this case, the age proportions aree based on the mature numbers-at-age at the time of spawning, where the fisehries removals are first subtracted from the mature numbers-at-age \eqref{eq.Oij}.  Note that this further assumes that all removals (i.e., fisheries selectivity) only harvests sexually mature fish.  This assumption is inconsistent with \eqref{eq.Vij}, where a different logistic curve is assumed for fisheries selectivity.  
+
+     \[ \Psi \]
+
+    \begin{table}[h]
+      \centering
+      \caption{Decomposition of the objective function based on the source code provided in \texttt{model.tpl}. The objective function $f$ is what AD Model Builder is trying to minimize. Note that $\dot{}$ represents mature state variables (e.g., mature weight-at-age $\dot{w}_j$)}
+      \label{tab:ModelDeconstruction}
+      \tableEq
+      \begin{align}
+        \hline \nonumber
+        &\mbox{Objective function} & \nonumber\\
+        & f = \lambda_C QC + \lambda_S QS + WQE + \lambda_R QR & \label{eq.f} \\[1ex]
+        %%
+        &\mbox{Commercial catch proportion-at-age}  \nonumber\\
+        & QC = \sum_i \sum_j (\hat{Q}_{i,j} - Q_{i,j})^2 & \mbox{$\hat{Q}_{i,j}$ observed proportions-at-age} \label{eq.SSQC}\\
+        & Q_{i,j} = \frac{V_{i,j}}{\sum_j V_{i,j}} & \mbox{$Q_{i,j}$ predicted proportion-at-age} \label{eq.Qij} \\
+        & V_{i,j} = N_{i,j} \frac{S_{i,j}}{\max(S_{i,j})} & \mbox{$V_{i,j}$ vulnerable numbers-at-age} \label{eq.Vij}\\
+        & S_{i,j} = \frac{1}{1+\exp(-g_i(j-a_i))} &\mbox{$S_{i,j}$ Selectivity in year $i$ for age $j$} \label{eq.Sij} \\[1ex]
+        %%
+        %%
+        &\mbox{Spawn proportion-at-age} \nonumber\\
+        & QS = \sum_i \sum_j (\hat{O}_{i,j}-O_{i,j})^2 &  \mbox{$\hat{O}_{i,j}$ observed proportion-at-age} \label{eq.QS}\\
+        & O_{i,j} = \frac{\dot{N}_{i,j}}{\sum_j \dot{N}_{i,j} } & \mbox{$O_{i,j}$ predicted proportion mature-at-age} \label{eq.Oij}\\
+        & \dot{N}_{i,j} = N_{i,j} M_{i,j} - C_{i,j} & \mbox{$\dot{N}_{ij}$  Number-at-age at spawning} \\
+        & C_{i,j} = \frac{\hat{c}_i Q_{i,j}}{\sum_j Q_{i,j} w_j} & \mbox{$\hat{c}_i$ observed catch, $w_j$ weight-at-age}\\[1ex]
+        %%
+        %%
+        &\mbox{Egg deposition survey} \nonumber\\
+        & WQE = \sum_i \varphi_i\left[ \ln(\hat{y}_i)-\ln(y_i) \right]^2 & \mbox{$\hat{y}_i$ observed egg deposition, $\varphi_i$ weight}\label{eq.WQE}\\
+        & y_i = 0.5 \sum_j O_{i,j} (\rho_i \dot{w}_{i,j}-\alpha_i) &\mbox{$\rho_i$ and $\alpha_i$ fecundity-weight regression} \\
+        %%
+        %%
+        &\mbox{Penalized recruitment deviations} \nonumber \\
+        & QR = \sum_{i}^{(I-k)} \left[  \ln\left(N_{i+k,k}\right) 
+        - \ln\left(f(\dot{N}_{i,j}) \right) \right]^2 
+          & \mbox{$N_{i+k,k}$ number of age $k$ recruits}\\
+        & f(\dot{N}_{i,j}) = a \dot{B}_i \exp(-b \dot{B}_i) &\mbox{Ricker stock-recruitment}\\
+        & \dot{B}_i = \sum_j \dot{N}_{i,j} \dot{w}_j &\mbox{$\dot{B}_i$ mature biomass at spawning} \\
+      %   %%
+        \hline \nonumber
+      \end{align}
+      \normalEq
+    \end{table}
+
+    The residual sum of squares for the egg deposition suvey is given by \eqref{eq.WQE}.  In this case the obsrevation errors are assumed to be lognormal, and each year's observation is weighted by the inverse variance of sampling observation errors ($\varphi_i$).
+    % subsection model_structure (end)
 
   % section model_deconstruction (end)
 
 
-
+  \clearpage
   \section{Methods} % (fold)
   \label{sec:methods}
   
@@ -176,7 +190,7 @@
   
   Estimated parameters for the population dynamics model include the initial abundance of ages 3-9+ for the intial year, abundance of age-3 recruits each year, and the natural mortality rate. In the original parameterizeation of the model, these initial recruitments and the vector of initial numbers-at-age result in creating $(N + A-1)$ scaling parameters.  To reduce the potential confounding with other global scaling parmaters, updates to the model code include estimation of two recruitment scaling parameters, and two vectors of deviates that represent deviations from the mean. This modification reduces the potential for parameter confounding among the many paraemters that affect global scaling (i.e., catchabiltiy coefficients, natural mortlaity rates).
 
-  \begin{table}
+  \begin{table}[h]
     \centering
     \caption{Notation and equations for population dynamics model.}
     \label{tab:PopulationDynamics}

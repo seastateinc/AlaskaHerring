@@ -23,6 +23,10 @@ To Do List
 	- [ ] OBSM::
 	- [ ] OBSM::catchObservationModel
 
+- [ ] Control file reorganization
+	- [ ] add design matrix to control parameter bounds and phases. 
+
+
 - [ ] Simulation model:
 	- [x] Add command line argument to turn on simulation model.
 	- [ ] Add FUNCTION runSimulationModel

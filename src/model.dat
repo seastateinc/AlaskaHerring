@@ -12,3 +12,12 @@
 sitka.dat
 sitka.ctl
 sitka_graphics.ctl
+
+##
+## DEBUG FLAG (0 = FALSE, 1 = TRUE)
+##
+0
+
+##
+##
+##

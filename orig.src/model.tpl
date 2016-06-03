@@ -479,7 +479,7 @@ PARAMETER_SECTION
   matrix est_mat_naa(1,myrs,1,nages);
   matrix est_mat_baa(1,myrs,1,nages);
   matrix post_naa(1,myrs,1,nages);
-  matrix est_egg_naa(1,myrs,1,nages;
+  matrix est_egg_naa(1,myrs,1,nages);
      
   
   // |---------------------------------------------------------------------------------|
@@ -784,7 +784,7 @@ FUNCTION get_parameters
 
   for (int i=1;i<=myrs;i++)
     {
-      int1(i)=max(GS(i));
+      int1(i)=max(GS(i));   // This is not differentiab
         for (int j=1;j<=nages;j++)
         {
           GS_Sc(i,j)=GS(i,j)/int1(i);
@@ -1000,9 +1000,10 @@ FUNCTION Time_Loop
             {
               est_egg_naa(i,j)=0.5*est_sp_naa(i,j)*(F_slope(t)*obs_sp_waa(i+md_offset,j)-F_inter(t))*0.000001;
             }
+        //cout<<est_egg_naa(i)<<endl;
         }
     }
-
+    //exit(1);
   tot_est_egg=rowsum(est_egg_naa);
 
   //----------------------------------------------------------------------------
