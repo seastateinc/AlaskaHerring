@@ -174,10 +174,37 @@ DATA_SECTION
 // |---------------------------------------------------------------------------|
 // | Controls for selectivity parameters
 // |---------------------------------------------------------------------------|
-	int nslx_cols;
-	!! nslx_cols = 9;
-	init_int nSelexBlocks;
-	init_matrix selex_cont(1,nSelexBlocks,1,nslx_cols);
+// | - nSlxCols 		» number of columns in selectivity design matrix
+// | - nSlxBlks 			» number of selectivity blocks/patterns 
+// | - selex_cont			» matrix of controls to be read in from control file.
+	int nSlxCols;
+	!! nSlxCols = 9;
+	init_int nSlxBlks;
+	init_matrix selex_cont(1,nSlxBlks,1,nSlxCols);
+	ivector       nSelType(1,nSlxBlks);
+	ivector       nslx_phz(1,nSlxBlks);
+	ivector      nslx_rows(1,nSlxBlks);
+	ivector      nslx_cols(1,nSlxBlks);
+	ivector      	nslx_syr(1,nSlxBlks);
+	ivector      	nslx_nyr(1,nSlxBlks);
+
+
+	LOCAL_CALCS
+		nSelType = ivector(column(selex_cont,2));
+		nslx_phz = ivector(column(selex_cont,7));
+		nslx_syr = ivector(column(selex_cont,8));
+		nslx_nyr = ivector(column(selex_cont,9));
+
+		// determine dimensions for log_slx_pars ragged object.
+		for(int h = 1; h <= nSlxBlks; h++){
+			nslx_rows(h) = 1;
+			switch(nSelType(h)){
+				case 1: // logistic 2-parameters
+					nslx_cols = int(2);
+				break;
+			}
+		}
+	END_CALCS
 
 // |---------------------------------------------------------------------------|
 // | END OF Control FILE
@@ -233,7 +260,22 @@ PARAMETER_SECTION
 // | SELECTIVITY PARAMETERS
 // |---------------------------------------------------------------------------|
 // | - log_slx_pars	» parameters for selectivity models (ragged object).
-	//init_bounded_matrix_vector log_slx_pars(1,nSelexBlocks,1,2,0,10);
+	init_bounded_matrix_vector log_slx_pars(1,nSlxBlks,1,nslx_rows,1,nslx_cols,-25,25,nslx_phz);
+	matrix log_slx(mod_syr,mod_nyr,sage,nage);
+	LOCAL_CALCS
+		if( ! global_parfile ){
+			for(int h = 1; h <= nSlxBlks; h++){
+				switch(nSelType(h)){
+					case 1: //logistic
+						log_slx_pars(h,1,1) = log(selex_cont(h,3));
+						log_slx_pars(h,1,2) = log(selex_cont(h,4));
+					break; 
+				}
+			}	
+		}
+
+	END_CALCS
+
 
 
 	objective_function_value f;
@@ -279,7 +321,7 @@ FUNCTION void initializeModelParameters()
   log_rbar              = theta(3);
   log_ro                = theta(4);
   log_reck              = theta(5);
-  COUT(log_natural_mortality);
+  //COUT(log_natural_mortality);
 
 
 FUNCTION void initializeMaturitySchedules() 
@@ -307,7 +349,7 @@ FUNCTION void calcNaturalMortality()
 
 		// fill mortality array by block
 		do{
-			cout<<iyr<<"\t"<<theta<<endl;
+			//cout<<iyr<<"\t"<<theta<<endl;
 			Mij(iyr++) = mi;
 		} while(iyr <= nMortBlockYear(h));
 	}	
@@ -315,7 +357,32 @@ FUNCTION void calcNaturalMortality()
 
 
 FUNCTION void calcSelectivity()
-
+	/**
+		- Loop over each of the selectivity block/pattern
+		- Determine which selectivity type is being used.
+		- get parameters from log_slx_pars
+		- calculate the age-dependent selectivity pattern
+		- fill selectivty array for that block.
+		- selectivity is scaled to have a mean = 1 across all ages.
+	*/
+	dvariable p1,p2;
+	dvar_vector slx(sage,nage);
+	log_slx.initialize();
+	
+	for(int h = 1; h <= nSlxBlks; h++){
+		switch(nSelType(h)){
+			case 1: //logistic
+				p1  = mfexp(log_slx_pars(h,1,1));
+				p2  = mfexp(log_slx_pars(h,1,2));
+				slx = plogis(age,p1,p2);
+			break;
+		}
+		//COUT(p1);
+		for(int i = nslx_syr(h); i <= nslx_nyr(h); i++){
+			log_slx(i) = log(slx) - log(mean(slx));
+		}
+	}
+	//COUT(exp(log_slx))
 
 GLOBALS_SECTION
 	#include <admodel.h>
