@@ -128,8 +128,8 @@ DATA_SECTION
 // |---------------------------------------------------------------------------|
 // | END OF DATA FILE
 // |---------------------------------------------------------------------------|
-	init_int eof; 
-	!! if(eof != 999){cout<<"Error reading data file, aborting."<<endl; exit(1);}
+	init_int dat_eof; 
+	!! if(dat_eof != 999){cout<<"Error reading data file, aborting."<<endl; exit(1);}
 
 
 
@@ -150,6 +150,7 @@ DATA_SECTION
   vector      theta_lb(1,n_theta);
   vector      theta_ub(1,n_theta);
   ivector    theta_phz(1,n_theta);
+  !! theta_ival = column(theta_DM,1);
 	!! theta_lb  = column(theta_DM,2);
 	!! theta_ub  = column(theta_DM,3);
 	!! theta_phz = ivector(column(theta_DM,4));
@@ -158,31 +159,39 @@ DATA_SECTION
 // |---------------------------------------------------------------------------|
 // | Controls for time-varying maturity
 // |---------------------------------------------------------------------------|
+	init_int mat_phz;
 	init_int nMatBlocks;
 	init_ivector nMatBlockYear(1,nMatBlocks);
 
 // |---------------------------------------------------------------------------|
-// | Controls for time-varying maturity
+// | Controls for natural mortality rate deviations in each block.
 // |---------------------------------------------------------------------------|
+	init_int mort_dev_phz;
 	init_int nMortBlocks;
-	init_matrix cntrl_NaturalMortality(1,nMortBlocks,1,5);
-	ivector             nMortBlockYear(1,nMortBlocks);
-	ivector                   mort_phz(1,nMortBlocks);
-	vector                     mort_lb(1,nMortBlocks);
-	vector                     mort_ub(1,nMortBlocks);
-	vector                   mort_ival(1,nMortBlocks);
-	!! nMortBlockYear = ivector(column(cntrl_NaturalMortality,1));
-	!! mort_ival      = column(cntrl_NaturalMortality,2);
-	!! mort_lb        = column(cntrl_NaturalMortality,3);
-	!! mort_ub        = column(cntrl_NaturalMortality,4);
-	!! mort_phz       = ivector(column(cntrl_NaturalMortality,5));
+	init_ivector nMortBlockYear(1,nMortBlocks);
 	
-	
-	
+
+// |---------------------------------------------------------------------------|
+// | Controls for selectivity parameters
+// |---------------------------------------------------------------------------|
+	int nslx_cols;
+	!! nslx_cols = 9;
+	init_int nSelexBlocks;
+	init_matrix selex_cont(1,nSelexBlocks,1,nslx_cols);
+
+// |---------------------------------------------------------------------------|
+// | END OF Control FILE
+// |---------------------------------------------------------------------------|
+	init_int ctl_eof;
+	LOCAL_CALCS
+		if(ctl_eof != 999){
+			cout<<"Error reading control file, aborting."<<ctl_eof<<endl; 
+			exit(1);
+		}
+	END_CALCS
+
 INITIALIZATION_SECTION
-  theta theta_ival;
-  log_m mort_ival;
-  
+	theta theta_ival;
   
 
 
@@ -197,34 +206,42 @@ PARAMETER_SECTION
 // | - theta(4) -> log of unfished recruitment.
 // | - theta(5) -> log of recruitment compensation (reck > 1.0)
   init_bounded_number_vector theta(1,n_theta,theta_lb,theta_ub,theta_phz);
-  number log_natural_mortality;
+	number log_natural_mortality;
   number log_rinit;
   number log_rbar;
   number log_ro;
   number log_reck;
+
 
 // |---------------------------------------------------------------------------|
 // | MATURITY PARAMETERS
 // |---------------------------------------------------------------------------|
 // | - mat_params[1] -> Age at 50% maturity
 // | - mat_params[2] -> Slope at 50% maturity
-	init_bounded_vector_vector mat_params(1,nMatBlocks,1,2,0,10,2);
+	init_bounded_matrix mat_params(1,nMatBlocks,1,2,0,10,mat_phz);
 	matrix mat(mod_syr,mod_nyr,sage,nage);
 
 // |---------------------------------------------------------------------------|
 // | NATURAL MORTALITY PARAMETERS
 // |---------------------------------------------------------------------------|
-// | - mat_params[1] -> Age at 50% maturity
-// | - mat_params[2] -> Slope at 50% maturity
-	init_bounded_number_vector log_m(1,nMortBlocks,mort_lb,mort_ub,mort_phz);
+// | - log_m_dev 		-> deviations in natural mortality for each block.
+// | - Mij					-> Array for natural mortality rate by year and age.
+	init_bounded_dev_vector log_m_dev(1,nMortBlocks,-5.0,5.0,mort_dev_phz);
 	matrix Mij(mod_syr,mod_nyr,sage,nage);
 
+// |---------------------------------------------------------------------------|
+// | SELECTIVITY PARAMETERS
+// |---------------------------------------------------------------------------|
+// | - log_slx_pars	» parameters for selectivity models (ragged object).
+	//init_bounded_matrix_vector log_slx_pars(1,nSelexBlocks,1,2,0,10);
 
 
 	objective_function_value f;
 
-PROCEDURE_SECTION
 
+
+PROCEDURE_SECTION
+	
 // |---------------------------------------------------------------------------|
 // | RUN STOCK ASSEAAMENT MODEL ROUTINES
 // |---------------------------------------------------------------------------|
@@ -233,18 +250,21 @@ PROCEDURE_SECTION
 // | - initialize Maturity Schedule information.
 // | - get natural mortality schedules.
 // |    - get fisheries selectivity schedules.
-// | - initialize State variables
-// | - update State variables
+// | 		- initialize State variables
+// | 		- update State variables
 // |---------------------------------------------------------------------------|
   initializeModelParameters();
-  if(DEBUG_FLAG) cout<<"--> Ok after initializeModelParameters <--"<<endl;
+  if(DEBUG_FLAG) cout<<"--> Ok after initializeModelParameters      <--"<<endl;
 
 	initializeMaturitySchedules();
-  if(DEBUG_FLAG) cout<<"--> Ok after initializeAgeSchedules    <--"<<endl;
+  if(DEBUG_FLAG) cout<<"--> Ok after initializeMaturitySchedules    <--"<<endl;
 
-  getNaturalMortality();
-  if(DEBUG_FLAG) cout<<"--> Ok after getNaturalMortality       <--"<<endl;
+  calcNaturalMortality();
+  if(DEBUG_FLAG) cout<<"--> Ok after calcNaturalMortality           <--"<<endl;
   
+  calcSelectivity();
+  if(DEBUG_FLAG) cout<<"--> Ok after calcSelectivity                <--"<<endl;
+  //exit(1);
 
 // |---------------------------------------------------------------------------|
 
@@ -253,11 +273,14 @@ PROCEDURE_SECTION
 	f = sum(square(theta));
 
 FUNCTION void initializeModelParameters()
+
   log_natural_mortality = theta(1);
   log_rinit             = theta(2);
   log_rbar              = theta(3);
   log_ro                = theta(4);
   log_reck              = theta(5);
+  COUT(log_natural_mortality);
+
 
 FUNCTION void initializeMaturitySchedules() 
 	int iyr = mod_syr;
@@ -271,20 +294,27 @@ FUNCTION void initializeMaturitySchedules()
 			mat(iyr++) = plogis(age,mat_a,mat_b);
 		} while(iyr <= nMatBlockYear(h));	
 	}
-	//COUT(mat);
 	
-FUNCTION void getNaturalMortality()
+	
+
+
+FUNCTION void calcNaturalMortality()
+	
 	int iyr = mod_syr;
 	Mij.initialize();
 	for(int h = 1; h <= nMortBlocks; h++){
-		dvariable mi = exp(log_m(h));
+		dvariable mi = exp(log_natural_mortality + log_m_dev(h));
 
 		// fill mortality array by block
 		do{
+			cout<<iyr<<"\t"<<theta<<endl;
 			Mij(iyr++) = mi;
 		} while(iyr <= nMortBlockYear(h));
 	}	
-	//COUT(Mij);
+	
+
+
+FUNCTION void calcSelectivity()
 
 
 GLOBALS_SECTION
