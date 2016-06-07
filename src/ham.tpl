@@ -238,6 +238,8 @@ PARAMETER_SECTION
   number log_rbar;
   number log_ro;
   number log_reck;
+  init_bounded_dev_vector log_rinit_devs(sage+1,nage,-5.0,5.0,2);
+  init_bounded_dev_vector log_rbar_devs(mod_syr,mod_nyr,-5.0,5.0,2);
 
 
 // |---------------------------------------------------------------------------|
@@ -277,6 +279,27 @@ PARAMETER_SECTION
 	END_CALCS
 
 
+// |---------------------------------------------------------------------------|
+// | VECTORS
+// |---------------------------------------------------------------------------|
+// | - ssb 			» spawning stock biomass at the time of spawning.
+	vector ssb(mod_syr,mod_nyr);	
+
+// |---------------------------------------------------------------------------|
+// | MATRIXES
+// |---------------------------------------------------------------------------|
+// | - Nij 			» numbers-at-age N(syr,nyr,sage,nage)
+// | - Nij 			» mature numbers-at-age O(syr,nyr,sage,nage)
+// | - Pij 			» numbers-at-age P(syr,nyr,sage,nage) post harvest.
+// | - Sij 			» selectivity-at-age 
+// | - Qij 			» vulnerable proportions-at-age
+// | - Cij    	» predicted catch-at-age in numbers.
+	matrix Nij(mod_syr,mod_nyr+1,sage,nage);
+	matrix Oij(mod_syr,mod_nyr+1,sage,nage);
+	matrix Pij(mod_syr,mod_nyr+1,sage,nage);
+	matrix Sij(mod_syr,mod_nyr+1,sage,nage);
+	matrix Qij(mod_syr,mod_nyr+1,sage,nage);
+	matrix Cij(mod_syr,mod_nyr+1,sage,nage);
 
 	objective_function_value f;
 
@@ -291,10 +314,13 @@ PROCEDURE_SECTION
 // | - initialize model parameters.
 // | - initialize Maturity Schedule information.
 // | - get natural mortality schedules.
-// |    - get fisheries selectivity schedules.
-// | 		- initialize State variables
-// | 		- update State variables
+// | - get fisheries selectivity schedules.
+// | - initialize State variables
+// | - update State variables
+// | 		- calculate spawning stock biomass
+// | 		- calculate age-composition residuals
 // |---------------------------------------------------------------------------|
+  
   initializeModelParameters();
   if(DEBUG_FLAG) cout<<"--> Ok after initializeModelParameters      <--"<<endl;
 
@@ -306,8 +332,20 @@ PROCEDURE_SECTION
   
   calcSelectivity();
   if(DEBUG_FLAG) cout<<"--> Ok after calcSelectivity                <--"<<endl;
-  //exit(1);
+  
+  initializeStateVariables();
+  if(DEBUG_FLAG) cout<<"--> Ok after initializeStateVariables       <--"<<endl;
+  
+  updateStateVariables();
+  if(DEBUG_FLAG) cout<<"--> Ok after updateStateVariables           <--"<<endl;
+	
+	calcSpawningStockRecruitment();
+  if(DEBUG_FLAG) cout<<"--> Ok after calcSpawningStockRecruitment   <--"<<endl;
 
+  calcAgeCompResiduals();
+  if(DEBUG_FLAG) cout<<"--> Ok after calcAgeCompResiduals           <--"<<endl;
+
+  exit(1);
 // |---------------------------------------------------------------------------|
 
 
@@ -337,8 +375,6 @@ FUNCTION void initializeMaturitySchedules()
 		} while(iyr <= nMatBlockYear(h));	
 	}
 	
-	
-
 
 FUNCTION void calcNaturalMortality()
 	
@@ -352,8 +388,7 @@ FUNCTION void calcNaturalMortality()
 			//cout<<iyr<<"\t"<<theta<<endl;
 			Mij(iyr++) = mi;
 		} while(iyr <= nMortBlockYear(h));
-	}	
-	
+	}		
 
 
 FUNCTION void calcSelectivity()
@@ -370,6 +405,7 @@ FUNCTION void calcSelectivity()
 	log_slx.initialize();
 	
 	for(int h = 1; h <= nSlxBlks; h++){
+
 		switch(nSelType(h)){
 			case 1: //logistic
 				p1  = mfexp(log_slx_pars(h,1,1));
@@ -377,12 +413,163 @@ FUNCTION void calcSelectivity()
 				slx = plogis(age,p1,p2);
 			break;
 		}
-		//COUT(p1);
+		
+
 		for(int i = nslx_syr(h); i <= nslx_nyr(h); i++){
 			log_slx(i) = log(slx) - log(mean(slx));
 		}
 	}
-	//COUT(exp(log_slx))
+	Sij.sub(mod_syr,mod_nyr) = mfexp(log_slx);
+
+
+FUNCTION void initializeStateVariables()
+	/**
+		- Set initial values for numbers-at-age matrix in first year
+		  and sage recruits for all years.
+		*/
+	Nij.initialize();
+
+	// initialize first row of numbers-at-age matrix
+	dvar_vector lx(sage,nage);
+	for(int j = sage; j <= nage; j++){
+
+		lx(j) = exp(-Mij(mod_syr,j)*(j-sage));
+		if( j==nage ) lx(j) /= (1.0-exp(-Mij(mod_syr,j)));
+
+		if( j > sage ){
+			Nij(mod_syr)(j) = mfexp(log_rinit + log_rinit_devs(j)) * lx(j);			
+		}
+	} 
+
+
+	// iniitialize first columb of numbers-at-age matrix
+	for(int i = mod_syr; i <= mod_nyr; i++){
+		Nij(i,sage) = exp(log_rbar + log_rbar_devs(i));
+	}
+	//COUT(lx);
+	//COUT(Nij);
+
+
+FUNCTION void updateStateVariables()
+	/**
+		- Update the numbers-at-age conditional on the catch-at-age.
+		- Assume a pulse fishery.
+		- step 1 » calculate a vector of vulnerable-numbers-at-age
+		- step 2 » calculate vulnerable proportions-at-age.
+		- step 3 » calc average weight of catch (wbar) conditional on Qij.
+		- step 4 » calc catch-at-age | catch in biomass Cij = Ct/wbar * Qij.
+		- step 5 » update numbers-at-age (using a very dangerous difference eqn.)
+		*/
+
+		Qij.initialize();
+		Cij.initialize();
+		Pij.initialize();
+		dvariable wbar;		// average weight of the catch.
+		dvar_vector vj(sage,nage);
+		dvar_vector pj(sage,nage);
+		dvar_vector sj(sage,nage);
+		
+
+		for(int i = mod_syr; i <= mod_nyr; i++){
+
+			// step 1.
+			vj = elem_prod(Nij(i),Sij(i));
+
+			// step 2.
+			Qij(i) = vj / sum(vj);
+
+			// step 3.
+			dvector wa = data_cm_waa(i)(sage,nage);
+			wbar = wa * Qij(i);
+
+			// step 4.
+			Cij(i) = data_catch(i,2) / wbar * Qij(i);
+
+			// step 5.
+			sj = mfexp(-Mij(i));
+			Pij(i) = Nij(i) - Cij(i); // should use posfun here
+			Nij(i+1)(sage+1,nage) =++ elem_prod(Pij(i)(sage,nage-1),sj(sage,nage-1));
+			Nij(i+1)(nage) += Pij(i,nage) * sj(nage);
+		}
+		// COUT(Nij)
+		// cross check... Looks good.
+		// COUT(Cij(mod_syr) * data_cm_waa(mod_syr)(sage,nage));
+
+
+FUNCTION void calcSpawningStockRecruitment()
+	/**
+		- The functional form of the stock recruitment model follows that of a 
+			Ricker model, where R = so * SSB * exp(-beta * SSB).  The two parameters
+			so and beta where previously estimated as free parameters in the old
+			herring model.  Herein this fucntion I derive so and beta from the 
+			leading parameters Ro and reck; Ro is the unfished sage recruits, and reck
+			is the recruitment compensation parameter, or the relative improvement in
+			juvenile survival rates as the spawning stock SSB tends to 0.  Simply a 
+			multiple of the replacement line Ro/Bo.
+
+			At issue here is time varying maturity and time-varying natural mortality.
+			When either of these two variables are assumed to change over time, then
+			the underlying stock recruitment relationship will also change. This 
+			results in a non-stationary distribution.  For the purposes of this 
+			assessment model, I use the average mortality and maturity schedules to
+			derive the spawning boimass per recruit, which is ultimately used in 
+			deriving the parameters for the stock recruitment relationship.
+		*/
+	for(int i = mod_syr; i <= mod_nyr; i++){
+		Oij(i) = elem_prod(mat(i),Nij(i));
+		ssb(i) = (Oij(i) - Cij(i)) * data_sp_waa(i)(sage,nage);
+	}
+
+	// average natural mortality
+	dvar_vector mbar(sage,nage);
+	int n = Mij.rowmax() - Mij.rowmin() + 1;
+	mbar  = colsum(Mij)/n;
+
+	// average maturity
+	dvar_vector mat_bar(sage,nage);
+	mat_bar = colsum(mat)/n;
+
+	COUT(mat(mod_syr));
+	COUT(mat_bar)
+	exit(1);
+
+	// Ricker stock-recruitment function 
+	// so = reck/phiE; where reck > 1.0
+	// beta = log(reck)/(ro * phiE)
+	dvariable reck = mfexp(log_reck);
+
+
+
+
+FUNCTION void calcAgeCompResiduals()
+	/**
+		- Commercial catch-age comp residuals
+		- Spawning survey catch-age comp residuals.
+		*/
+
+		dvar_matrix pred_cm_comp(mod_syr,mod_nyr,sage,nage);
+		dvar_matrix resd_cm_comp(mod_syr,mod_nyr,sage,nage);
+		dvar_matrix pred_sp_comp(mod_syr,mod_nyr,sage,nage);
+		dvar_matrix resd_sp_comp(mod_syr,mod_nyr,sage,nage);
+
+		resd_cm_comp.initialize();
+		resd_sp_comp.initialize();
+		for(int i = mod_syr; i <= mod_nyr; i++){
+			
+			// commercial age-comp prediction 
+			pred_cm_comp(i) = Qij(i);
+			if( data_cm_comp(i,sage) >= 0 ){
+				resd_cm_comp(i) = data_cm_comp(i)(sage,nage) - pred_cm_comp(i);
+			}
+
+			// spawning age-comp prediction
+			pred_sp_comp(i) = Oij(i) / sum(Oij(i));
+			if( data_sp_comp(i,sage) >= 0 ){
+				resd_sp_comp(i) = data_sp_comp(i)(sage,nage) - pred_sp_comp(i);
+			}
+		}
+
+		//COUT(resd_sp_comp);
 
 GLOBALS_SECTION
 	#include <admodel.h>

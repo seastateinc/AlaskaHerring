@@ -1,14 +1,14 @@
 # Fdb version 3
-["bibtex HerringModelDocumentation"] 1464980517 "HerringModelDocumentation.aux" "HerringModelDocumentation.bbl" "HerringModelDocumentation" 1464981869
+["bibtex HerringModelDocumentation"] 1465251039 "HerringModelDocumentation.aux" "HerringModelDocumentation.bbl" "HerringModelDocumentation" 1465251284
   "/Users/steve/Documents/ARTICLES/Articles-1.bib" 1458491886 362543 72e9ffe1496a650a17d07fc3f90ba05b ""
   "/usr/local/texlive/2015/texmf-dist/bibtex/bst/base/apalike.bst" 1292289607 24635 604dafcc79f521a11ea73e506e1fbd98 ""
-  "HerringModelDocumentation.aux" 1464981869 5399 6423775d4dd26c580c8a9566eae84bfc ""
+  "HerringModelDocumentation.aux" 1465251213 5714 db66d54be4576d7b7367fda680449496 ""
   "HerringModelDocumentation.bcf" 0 -1 0 ""
   (generated)
   "HerringModelDocumentation.bbl"
   "HerringModelDocumentation.blg"
-["pdflatex"] 1464981868 "HerringModelDocumentation.tex" "HerringModelDocumentation.pdf" "HerringModelDocumentation" 1464981869
-  "./HerringModelDocumentation.out" 1464981869 335 24db9e3ef760147c71372da1c3106d7a ""
+["pdflatex"] 1465251213 "HerringModelDocumentation.tex" "HerringModelDocumentation.pdf" "HerringModelDocumentation" 1465251284
+  "./HerringModelDocumentation.out" 1465251213 335 24db9e3ef760147c71372da1c3106d7a ""
   "/usr/local/texlive/2015/texmf-dist/fonts/map/fontname/texfonts.map" 1272929888 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
   "/usr/local/texlive/2015/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy6.tfm" 1246382020 1124 14ccf5552bc7f77ca02a8a402bea8bfb ""
   "/usr/local/texlive/2015/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy7.tfm" 1246382020 1120 7f9f170e8aa57527ad6c49feafd45d54 ""
@@ -121,12 +121,12 @@
   "/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1432479641 1764542 91654ba72bdb667e84ea24f076ae16d8 ""
   "/usr/local/texlive/2015/texmf-var/web2c/pdftex/pdflatex.fmt" 1432479681 3849859 39a7d258195bde2394e244961601fbc5 ""
   "/usr/local/texlive/2015/texmf.cnf" 1432479636 577 0d611272082f3cdb8e80e09a3c69cf07 ""
-  "HerringModelDocumentation.aux" 1464981869 5399 6423775d4dd26c580c8a9566eae84bfc ""
-  "HerringModelDocumentation.bbl" 1464980517 49 0eba253fc001332e731e8aba3f23127b "bibtex HerringModelDocumentation"
-  "HerringModelDocumentation.out" 1464981869 335 24db9e3ef760147c71372da1c3106d7a ""
-  "HerringModelDocumentation.tex" 1464981868 10895 2835375099f37239d7d8c8e7d0988fea ""
+  "HerringModelDocumentation.aux" 1465251213 5714 db66d54be4576d7b7367fda680449496 ""
+  "HerringModelDocumentation.bbl" 1465251039 49 0eba253fc001332e731e8aba3f23127b "bibtex HerringModelDocumentation"
+  "HerringModelDocumentation.out" 1465251213 335 24db9e3ef760147c71372da1c3106d7a ""
+  "HerringModelDocumentation.tex" 1465251283 11185 8c80f22db5a42a122e3805b6255e14d6 ""
   (generated)
   "HerringModelDocumentation.log"
-  "HerringModelDocumentation.aux"
   "HerringModelDocumentation.out"
+  "HerringModelDocumentation.aux"
   "HerringModelDocumentation.pdf"

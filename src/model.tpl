@@ -1009,7 +1009,7 @@ FUNCTION Time_Loop
         int2(i,j)=sel_naa_prop(i,j)*obs_c_waa(i+md_offset,j);  //proporton * wt_kg
       }
 
-      int3=rowsum(int2);
+      int3=rowsum(int2);  // average weight of the catch.
 
 
     for(int j=1;j<=nages;j++)

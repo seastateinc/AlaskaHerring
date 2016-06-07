@@ -127,9 +127,9 @@
 
     The same normal error distribution is also assumed for the age-proportions in the spawner catch composition samples \eqref{eq.QS}.  In this case, the age proportions aree based on the mature numbers-at-age at the time of spawning, where the fisehries removals are first subtracted from the mature numbers-at-age \eqref{eq.Oij}.  Note that this further assumes that all removals (i.e., fisheries selectivity) only harvests sexually mature fish.  This assumption is inconsistent with \eqref{eq.Vij}, where a different logistic curve is assumed for fisheries selectivity.  
 
-     \[ \Psi \]
 
-    \begin{table}[h]
+
+    \begin{table}[ht]
       \centering
       \caption{Decomposition of the objective function based on the source code provided in \texttt{model.tpl}. The objective function $f$ is what AD Model Builder is trying to minimize. Note that $\dot{}$ represents mature state variables (e.g., mature weight-at-age $\dot{w}_j$)}
       \label{tab:ModelDeconstruction}
@@ -150,7 +150,7 @@
         & QS = \sum_i \sum_j (\hat{O}_{i,j}-O_{i,j})^2 &  \mbox{$\hat{O}_{i,j}$ observed proportion-at-age} \label{eq.QS}\\
         & O_{i,j} = \frac{\dot{N}_{i,j}}{\sum_j \dot{N}_{i,j} } & \mbox{$O_{i,j}$ predicted proportion mature-at-age} \label{eq.Oij}\\
         & \dot{N}_{i,j} = N_{i,j} M_{i,j} - C_{i,j} & \mbox{$\dot{N}_{ij}$  Number-at-age at spawning} \\
-        & C_{i,j} = \frac{\hat{c}_i Q_{i,j}}{\sum_j Q_{i,j} w_j} & \mbox{$\hat{c}_i$ observed catch, $w_j$ weight-at-age}\\[1ex]
+        & C_{i,j} = \frac{\hat{c}_i Q_{i,j}}{\sum_j Q_{i,j} w_j} & \mbox{$\hat{c}_i$ observed catch, $w_j$ weight-at-age} \label{eq.Cij}\\[1ex]
         %%
         %%
         &\mbox{Egg deposition survey} \nonumber\\
@@ -169,8 +169,10 @@
       \end{align}
       \normalEq
     \end{table}
+    The catch-at-age data is internally derived in the model \eqref{eq.Cij} conditional on the numbers-at-age and the estimated selectivity. The model further assumes the total catch (in short tons) is measured without error.  This is also referred to as conditioning the model on catch.
 
     The residual sum of squares for the egg deposition suvey is given by \eqref{eq.WQE}.  In this case the obsrevation errors are assumed to be lognormal, and each year's observation is weighted by the inverse variance of sampling observation errors ($\varphi_i$).
+
     % subsection model_structure (end)
 
   % section model_deconstruction (end)
