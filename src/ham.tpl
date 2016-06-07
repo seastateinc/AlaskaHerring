@@ -117,6 +117,7 @@ DATA_SECTION
 // | data_cm_comp	-> Commercial catch composition (Year, age proporitons)
 // | data_sp_comp -> Spawn Sample age composition (Year, age proportions)
 // | data_egg_dep -> Egg deposition survey (Year, Index, log.se)
+// | avg_sp_waa   -> Average weight-at-age for spawning biomass.
 	init_matrix   data_catch(dat_syr,dat_nyr,1,3);
 	init_matrix  data_sp_waa(dat_syr,dat_nyr,sage-1,nage);
 	init_matrix  data_cm_waa(dat_syr,dat_nyr,sage-1,nage);
@@ -124,6 +125,13 @@ DATA_SECTION
 	init_matrix data_sp_comp(dat_syr,dat_nyr,sage-1,nage);
 	init_matrix data_egg_dep(dat_syr,dat_nyr,1,3);
 	init_matrix data_mileday(dat_syr,dat_nyr,1,3);
+
+	vector avg_sp_waa(sage,nage);
+	LOCAL_CALCS
+		int n = data_sp_waa.rowmax() - data_sp_waa.rowmin() + 1;
+		avg_sp_waa = colsum(data_sp_waa)(sage,nage) / n;
+	END_CALCS
+
 
 // |---------------------------------------------------------------------------|
 // | END OF DATA FILE
@@ -529,17 +537,33 @@ FUNCTION void calcSpawningStockRecruitment()
 	dvar_vector mat_bar(sage,nage);
 	mat_bar = colsum(mat)/n;
 
-	COUT(mat(mod_syr));
-	COUT(mat_bar)
-	exit(1);
+	
+
+
+
+	// unfished spawning biomass per recruit
+	dvar_vector lx(sage,nage);
+	lx(sage) = 1.0;
+	for(int j = sage + 1; j <= nage; j++){
+		lx(j) = lx(j-1) * mfexp(-mbar(j-1));
+		if(j == nage){
+			lx(j) /= 1.0 - mfexp(-mbar(j));
+		}
+	}
+	dvariable phie = lx * elem_prod(avg_sp_waa,mat_bar);
+
 
 	// Ricker stock-recruitment function 
 	// so = reck/phiE; where reck > 1.0
 	// beta = log(reck)/(ro * phiE)
+	dvariable ro   = mfexp(log_ro);
 	dvariable reck = mfexp(log_reck);
+	dvariable so   = reck/phie;
+	dvariable beta = log_reck / (ro * phie);
 
+	
 
-
+	exit(1);
 
 FUNCTION void calcAgeCompResiduals()
 	/**
@@ -591,4 +615,34 @@ GLOBALS_SECTION
   {
   	return(1.0 / (1.0 + exp(-(x-location)/scale)));
   }
+
+
+REPORT_SECTION
+	REPORT(dat_syr);
+	REPORT(dat_nyr);
+	REPORT(mod_syr);
+	REPORT(mod_nyr); 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
