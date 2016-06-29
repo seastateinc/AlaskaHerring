@@ -1,13 +1,13 @@
 # Fdb version 3
-["bibtex HerringModelDocumentation"] 1465251039 "HerringModelDocumentation.aux" "HerringModelDocumentation.bbl" "HerringModelDocumentation" 1465251284
+["bibtex HerringModelDocumentation"] 1465251039 "HerringModelDocumentation.aux" "HerringModelDocumentation.bbl" "HerringModelDocumentation" 1467234478
   "/Users/steve/Documents/ARTICLES/Articles-1.bib" 1458491886 362543 72e9ffe1496a650a17d07fc3f90ba05b ""
   "/usr/local/texlive/2015/texmf-dist/bibtex/bst/base/apalike.bst" 1292289607 24635 604dafcc79f521a11ea73e506e1fbd98 ""
   "HerringModelDocumentation.aux" 1465251213 5714 db66d54be4576d7b7367fda680449496 ""
   "HerringModelDocumentation.bcf" 0 -1 0 ""
   (generated)
-  "HerringModelDocumentation.bbl"
   "HerringModelDocumentation.blg"
-["pdflatex"] 1465251213 "HerringModelDocumentation.tex" "HerringModelDocumentation.pdf" "HerringModelDocumentation" 1465251284
+  "HerringModelDocumentation.bbl"
+["pdflatex"] 1465251213 "HerringModelDocumentation.tex" "HerringModelDocumentation.pdf" "HerringModelDocumentation" 1467234478
   "./HerringModelDocumentation.out" 1465251213 335 24db9e3ef760147c71372da1c3106d7a ""
   "/usr/local/texlive/2015/texmf-dist/fonts/map/fontname/texfonts.map" 1272929888 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
   "/usr/local/texlive/2015/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy6.tfm" 1246382020 1124 14ccf5552bc7f77ca02a8a402bea8bfb ""
@@ -124,9 +124,9 @@
   "HerringModelDocumentation.aux" 1465251213 5714 db66d54be4576d7b7367fda680449496 ""
   "HerringModelDocumentation.bbl" 1465251039 49 0eba253fc001332e731e8aba3f23127b "bibtex HerringModelDocumentation"
   "HerringModelDocumentation.out" 1465251213 335 24db9e3ef760147c71372da1c3106d7a ""
-  "HerringModelDocumentation.tex" 1465251283 11185 8c80f22db5a42a122e3805b6255e14d6 ""
+  "HerringModelDocumentation.tex" 1465494008 11185 8c80f22db5a42a122e3805b6255e14d6 ""
   (generated)
+  "HerringModelDocumentation.pdf"
+  "HerringModelDocumentation.aux"
   "HerringModelDocumentation.log"
   "HerringModelDocumentation.out"
-  "HerringModelDocumentation.aux"
-  "HerringModelDocumentation.pdf"

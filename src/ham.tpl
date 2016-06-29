@@ -105,13 +105,26 @@ DATA_SECTION
 	init_int mod_nyr;
 	init_int sage;
 	init_int nage;
+	int rec_syr;
+	!!  rec_syr = mod_syr + sage;
+
 	vector age(sage,nage);
 	!! age.fill_seqadd(sage,1);
 
 // |---------------------------------------------------------------------------|
+// | Fecundity regression coefficients
+// |---------------------------------------------------------------------------|
+// | - 
+	init_int nFecBlocks;
+	init_ivector nFecBlockYears(1,nFecBlocks);
+	init_vector fec_slope(1,nFecBlocks);
+	init_vector fec_inter(1,nFecBlocks);
+	// !!COUT(fec_slope)
+
+// |---------------------------------------------------------------------------|
 // | Time series data.  Catch in short tons. Comps in proportions.
 // |---------------------------------------------------------------------------|
-// | data_catch		-> Catch: colnames(Year,Catch,log.se)
+// | data_catch		-> Catch: colnames(Year,Catch,log.se) units are short tons
 // | data_sp_waa 	-> Spawn Weight-at-age (Year,weight-at-age)
 // | data_cm_waa	-> Commercial catch weight-at-age (Year, weight-at-age)
 // | data_cm_comp	-> Commercial catch composition (Year, age proporitons)
@@ -125,13 +138,27 @@ DATA_SECTION
 	init_matrix data_sp_comp(dat_syr,dat_nyr,sage-1,nage);
 	init_matrix data_egg_dep(dat_syr,dat_nyr,1,3);
 	init_matrix data_mileday(dat_syr,dat_nyr,1,3);
-
+	
+	// Calculate average spawner weight-at-age for SR parameters
 	vector avg_sp_waa(sage,nage);
 	LOCAL_CALCS
 		int n = data_sp_waa.rowmax() - data_sp_waa.rowmin() + 1;
 		avg_sp_waa = colsum(data_sp_waa)(sage,nage) / n;
 	END_CALCS
 
+	// Calculate Fecundity-at-age based on regression coefficients.
+	matrix Fij(mod_syr,mod_nyr,sage,nage);
+	LOCAL_CALCS
+		int iyr = mod_syr;
+		
+		for(int h = 1; h <= nFecBlocks; h++){
+			do{
+				Fij(iyr) = 1.e-6 *
+								(data_sp_waa(iyr)(sage,nage) * fec_slope(h) - fec_inter(h));
+				iyr ++;
+			}while(iyr <= nFecBlockYears(h));
+		}
+	END_CALCS
 
 // |---------------------------------------------------------------------------|
 // | END OF DATA FILE
@@ -215,6 +242,23 @@ DATA_SECTION
 	END_CALCS
 
 // |---------------------------------------------------------------------------|
+// | Miscellaneous Controls
+// |---------------------------------------------------------------------------|
+// | nMiscCont 	»	Number of controls to read in.
+// | dMiscCont	»	Vector of miscelaneous controls,
+// | pos 1 » Catch scaler.
+
+	init_int nMiscCont;
+	init_vector dMiscCont(1,nMiscCont);
+
+	LOCAL_CALCS
+		for( int i = dat_syr; i <= dat_nyr; i++ ) {
+			data_catch(i,2) = dMiscCont(1) * data_catch(i,2);
+		}
+	END_CALCS
+
+
+// |---------------------------------------------------------------------------|
 // | END OF Control FILE
 // |---------------------------------------------------------------------------|
 	init_int ctl_eof;
@@ -246,8 +290,8 @@ PARAMETER_SECTION
   number log_rbar;
   number log_ro;
   number log_reck;
-  init_bounded_dev_vector log_rinit_devs(sage+1,nage,-5.0,5.0,2);
-  init_bounded_dev_vector log_rbar_devs(mod_syr,mod_nyr,-5.0,5.0,2);
+  init_bounded_dev_vector log_rinit_devs(sage+1,nage,-15.0,15.0,2);
+  init_bounded_dev_vector log_rbar_devs(mod_syr,mod_nyr+1,-15.0,15.0,2);
 
 
 // |---------------------------------------------------------------------------|
@@ -263,7 +307,7 @@ PARAMETER_SECTION
 // |---------------------------------------------------------------------------|
 // | - log_m_dev 		-> deviations in natural mortality for each block.
 // | - Mij					-> Array for natural mortality rate by year and age.
-	init_bounded_dev_vector log_m_dev(1,nMortBlocks,-5.0,5.0,mort_dev_phz);
+	init_bounded_dev_vector log_m_dev(1,nMortBlocks,-15.0,15.0,mort_dev_phz);
 	matrix Mij(mod_syr,mod_nyr,sage,nage);
 
 // |---------------------------------------------------------------------------|
@@ -291,13 +335,22 @@ PARAMETER_SECTION
 // | VECTORS
 // |---------------------------------------------------------------------------|
 // | - ssb 			» spawning stock biomass at the time of spawning.
-	vector ssb(mod_syr,mod_nyr);	
+// | - recruits » vector of sage recruits predicted by S-R curve.
+// | - spawners » vector of ssb indexed by brood year.
+// | - resd_rec » vector of residual process error (log-normal).
+	vector ssb(mod_syr,mod_nyr);
+	vector recruits(rec_syr,mod_nyr+1);
+	vector spawners(rec_syr,mod_nyr+1);
+	vector resd_rec(rec_syr,mod_nyr+1);
+
+	vector pred_egg_dep(mod_syr,mod_nyr);
+	vector resd_egg_dep(mod_syr,mod_nyr);
 
 // |---------------------------------------------------------------------------|
 // | MATRIXES
 // |---------------------------------------------------------------------------|
 // | - Nij 			» numbers-at-age N(syr,nyr,sage,nage)
-// | - Nij 			» mature numbers-at-age O(syr,nyr,sage,nage)
+// | - Oij 			» mature numbers-at-age O(syr,nyr,sage,nage)
 // | - Pij 			» numbers-at-age P(syr,nyr,sage,nage) post harvest.
 // | - Sij 			» selectivity-at-age 
 // | - Qij 			» vulnerable proportions-at-age
@@ -309,8 +362,14 @@ PARAMETER_SECTION
 	matrix Qij(mod_syr,mod_nyr+1,sage,nage);
 	matrix Cij(mod_syr,mod_nyr+1,sage,nage);
 
+	matrix pred_cm_comp(mod_syr,mod_nyr,sage,nage);
+	matrix resd_cm_comp(mod_syr,mod_nyr,sage,nage);
+	matrix pred_sp_comp(mod_syr,mod_nyr,sage,nage);
+	matrix resd_sp_comp(mod_syr,mod_nyr,sage,nage);
+
 	objective_function_value f;
 
+	number fpen;
 
 
 PROCEDURE_SECTION
@@ -353,21 +412,26 @@ PROCEDURE_SECTION
   calcAgeCompResiduals();
   if(DEBUG_FLAG) cout<<"--> Ok after calcAgeCompResiduals           <--"<<endl;
 
-  exit(1);
+  calcEggSurveyResiduals();
+  if(DEBUG_FLAG) cout<<"--> Ok after calcEggSurveyResiduals         <--"<<endl;
+
+  calcObjectiveFunction();
+  if(DEBUG_FLAG) cout<<"--> Ok after calcObjectiveFunction          <--"<<endl;
+  
 // |---------------------------------------------------------------------------|
 
+	
 
 
-	f = sum(square(theta));
 
 FUNCTION void initializeModelParameters()
-
+	fpen = 0;
   log_natural_mortality = theta(1);
   log_rinit             = theta(2);
   log_rbar              = theta(3);
   log_ro                = theta(4);
   log_reck              = theta(5);
-  //COUT(log_natural_mortality);
+  // COUT(theta);
 
 
 FUNCTION void initializeMaturitySchedules() 
@@ -418,7 +482,7 @@ FUNCTION void calcSelectivity()
 			case 1: //logistic
 				p1  = mfexp(log_slx_pars(h,1,1));
 				p2  = mfexp(log_slx_pars(h,1,2));
-				slx = plogis(age,p1,p2);
+				slx = plogis(age,p1,p2) + TINY;
 			break;
 		}
 		
@@ -438,21 +502,25 @@ FUNCTION void initializeStateVariables()
 	Nij.initialize();
 
 	// initialize first row of numbers-at-age matrix
+	// lx is a vector of survivorship (probability of surviving to age j)
 	dvar_vector lx(sage,nage);
-	for(int j = sage; j <= nage; j++){
 
+	for(int j = sage; j <= nage; j++){
+		
 		lx(j) = exp(-Mij(mod_syr,j)*(j-sage));
 		if( j==nage ) lx(j) /= (1.0-exp(-Mij(mod_syr,j)));
+
 
 		if( j > sage ){
 			Nij(mod_syr)(j) = mfexp(log_rinit + log_rinit_devs(j)) * lx(j);			
 		}
 	} 
+		
 
 
 	// iniitialize first columb of numbers-at-age matrix
-	for(int i = mod_syr; i <= mod_nyr; i++){
-		Nij(i,sage) = exp(log_rbar + log_rbar_devs(i));
+	for(int i = mod_syr; i <= mod_nyr + 1; i++){
+		Nij(i,sage) = mfexp(log_rbar + log_rbar_devs(i));
 	}
 	//COUT(lx);
 	//COUT(Nij);
@@ -489,17 +557,17 @@ FUNCTION void updateStateVariables()
 			// step 3.
 			dvector wa = data_cm_waa(i)(sage,nage);
 			wbar = wa * Qij(i);
-
+			
 			// step 4.
 			Cij(i) = data_catch(i,2) / wbar * Qij(i);
 
 			// step 5.
 			sj = mfexp(-Mij(i));
-			Pij(i) = Nij(i) - Cij(i); // should use posfun here
+			Pij(i) = posfun(Nij(i) - Cij(i),0.001,fpen); // should use posfun here
 			Nij(i+1)(sage+1,nage) =++ elem_prod(Pij(i)(sage,nage-1),sj(sage,nage-1));
 			Nij(i+1)(nage) += Pij(i,nage) * sj(nage);
 		}
-		// COUT(Nij)
+		
 		// cross check... Looks good.
 		// COUT(Cij(mod_syr) * data_cm_waa(mod_syr)(sage,nage));
 
@@ -523,10 +591,18 @@ FUNCTION void calcSpawningStockRecruitment()
 			derive the spawning boimass per recruit, which is ultimately used in 
 			deriving the parameters for the stock recruitment relationship.
 		*/
+
+	/*
+		Spoke to Sherri about this. Agreed to change the equation to prevent
+	*/
 	for(int i = mod_syr; i <= mod_nyr; i++){
-		Oij(i) = elem_prod(mat(i),Nij(i));
-		ssb(i) = (Oij(i) - Cij(i)) * data_sp_waa(i)(sage,nage);
+		//Oij(i) = elem_prod(mat(i),Nij(i));
+		//ssb(i) = (Oij(i) - Cij(i)) * data_sp_waa(i)(sage,nage);
+
+		Oij(i) = elem_prod(mat(i),Nij(i)-Cij(i));
+		ssb(i) = Oij(i) * data_sp_waa(i)(sage,nage);
 	}
+	
 
 	// average natural mortality
 	dvar_vector mbar(sage,nage);
@@ -536,9 +612,6 @@ FUNCTION void calcSpawningStockRecruitment()
 	// average maturity
 	dvar_vector mat_bar(sage,nage);
 	mat_bar = colsum(mat)/n;
-
-	
-
 
 
 	// unfished spawning biomass per recruit
@@ -559,22 +632,19 @@ FUNCTION void calcSpawningStockRecruitment()
 	dvariable ro   = mfexp(log_ro);
 	dvariable reck = mfexp(log_reck);
 	dvariable so   = reck/phie;
-	dvariable beta = log_reck / (ro * phie);
+	dvariable beta = log(reck) / (ro * phie);
 
-	
+	spawners = ssb(mod_syr,mod_nyr-sage+1).shift(rec_syr);
+	recruits = elem_prod( so*spawners , mfexp(-beta*spawners) );
+	resd_rec = log(column(Nij,sage)(rec_syr,mod_nyr+1)+TINY) - log(recruits+TINY);
 
-	exit(1);
+
 
 FUNCTION void calcAgeCompResiduals()
 	/**
 		- Commercial catch-age comp residuals
 		- Spawning survey catch-age comp residuals.
 		*/
-
-		dvar_matrix pred_cm_comp(mod_syr,mod_nyr,sage,nage);
-		dvar_matrix resd_cm_comp(mod_syr,mod_nyr,sage,nage);
-		dvar_matrix pred_sp_comp(mod_syr,mod_nyr,sage,nage);
-		dvar_matrix resd_sp_comp(mod_syr,mod_nyr,sage,nage);
 
 		resd_cm_comp.initialize();
 		resd_sp_comp.initialize();
@@ -594,13 +664,56 @@ FUNCTION void calcAgeCompResiduals()
 		}
 
 		//COUT(resd_sp_comp);
+FUNCTION void calcEggSurveyResiduals()
+	/**
+		- Observed egg data is in trillions of eggs
+		- Predicted eggs is the mature female numbers-at-age multiplied 
+		  by the fecundity-at-age, which comes from a regession of 
+		  fecundity = slope * obs_sp_waa - intercept
+		- Note Fij is the Fecundity-at-age j in year i.
+		*/
+		resd_egg_dep.initialize();
+		for(int i = mod_syr; i <= mod_nyr; i++){
+			pred_egg_dep(i) = (0.5 * Oij(i)) * Fij(i);
+			
+
+			if(data_egg_dep(i,2) > 0){
+				resd_egg_dep(i) = log(data_egg_dep(i,2)) - log(pred_egg_dep(i));
+			}
+		}
+
+FUNCTION void calcObjectiveFunction()
+	/**
+		-	
+		*/
+		dvar_vector nll(1,6);
+
+		nll(1) = norm2(resd_sp_comp);
+		nll(2) = norm2(resd_cm_comp);
+		nll(3) = norm2(resd_egg_dep);
+		nll(4) = norm2(resd_rec);
+		nll(5) = norm2(log_rinit_devs);
+		nll(6) = norm2(log_rbar_devs);
+
+		f = sum(nll);// + 1000.0 * fpen;
+		if(DEBUG_FLAG){
+			COUT(nll);
+			COUT(fpen);
+			COUT(f);
+			if(fpen > 0 ){cout<<fpen<<endl;}
+		}  
+
 
 GLOBALS_SECTION
 	#include <admodel.h>
 	#include <string.h>
 	#include <time.h>
 
+	#undef EOF
+	#define EOF 999
 
+	#undef TINY
+	#define TINY  1.0e-10
 
   #undef REPORT
   #define REPORT(object) report << #object "\n" << setw(8) \
@@ -618,10 +731,63 @@ GLOBALS_SECTION
 
 
 REPORT_SECTION
+// Write out Raw Data (Useful for simulation studies)
+// Note that I use a Macro called REPORT here to ensure a standard format.
 	REPORT(dat_syr);
 	REPORT(dat_nyr);
 	REPORT(mod_syr);
-	REPORT(mod_nyr); 
+	REPORT(mod_nyr);
+	REPORT(sage);
+	REPORT(nage);
+	REPORT(nFecBlocks);
+	REPORT(nFecBlockYears);
+	REPORT(fec_slope);
+	REPORT(fec_inter);
+	REPORT(data_catch);
+	REPORT(data_sp_waa);
+	REPORT(data_cm_waa);
+	REPORT(data_cm_comp);
+	REPORT(data_sp_comp);
+	REPORT(data_egg_dep);
+	REPORT(data_mileday);
+	REPORT(EOF)
+// END of Replicated Data File. (run model with -noest to check data)
+
+// Vectors of years.
+	ivector year(mod_syr,mod_nyr+1);
+	year.fill_seqadd(mod_syr,1);
+	
+	ivector years(mod_syr,mod_nyr+1);
+	years.fill_seqadd(mod_syr,1);
+
+	ivector rec_years(rec_syr,mod_nyr+1);
+	rec_years.fill_seqadd(rec_syr,1);
+
+	ivector iage = ivector(age);
+
+	REPORT(iage);
+	REPORT(year);
+	REPORT(years);
+
+// SSB, recruits, spawners,
+	REPORT(ssb);
+	REPORT(spawners);
+	REPORT(recruits);
+
+// Numbers-at-age of various flavors.
+	REPORT(Nij);
+	REPORT(Oij);
+	REPORT(Pij);
+	REPORT(Cij);
+
+// Selectivity and vulnerable proportion-at-age.
+	REPORT(Sij);
+	REPORT(Qij);
+
+
+
+
+
 
 
 
