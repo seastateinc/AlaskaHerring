@@ -1,7 +1,7 @@
 ## Alaska Herring Assessment Model
 Steve Martell.
-May 12, 2015
-
+May 12, 2016
+Jun 29, 2016
 ----
 
 ### Introduction
@@ -25,7 +25,8 @@ To Do List
 
 - [ ] Control file reorganization
 	- [x] add design matrix to control parameter bounds and phases. 
-	- [o] add contrls for time varying maturity
+	- [x] add contrls for time varying maturity
+	- [x] add contrls for time varying natural mortality rate deviations.
 	- [ ] add design matrix for selectivity parameter controls.
 
 
