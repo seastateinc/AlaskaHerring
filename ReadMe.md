@@ -24,7 +24,9 @@ To Do List
 	- [ ] OBSM::catchObservationModel
 
 - [ ] Control file reorganization
-	- [ ] add design matrix to control parameter bounds and phases. 
+	- [x] add design matrix to control parameter bounds and phases. 
+	- [o] add contrls for time varying maturity
+	- [ ] add design matrix for selectivity parameter controls.
 
 
 - [ ] Simulation model:
