@@ -375,6 +375,32 @@ PARAMETER_SECTION
 	number fpen;
 
 
+PRELIMINARY_CALCS_SECTION
+
+	/* 
+	 * SIMULATION MODEL 
+	 */
+	if( b_simulation_flag	) {
+		cout<<"|--------------------------|"<<endl;
+		cout<<"| RUNNING SIMULATION MODEL |"<<endl;
+		cout<<"|--------------------------|"<<endl;
+		
+		char type;
+		do
+		{
+		    cout<<"| Continue? [y]es or [n]o "<<endl;
+		    cin >> type;
+		}
+		while( !cin.fail() && type!='y' && type!='n' );
+		if( type =='y' ){
+			//run simulation model.
+		} else {
+			exit(1);
+		}
+
+	}
+
+
 PROCEDURE_SECTION
 	
 // |---------------------------------------------------------------------------|
