@@ -131,7 +131,7 @@ DATA_SECTION
 // | data_sp_comp -> Spawn Sample age composition (Year, age proportions)
 // | data_egg_dep -> Egg deposition survey (Year, Index, log.se)
 // | avg_sp_waa   -> Average weight-at-age for spawning biomass.
-	init_matrix   data_catch(dat_syr,dat_nyr,1,3);
+	init_matrix  data_ct_raw(dat_syr,dat_nyr,1,3);
 	init_matrix  data_sp_waa(dat_syr,dat_nyr,sage-1,nage);
 	init_matrix  data_cm_waa(dat_syr,dat_nyr,sage-1,nage);
 	init_matrix data_cm_comp(dat_syr,dat_nyr,sage-1,nage);
@@ -251,9 +251,12 @@ DATA_SECTION
 	init_int nMiscCont;
 	init_vector dMiscCont(1,nMiscCont);
 
+	// Rescale the catch data as needed.
+	matrix  data_catch(dat_syr,dat_nyr,1,3);
 	LOCAL_CALCS
+		data_catch = data_ct_raw;
 		for( int i = dat_syr; i <= dat_nyr; i++ ) {
-			data_catch(i,2) = dMiscCont(1) * data_catch(i,2);
+			data_catch(i,2) = dMiscCont(1) * data_ct_raw(i,2);
 		}
 	END_CALCS
 
@@ -743,7 +746,7 @@ REPORT_SECTION
 	REPORT(nFecBlockYears);
 	REPORT(fec_slope);
 	REPORT(fec_inter);
-	REPORT(data_catch);
+	REPORT(data_ct_raw);
 	REPORT(data_sp_waa);
 	REPORT(data_cm_waa);
 	REPORT(data_cm_comp);
@@ -754,7 +757,7 @@ REPORT_SECTION
 // END of Replicated Data File. (run model with -noest to check data)
 
 // Vectors of years.
-	ivector year(mod_syr,mod_nyr+1);
+	ivector year(mod_syr,mod_nyr);
 	year.fill_seqadd(mod_syr,1);
 	
 	ivector years(mod_syr,mod_nyr+1);
@@ -768,6 +771,7 @@ REPORT_SECTION
 	REPORT(iage);
 	REPORT(year);
 	REPORT(years);
+	REPORT(data_catch);
 
 // SSB, recruits, spawners,
 	REPORT(ssb);
