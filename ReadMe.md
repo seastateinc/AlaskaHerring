@@ -10,16 +10,16 @@ This Repository docments changes made to the Age-structured Model for Alaska her
 To Do List
 
 - [ ] Improve Numerical Stability:
-	- [ ] Parameter transformations to log-space
-	- [ ] Design matrix for estimated parameters (ival, lb, ub, phz, bayes)
+	- [x] Parameter transformations to log-space
+	- [x] Design matrix for estimated parameters (ival, lb, ub, phz, bayes)
 
 - [ ] Code reorganization:
-	- [ ] HEAD::initializeModelParameters
-	- [ ] BIOL::initializeAgeSchedule
-		- [ ] BIOL::getNaturalMortality
-		- [ ] OBSM::getSelex
-	- [ ] BIOL::initializeStateVariables
-	- [ ] BIOL::updateStateVariables
+	- [x] HEAD::initializeModelParameters
+	- [x] BIOL::initializeAgeSchedule
+		- [x] BIOL::getNaturalMortality
+		- [x] OBSM::getSelex
+	- [x] BIOL::initializeStateVariables
+	- [x] BIOL::updateStateVariables
 	- [ ] OBSM::
 	- [ ] OBSM::catchObservationModel
 
@@ -27,7 +27,8 @@ To Do List
 	- [x] add design matrix to control parameter bounds and phases. 
 	- [x] add contrls for time varying maturity
 	- [x] add contrls for time varying natural mortality rate deviations.
-	- [ ] add design matrix for selectivity parameter controls.
+	- [x] add design matrix for selectivity parameter controls.
+	- [ ] add Miscellaneous controls for appending.
 
 
 - [ ] Simulation model:
