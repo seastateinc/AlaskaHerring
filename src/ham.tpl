@@ -813,6 +813,7 @@ FUNCTION void calcEggMiledaySurveyResiduals()
 			if(data_egg_dep(i,2) > 0){
 				resd_egg_dep(i) = log(data_egg_dep(i,2)) - log(pred_egg_dep(i));
 			}
+			// Fix this, use qmle for relative abundance
 			if(data_mileday(i,2) > 0){
 				resd_mileday(i) = log(data_mileday(i,2)) - log(pred_mileday(i));
 			}
