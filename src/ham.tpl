@@ -308,9 +308,9 @@ PARAMETER_SECTION
 // |---------------------------------------------------------------------------|
 // | NATURAL MORTALITY PARAMETERS
 // |---------------------------------------------------------------------------|
-// | - log_m_dev 		-> deviations in natural mortality for each block.
+// | - log_m_devs 	-> deviations in natural mortality for each block.
 // | - Mij					-> Array for natural mortality rate by year and age.
-	init_bounded_dev_vector log_m_dev(1,nMortBlocks,-15.0,15.0,mort_dev_phz);
+	init_bounded_dev_vector log_m_devs(1,nMortBlocks,-15.0,15.0,mort_dev_phz);
 	matrix Mij(mod_syr,mod_nyr,sage,nage);
 
 // |---------------------------------------------------------------------------|
@@ -349,6 +349,9 @@ PARAMETER_SECTION
 	vector pred_egg_dep(mod_syr,mod_nyr);
 	vector resd_egg_dep(mod_syr,mod_nyr);
 
+	vector pred_mileday(mod_syr,mod_nyr);
+	vector resd_mileday(mod_syr,mod_nyr);
+
 // |---------------------------------------------------------------------------|
 // | MATRIXES
 // |---------------------------------------------------------------------------|
@@ -378,7 +381,7 @@ PARAMETER_SECTION
 PRELIMINARY_CALCS_SECTION
 
 	/* 
-	 * SIMULATION MODEL 
+	 * SIMULATION MODEL SWITCH
 	 */
 	if( b_simulation_flag	) {
 		cout<<"|--------------------------|"<<endl;
@@ -393,7 +396,7 @@ PRELIMINARY_CALCS_SECTION
 		}
 		while( !cin.fail() && type!='y' && type!='n' );
 		if( type =='y' ){
-			//run simulation model.
+			runSimulationModel(rseed);
 		} else {
 			exit(1);
 		}
@@ -441,8 +444,8 @@ PROCEDURE_SECTION
   calcAgeCompResiduals();
   if(DEBUG_FLAG) cout<<"--> Ok after calcAgeCompResiduals           <--"<<endl;
 
-  calcEggSurveyResiduals();
-  if(DEBUG_FLAG) cout<<"--> Ok after calcEggSurveyResiduals         <--"<<endl;
+  calcEggMiledaySurveyResiduals();
+  if(DEBUG_FLAG) cout<<"--> Ok after calcEggMiledaySurveyResiduals  <--"<<endl;
 
   calcObjectiveFunction();
   if(DEBUG_FLAG) cout<<"--> Ok after calcObjectiveFunction          <--"<<endl;
@@ -450,8 +453,106 @@ PROCEDURE_SECTION
 // |---------------------------------------------------------------------------|
 
 	
+FUNCTION void runSimulationModel(const int& rseed)
+	/*
+		PSUEDOCODE:
+		1) initialize model parameters based on pin file, or control file.
+		2) initialize maturity schedules for all block years.
+		3) initialize natural mortality schedules for all block years.
+		4) calculate selectivity parameters.
+		5) generate random normal deviates for process/observation errors.
+		6) initialize state variables.
+		7) update state variables conditioned on the observed catch data.
+		8) calculate age-composition residuals and over-write input data in memory.
+		9) calculate egg survey residuals and simulate fake survey.
+	*/
+	if(global_parfile) {
+		cout<<"\nUsing pin file for simulation parameter values.\n"<<endl;
+	}
 
+	// 1) initialize model parameters based on pin file, or control file.
+	initializeModelParameters();
 
+	// 2) initialize maturity schedules for all block years.
+	initializeMaturitySchedules();
+
+	// 3) initialize natural mortality schedules for all block years.
+	calcNaturalMortality();
+
+	// 4) calculate selectivity parameters.
+	calcSelectivity();
+	
+	// 5) generate random normal deviates for process errors:
+	//    - log_m_devs
+	//    - log_rinit_devs
+	//    - log_rbar_devs
+	random_number_generator rng(rseed);
+	dvector epsilon_m_devs(1,nMortBlocks);
+	dvector epsilon_rbar_devs(mod_syr,mod_nyr+1);
+	dvector epsilon_rinit_devs(sage+1,nage);
+
+	double sigma_m_devs = 0.1;
+	double sigma_rbar_devs = 0.4;
+	double sigma_rinit_devs = 0.4;
+
+	epsilon_m_devs.fill_randn(rng);
+	epsilon_rbar_devs.fill_randn(rng);
+	epsilon_rinit_devs.fill_randn(rng);
+
+	log_m_devs = dvar_vector(epsilon_m_devs * sigma_m_devs);
+	log_rbar_devs = dvar_vector(epsilon_rbar_devs * sigma_rbar_devs);
+	log_rinit_devs = dvar_vector(epsilon_rinit_devs * sigma_rinit_devs);
+
+	// Not sure if the following should be done. It should produce a less
+	// biased MLE of the average recruitment, but uncertainty is biased downwards.
+	// ensure random deviates satisfy ∑ dev = 0 constraint.
+	//log_m_devs -= mean(log_m_devs);
+	//log_rbar_devs -= mean(log_rbar_devs);
+	//log_rinit_devs -= mean(log_rinit_devs);
+	
+	
+	// 6) initialize state variables.
+	initializeStateVariables();
+
+	// 7) update state variables conditioned on the observed catch data.
+	updateStateVariables();
+	
+	// 8) calculate age-composition residuals and over-write input data in memory.
+	// 		- Note the age-comps are sampled from a multivariate logistic dist.
+	calcAgeCompResiduals();
+	for(int i = mod_syr; i <= mod_nyr; i++) {
+		dvector t1 = value(pred_cm_comp(i));
+		dvector t2 = value(pred_sp_comp(i));
+
+		data_cm_comp(i)(sage,nage) = rmvlogistic(t1,0.30,rseed + i);
+		data_sp_comp(i)(sage,nage) = rmvlogistic(t2,0.30,rseed - i);
+	}
+	
+
+	// 9) calculate egg survey residuals and simulate fake survey.
+	calcSpawningStockRecruitment();
+	calcEggMiledaySurveyResiduals();
+	
+	dvector epsilon_egg_dep(mod_syr,mod_nyr);
+	epsilon_egg_dep.fill_randn(rng);
+	for(int i = mod_syr; i <= mod_nyr; i++) {
+		if( data_egg_dep(i,2) > 0 ) {
+			data_egg_dep(i,2) = value(pred_egg_dep(i)) 
+													* exp(epsilon_egg_dep(i)*data_egg_dep(i,3));	
+		}
+	}
+
+	// 10) calculate mile_days
+	dvector epsilon_mileday(mod_syr,mod_nyr);
+	epsilon_mileday.fill_randn(rng);
+	for(int i = mod_syr; i <= mod_nyr; i++) {
+		if( data_mileday(i,2) > 0 ) {
+			data_mileday(i,2) = value(pred_mileday(i))
+													* exp(epsilon_mileday(i) * data_mileday(i,3));
+		}
+	}
+
+	
 
 FUNCTION void initializeModelParameters()
 	fpen = 0;
@@ -482,7 +583,7 @@ FUNCTION void calcNaturalMortality()
 	int iyr = mod_syr;
 	Mij.initialize();
 	for(int h = 1; h <= nMortBlocks; h++){
-		dvariable mi = exp(log_natural_mortality + log_m_dev(h));
+		dvariable mi = exp(log_natural_mortality + log_m_devs(h));
 
 		// fill mortality array by block
 		do{
@@ -571,7 +672,7 @@ FUNCTION void updateStateVariables()
 		Pij.initialize();
 		dvariable wbar;		// average weight of the catch.
 		dvar_vector vj(sage,nage);
-		dvar_vector pj(sage,nage);
+		//dvar_vector pj(sage,nage);
 		dvar_vector sj(sage,nage);
 		
 
@@ -693,21 +794,27 @@ FUNCTION void calcAgeCompResiduals()
 		}
 
 		//COUT(resd_sp_comp);
-FUNCTION void calcEggSurveyResiduals()
+FUNCTION void calcEggMiledaySurveyResiduals()
 	/**
 		- Observed egg data is in trillions of eggs
 		- Predicted eggs is the mature female numbers-at-age multiplied 
 		  by the fecundity-at-age, which comes from a regession of 
 		  fecundity = slope * obs_sp_waa - intercept
 		- Note Fij is the Fecundity-at-age j in year i.
+		- 
 		*/
 		resd_egg_dep.initialize();
+		resd_mileday.initialize();
 		for(int i = mod_syr; i <= mod_nyr; i++){
 			pred_egg_dep(i) = (0.5 * Oij(i)) * Fij(i);
+			pred_mileday(i) = sum(0.5 * Oij(i));
 			
 
 			if(data_egg_dep(i,2) > 0){
 				resd_egg_dep(i) = log(data_egg_dep(i,2)) - log(pred_egg_dep(i));
+			}
+			if(data_mileday(i,2) > 0){
+				resd_mileday(i) = log(data_mileday(i,2)) - log(pred_mileday(i));
 			}
 		}
 
@@ -813,6 +920,13 @@ REPORT_SECTION
 // Selectivity and vulnerable proportion-at-age.
 	REPORT(Sij);
 	REPORT(Qij);
+
+// Residuals
+	REPORT(resd_egg_dep);
+	REPORT(resd_rec);
+	REPORT(resd_sp_comp);
+	REPORT(resd_cm_comp);
+	
 
 
 
