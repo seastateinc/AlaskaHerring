@@ -804,20 +804,28 @@ FUNCTION void calcEggMiledaySurveyResiduals()
 		- 
 		*/
 		resd_egg_dep.initialize();
-		resd_mileday.initialize();
 		for(int i = mod_syr; i <= mod_nyr; i++){
 			pred_egg_dep(i) = (0.5 * Oij(i)) * Fij(i);
-			pred_mileday(i) = sum(0.5 * Oij(i));
-			
-
 			if(data_egg_dep(i,2) > 0){
 				resd_egg_dep(i) = log(data_egg_dep(i,2)) - log(pred_egg_dep(i));
 			}
-			// Fix this, use qmle for relative abundance
-			if(data_mileday(i,2) > 0){
-				resd_mileday(i) = log(data_mileday(i,2)) - log(pred_mileday(i));
-			}
 		}
+
+		resd_mileday.initialize();
+		pred_mileday.initialize();
+		int n = 1;
+		dvar_vector zt(mod_syr,mod_nyr); zt.initialize();
+		dvariable zbar = 0;
+		for(int i = mod_syr; i <= mod_nyr; i++){
+			if(data_mileday(i,2) > 0){
+				zt(i) = log(data_mileday(i,2)) - log(ssb(i));
+				zbar  = zt(i)/n + zbar *(n-1)/n;
+				n++ ;
+			}		
+		}
+		pred_mileday = ssb * exp(zbar);
+		resd_mileday = zt - zbar;
+		// COUT(resd_mileday);
 
 FUNCTION void calcObjectiveFunction()
 	/**

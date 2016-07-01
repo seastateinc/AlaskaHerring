@@ -33,10 +33,10 @@ To Do List
 
 - [ ] Simulation model:
 	- [x] Add command line argument to turn on simulation model.
-	- [ ] Add FUNCTION runSimulationModel
-		- [ ] Get and use True Parameter values
-		- [ ] Generate random variables | random number seed.
+	- [x] Add FUNCTION runSimulationModel
+		- [x] Get and use True Parameter values
+		- [x] Generate random variables | random number seed.
 		- [ ] Run population dynamics model conditioned on catch & process errors.
-		- [ ] Cache observation model results into data variables.
-		- [ ] Add observation errors.
-		- [ ] Allow Alaska Herring Assessment to continue with parameter estimation.
+		- [x] Cache observation model results into data variables.
+		- [x] Add observation errors.
+		- [x] Allow Alaska Herring Assessment to continue with parameter estimation.
