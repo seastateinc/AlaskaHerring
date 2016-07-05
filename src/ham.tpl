@@ -383,7 +383,7 @@ PRELIMINARY_CALCS_SECTION
 	/* 
 	 * SIMULATION MODEL SWITCH
 	 */
-	if( b_simulation_flag	) {
+	if( b_simulation_flag	&& rseed > 0) {
 		cout<<"|--------------------------|"<<endl;
 		cout<<"| RUNNING SIMULATION MODEL |"<<endl;
 		cout<<"|--------------------------|"<<endl;
@@ -401,6 +401,8 @@ PRELIMINARY_CALCS_SECTION
 			exit(1);
 		}
 
+	} else if ( b_simulation_flag && rseed < 0){
+		runSimulationModel(rseed);
 	}
 
 
@@ -582,16 +584,17 @@ FUNCTION void calcNaturalMortality()
 	
 	int iyr = mod_syr;
 	Mij.initialize();
+	
 	for(int h = 1; h <= nMortBlocks; h++){
-		dvariable mi = exp(log_natural_mortality + log_m_devs(h));
-
+		dvariable mi = mfexp(log_natural_mortality + log_m_devs(h));
+		
 		// fill mortality array by block
 		do{
 			//cout<<iyr<<"\t"<<theta<<endl;
 			Mij(iyr++) = mi;
 		} while(iyr <= nMortBlockYear(h));
 	}		
-
+	//COUT(Mij)
 
 FUNCTION void calcSelectivity()
 	/**
@@ -697,7 +700,7 @@ FUNCTION void updateStateVariables()
 			Nij(i+1)(sage+1,nage) =++ elem_prod(Pij(i)(sage,nage-1),sj(sage,nage-1));
 			Nij(i+1)(nage) += Pij(i,nage) * sj(nage);
 		}
-		
+	
 		// cross check... Looks good.
 		// COUT(Cij(mod_syr) * data_cm_waa(mod_syr)(sage,nage));
 
@@ -840,7 +843,7 @@ FUNCTION void calcObjectiveFunction()
 		nll(5) = norm2(log_rinit_devs);
 		nll(6) = norm2(log_rbar_devs);
 
-		f = sum(nll);// + 1000.0 * fpen;
+		f = sum(nll) + 1000.0 * fpen;
 		if(DEBUG_FLAG){
 			COUT(nll);
 			COUT(fpen);
@@ -913,12 +916,14 @@ REPORT_SECTION
 	REPORT(iage);
 	REPORT(year);
 	REPORT(years);
+	REPORT(rec_years);
 	REPORT(data_catch);
 
 // SSB, recruits, spawners,
 	REPORT(ssb);
 	REPORT(spawners);
 	REPORT(recruits);
+	REPORT(pred_egg_dep);
 
 // Numbers-at-age of various flavors.
 	REPORT(Nij);
