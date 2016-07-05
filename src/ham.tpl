@@ -696,7 +696,7 @@ FUNCTION void updateStateVariables()
 
 			// step 5.
 			sj = mfexp(-Mij(i));
-			Pij(i) = posfun(Nij(i) - Cij(i),0.001,fpen); // should use posfun here
+			Pij(i) = posfun(Nij(i) - Cij(i),0.01,fpen); // should use posfun here
 			Nij(i+1)(sage+1,nage) =++ elem_prod(Pij(i)(sage,nage-1),sj(sage,nage-1));
 			Nij(i+1)(nage) += Pij(i,nage) * sj(nage);
 		}
