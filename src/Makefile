@@ -51,7 +51,7 @@ clean:
 
 # Develop an R-script to read and summarise the data from simulations.
 
-READSIMS = 'source(file.path("readSims.R"))'
+READSIMS = 'source(file.path("../app/readSims.R"))'
 
 sims.Rdata: sim
 	@echo $(READSIMS) | R --vanilla --slave

@@ -531,16 +531,16 @@ FUNCTION void runSimulationModel(const int& rseed)
 	epsilon_rbar_devs.fill_randn(rng);
 	epsilon_rinit_devs.fill_randn(rng);
 
-	log_m_devs = dvar_vector(epsilon_m_devs * sigma_m_devs);
-	log_rbar_devs = dvar_vector(epsilon_rbar_devs * sigma_rbar_devs);
-	log_rinit_devs = dvar_vector(epsilon_rinit_devs * sigma_rinit_devs);
+	log_m_devs = dvar_vector(epsilon_m_devs * sigma_m_devs - 0.5 * square(sigma_m_devs));
+	log_rbar_devs = dvar_vector(epsilon_rbar_devs * sigma_rbar_devs - 0.5 * square(sigma_rbar_devs));
+	log_rinit_devs = dvar_vector(epsilon_rinit_devs * sigma_rinit_devs - 0.5 * square(sigma_rinit_devs));
 
 	// Not sure if the following should be done. It should produce a less
 	// biased MLE of the average recruitment, but uncertainty is biased downwards.
 	// ensure random deviates satisfy ∑ dev = 0 constraint.
-	//log_m_devs -= mean(log_m_devs);
-	//log_rbar_devs -= mean(log_rbar_devs);
-	//log_rinit_devs -= mean(log_rinit_devs);
+	// log_m_devs -= mean(log_m_devs);
+	// log_rbar_devs -= mean(log_rbar_devs);
+	// log_rinit_devs -= mean(log_rinit_devs);
 	
 	
 	// 6) initialize state variables.
@@ -569,8 +569,9 @@ FUNCTION void runSimulationModel(const int& rseed)
 	epsilon_egg_dep.fill_randn(rng);
 	for(int i = mod_syr; i <= mod_nyr; i++) {
 		if( data_egg_dep(i,2) > 0 ) {
+			double sd = data_egg_dep(i,3);
 			data_egg_dep(i,2) = value(pred_egg_dep(i)) 
-													* exp(epsilon_egg_dep(i)*data_egg_dep(i,3));	
+													* exp(epsilon_egg_dep(i) * sd - 0.5 * square(sd));	
 		}
 	}
 
@@ -579,8 +580,9 @@ FUNCTION void runSimulationModel(const int& rseed)
 	epsilon_mileday.fill_randn(rng);
 	for(int i = mod_syr; i <= mod_nyr; i++) {
 		if( data_mileday(i,2) > 0 ) {
+			double sd = data_mileday(i,3);
 			data_mileday(i,2) = value(pred_mileday(i))
-													* exp(epsilon_mileday(i) * data_mileday(i,3));
+													* exp(epsilon_mileday(i) * sd - 0.5 * square(sd));
 		}
 	}
 
@@ -907,17 +909,16 @@ FUNCTION void calcCatchResiduals()
 FUNCTION void calcObjectiveFunction()
 	/**
 		-	THIS FUNCTION IS ORGANIZED AS FOLLOWS:
-			1. Penalized loglikelihoods (penll)
-			2. Negative logliklihoods (nll)
-			3. Constraints (cons)
+			1. Negative logliklihoods (nll)
+			2. Penalized loglikelihoods (penll)
+
 		*/
 
-		// 1. Penalized logliklelihoods
-		dvar_vector penll(1,2);
 
 
-		// 2. Negative loglikelihoods
+		// 1. Negative loglikelihoods
 		dvar_vector nll(1,7);
+		nll.initialize();
 
 		// Mulitvariate logistic likelihood for composition data.
 		double sp_tau2;
@@ -925,6 +926,7 @@ FUNCTION void calcObjectiveFunction()
 		dmatrix d_sp_comp = trans(trans(data_sp_comp).sub(sage,nage)).sub(mod_syr,mod_nyr);
 		nll(1) = dmvlogistic(d_sp_comp,pred_sp_comp,resd_sp_comp,sp_tau2,minp);
 		
+		// Mulitvariate logistic likelihood for composition data.
 		double cm_tau2;
 		dmatrix d_cm_comp  = trans(trans(data_cm_comp).sub(sage,nage)).sub(mod_syr,mod_nyr);
 		nll(2) = dmvlogistic(d_cm_comp,pred_cm_comp,resd_cm_comp,cm_tau2,minp);
@@ -942,31 +944,54 @@ FUNCTION void calcObjectiveFunction()
 		std_rec = 0.6;
 		nll(5) = dnorm(resd_rec,std_rec);
 		
-		cout<<"nll = "<<(nll(1,5))<<endl;
-		nll.initialize();
-		//nll(1) = norm2(resd_sp_comp);
-		//nll(2) = norm2(resd_cm_comp);
-		//nll(3) = norm2(resd_egg_dep);
-		//nll(4) = norm2(resd_rec);
-		nll(5) = norm2(log_rinit_devs);
-		nll(6) = norm2(log_rbar_devs);
-		if( dMiscCont(2) ) nll(7) = norm2(resd_catch);
-		// cout<<(data_sp_comp)<<endl;
-		f  = sum(nll) + 1000.0 * fpen;
-		if( dMiscCont(2) ){
-			if( !last_phase() ) {
-				f += 100. * square(mean(log_ft_pars)-log(0.2));
-			} else {
-				f += 100. * square(mean(log_ft_pars)-log(0.2));
-			}
+		// Negative loglikelihood for catch data
+		dvector std_catch = column(data_catch,3)(mod_syr,mod_nyr);
+		nll(6) = dnorm(resd_catch,std_catch);
+
+		
+
+
+
+		// 2. Penalized logliklelihoods
+
+		
+		dvar_vector penll(1,4);
+		penll.initialize();
+
+		// | Terminal phase of estimation.
+		dvariable log_fbar = mean(log_ft_pars);
+		if( last_phase() ){
+			penll(1) = dnorm(log_rinit_devs,0.0,5.0);
+			penll(2) = dnorm(log_rbar_devs,0.0,5.0);
+			penll(3) = dnorm(log_fbar,0.2,2.0);
+		} else {
+			penll(1) = dnorm(log_rinit_devs,0.0,1.0);
+			penll(2) = dnorm(log_rbar_devs,0.0,1.0);
+			penll(3) = dnorm(log_fbar,0.2,0.07);			
 		}
 
 
+
+		//if( dMiscCont(2) ) nll(7) = norm2(resd_catch);
+		//// cout<<(data_sp_comp)<<endl;
+		//f  = sum(nll) + 1000.0 * fpen;
+		//if( dMiscCont(2) ){
+		//	if( !last_phase() ) {
+		//		f += 100. * square(mean(log_ft_pars)-log(0.2));
+		//
+		//	} else {
+		//		f += 100. * square(mean(log_ft_pars)-log(0.2));
+		//	}
+		//}
+
+
+		f = sum(nll) + sum(penll) + fpen;
+
 		if(DEBUG_FLAG){
-			COUT(nll);
-			COUT(fpen);
 			COUT(f);
-			if(fpen > 0 ){cout<<fpen<<endl;}
+			COUT(nll);
+			COUT(penll);
+			if(fpen > 0 ){COUT(fpen);}
 		}  
 
 

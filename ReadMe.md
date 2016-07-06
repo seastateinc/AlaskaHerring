@@ -12,7 +12,7 @@ To Do List
 - [ ] Improve Numerical Stability:
 	- [x] Parameter transformations to log-space
 	- [x] Design matrix for estimated parameters (ival, lb, ub, phz, bayes)
-	- [ ] Develop option to condition the model on F and fit to catch.
+	- [x] Develop option to condition the model on F and fit to catch.
 
 - [ ] Code reorganization:
 	- [x] HEAD::initializeModelParameters
@@ -24,7 +24,7 @@ To Do List
 	- [x] BIOL::calcSpawningStockRecruitment
 	- [x] OBSM::calcAgeCompResiduals
 	- [x] OBSM::calcEggMiledaySurveyResiduals
-	- [ ] OBSM::catchObservationModel
+	- [x] OBSM::catchObservationModel
 	- [ ] STAT::calcObjectiveFunction
 		- [ ] STAT::penaltyFunctions
 		- [ ] STAT::negativeLogLikelihoods
