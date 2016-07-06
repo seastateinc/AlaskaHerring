@@ -147,13 +147,13 @@ DATA_SECTION
 	END_CALCS
 
 	// Calculate Fecundity-at-age based on regression coefficients.
-	matrix Fij(mod_syr,mod_nyr,sage,nage);
+	matrix Eij(mod_syr,mod_nyr,sage,nage);
 	LOCAL_CALCS
 		int iyr = mod_syr;
 		
 		for(int h = 1; h <= nFecBlocks; h++){
 			do{
-				Fij(iyr) = 1.e-6 *
+				Eij(iyr) = 1.e-6 *
 								(data_sp_waa(iyr)(sage,nage) * fec_slope(h) - fec_inter(h));
 				iyr ++;
 			}while(iyr <= nFecBlockYears(h));
@@ -247,6 +247,7 @@ DATA_SECTION
 // | nMiscCont 	»	Number of controls to read in.
 // | dMiscCont	»	Vector of miscelaneous controls,
 // | pos 1 » Catch scaler.
+// | pos 2 » Condition on catch, condition on effort.
 
 	init_int nMiscCont;
 	init_vector dMiscCont(1,nMiscCont);
@@ -258,6 +259,7 @@ DATA_SECTION
 		for( int i = dat_syr; i <= dat_nyr; i++ ) {
 			data_catch(i,2) = dMiscCont(1) * data_ct_raw(i,2);
 		}
+		if(dMiscCont(2)) cout<<"Condition model on Ft"<<endl;
 	END_CALCS
 
 
@@ -333,6 +335,13 @@ PARAMETER_SECTION
 
 	END_CALCS
 
+// |---------------------------------------------------------------------------|
+// | FISHING MORTALITY RATE PARAMETERS
+// |---------------------------------------------------------------------------|
+// |
+	!! int phz; phz = dMiscCont(2)==0?-1:1;
+	init_bounded_vector log_ft_pars(mod_syr,mod_nyr,-30.,3.0,phz);
+
 
 // |---------------------------------------------------------------------------|
 // | VECTORS
@@ -352,6 +361,9 @@ PARAMETER_SECTION
 	vector pred_mileday(mod_syr,mod_nyr);
 	vector resd_mileday(mod_syr,mod_nyr);
 
+	vector pred_catch(mod_syr,mod_nyr);
+	vector resd_catch(mod_syr,mod_nyr);
+
 // |---------------------------------------------------------------------------|
 // | MATRIXES
 // |---------------------------------------------------------------------------|
@@ -367,6 +379,7 @@ PARAMETER_SECTION
 	matrix Sij(mod_syr,mod_nyr+1,sage,nage);
 	matrix Qij(mod_syr,mod_nyr+1,sage,nage);
 	matrix Cij(mod_syr,mod_nyr+1,sage,nage);
+	matrix Fij(mod_syr,mod_nyr+1,sage,nage);
 
 	matrix pred_cm_comp(mod_syr,mod_nyr,sage,nage);
 	matrix resd_cm_comp(mod_syr,mod_nyr,sage,nage);
@@ -434,6 +447,11 @@ PROCEDURE_SECTION
   calcSelectivity();
   if(DEBUG_FLAG) cout<<"--> Ok after calcSelectivity                <--"<<endl;
   
+  if( dMiscCont(2) ) {
+  	calcFishingMortalitiy();
+  	if(DEBUG_FLAG) cout<<"--> Ok after calcFishingMortalitiy        <--"<<endl;	
+  }
+
   initializeStateVariables();
   if(DEBUG_FLAG) cout<<"--> Ok after initializeStateVariables       <--"<<endl;
   
@@ -448,6 +466,11 @@ PROCEDURE_SECTION
 
   calcEggMiledaySurveyResiduals();
   if(DEBUG_FLAG) cout<<"--> Ok after calcEggMiledaySurveyResiduals  <--"<<endl;
+
+  //if( dMiscCont(2) ) {
+  	calcCatchResiduals();
+  	if(DEBUG_FLAG) cout<<"--> Ok after calcCatchResiduals           <--"<<endl;	
+  // }
 
   calcObjectiveFunction();
   if(DEBUG_FLAG) cout<<"--> Ok after calcObjectiveFunction          <--"<<endl;
@@ -627,6 +650,17 @@ FUNCTION void calcSelectivity()
 	Sij.sub(mod_syr,mod_nyr) = mfexp(log_slx);
 
 
+FUNCTION void calcFishingMortalitiy()
+	/**
+		- Calculate Fishing mortality, and then Zij = Mij + Eij
+		*/
+
+	for(int i = mod_syr; i <= mod_nyr; i++) {
+		Fij(i) = exp(log_ft_pars(i)) * Sij(i);
+	}
+
+
+
 FUNCTION void initializeStateVariables()
 	/**
 		- Set initial values for numbers-at-age matrix in first year
@@ -667,7 +701,8 @@ FUNCTION void updateStateVariables()
 		- step 2 » calculate vulnerable proportions-at-age.
 		- step 3 » calc average weight of catch (wbar) conditional on Qij.
 		- step 4 » calc catch-at-age | catch in biomass Cij = Ct/wbar * Qij.
-		- step 5 » update numbers-at-age (using a very dangerous difference eqn.)
+		- step 5 » condition on Ft or else condition on observed catch.
+		- step 6 » update numbers-at-age (using a very dangerous difference eqn.)
 		*/
 
 		Qij.initialize();
@@ -691,14 +726,26 @@ FUNCTION void updateStateVariables()
 			dvector wa = data_cm_waa(i)(sage,nage);
 			wbar = wa * Qij(i);
 			
-			// step 4.
-			Cij(i) = data_catch(i,2) / wbar * Qij(i);
 
+			// step 4.
 			// step 5.
+			// Condition on Ft
+			if( dMiscCont(2) ){
+				Pij(i) = elem_prod( Nij(i), exp(-Fij(i)) );
+				Cij(i) = elem_prod( Nij(i), 1.-exp(-Fij(i)));
+			} 
+			// Condition on Ct
+			else {                 
+				Cij(i) = data_catch(i,2) / wbar * Qij(i);
+				Pij(i) = posfun(Nij(i) - Cij(i),0.01,fpen); // should use posfun here
+			}
+
+			// step 6. update numbers at age		
 			sj = mfexp(-Mij(i));
-			Pij(i) = posfun(Nij(i) - Cij(i),0.01,fpen); // should use posfun here
 			Nij(i+1)(sage+1,nage) =++ elem_prod(Pij(i)(sage,nage-1),sj(sage,nage-1));
-			Nij(i+1)(nage) += Pij(i,nage) * sj(nage);
+			Nij(i+1)(nage) += Pij(i,nage) * sj(nage);				
+
+
 		}
 	
 		// cross check... Looks good.
@@ -803,12 +850,12 @@ FUNCTION void calcEggMiledaySurveyResiduals()
 		- Predicted eggs is the mature female numbers-at-age multiplied 
 		  by the fecundity-at-age, which comes from a regession of 
 		  fecundity = slope * obs_sp_waa - intercept
-		- Note Fij is the Fecundity-at-age j in year i.
+		- Note Eij is the Fecundity-at-age j in year i.
 		- 
 		*/
 		resd_egg_dep.initialize();
 		for(int i = mod_syr; i <= mod_nyr; i++){
-			pred_egg_dep(i) = (0.5 * Oij(i)) * Fij(i);
+			pred_egg_dep(i) = (0.5 * Oij(i)) * Eij(i);
 			if(data_egg_dep(i,2) > 0){
 				resd_egg_dep(i) = log(data_egg_dep(i,2)) - log(pred_egg_dep(i));
 			}
@@ -830,20 +877,43 @@ FUNCTION void calcEggMiledaySurveyResiduals()
 		resd_mileday = zt - zbar;
 		// COUT(resd_mileday);
 
+FUNCTION void calcCatchResiduals()
+	/**
+		- Catch residuals assuming a lognormal error structure.
+		*/
+		pred_catch.initialize();
+		resd_catch.initialize();
+		for(int i = mod_syr; i <= mod_nyr; i++) {
+			if(data_catch(i,2) > 0) {
+				pred_catch(i) = Cij(i) * data_cm_waa(i)(sage,nage);
+				resd_catch(i) = log(data_catch(i,2)) - log(pred_catch(i));
+			}
+		}
+
 FUNCTION void calcObjectiveFunction()
 	/**
 		-	
 		*/
-		dvar_vector nll(1,6);
-
+		dvar_vector nll(1,7);
+		nll.initialize();
 		nll(1) = norm2(resd_sp_comp);
 		nll(2) = norm2(resd_cm_comp);
 		nll(3) = norm2(resd_egg_dep);
 		nll(4) = norm2(resd_rec);
 		nll(5) = norm2(log_rinit_devs);
 		nll(6) = norm2(log_rbar_devs);
+		if( dMiscCont(2) ) nll(7) = norm2(resd_catch);
 
-		f = sum(nll) + 1000.0 * fpen;
+		f  = sum(nll) + 1000.0 * fpen;
+		if( dMiscCont(2) ){
+			if( !last_phase() ) {
+				f += 100. * square(mean(log_ft_pars)-log(0.2));
+			} else {
+				f += 100. * square(mean(log_ft_pars)-log(0.2));
+			}
+		}
+
+
 		if(DEBUG_FLAG){
 			COUT(nll);
 			COUT(fpen);
@@ -918,6 +988,7 @@ REPORT_SECTION
 	REPORT(years);
 	REPORT(rec_years);
 	REPORT(data_catch);
+	REPORT(pred_catch);
 
 // SSB, recruits, spawners,
 	REPORT(ssb);
@@ -938,6 +1009,7 @@ REPORT_SECTION
 // Residuals
 	REPORT(resd_egg_dep);
 	REPORT(resd_rec);
+	REPORT(resd_catch);
 	REPORT(resd_sp_comp);
 	REPORT(resd_cm_comp);
 	

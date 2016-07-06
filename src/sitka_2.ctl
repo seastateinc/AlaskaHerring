@@ -62,10 +62,10 @@
 ##                        OTHER MISCELLANEOUS CONTROLS                        ##
 ## —————————————————————————————————————————————————————————————————————————— ##
 ## number of controls to read in.
-1
+2
 ## Value    # - Description
 0.90718     # - Catch Scaler (convert from short tons to metric tons)
-
+1           # - Condition on Catch = 0, Condition of Effort = 1
 
 ## EOF
 999
