@@ -341,6 +341,9 @@ PARAMETER_SECTION
 // |
 	!! int phz; phz = dMiscCont(2)==0?-1:1;
 	init_bounded_vector log_ft_pars(mod_syr,mod_nyr,-30.,3.0,phz);
+	LOCAL_CALCS
+		if(b_simulation_flag) log_ft_pars = log(0.1);
+	END_CALCS
 
 
 // |---------------------------------------------------------------------------|
@@ -449,7 +452,8 @@ PROCEDURE_SECTION
   
   if( dMiscCont(2) ) {
   	calcFishingMortalitiy();
-  	if(DEBUG_FLAG) cout<<"--> Ok after calcFishingMortalitiy        <--"<<endl;	
+  	if(DEBUG_FLAG) 
+  	cout<<"--> Ok after calcFishingMortalitiy          <--"<<endl;	
   }
 
   initializeStateVariables();
@@ -507,6 +511,9 @@ FUNCTION void runSimulationModel(const int& rseed)
 	// 4) calculate selectivity parameters.
 	calcSelectivity();
 	
+	// 4b) calculate fishing mortality.
+	calcFishingMortalitiy();
+
 	// 5) generate random normal deviates for process errors:
 	//    - log_m_devs
 	//    - log_rinit_devs
@@ -541,6 +548,7 @@ FUNCTION void runSimulationModel(const int& rseed)
 
 	// 7) update state variables conditioned on the observed catch data.
 	updateStateVariables();
+	calcSpawningStockRecruitment();
 	
 	// 8) calculate age-composition residuals and over-write input data in memory.
 	// 		- Note the age-comps are sampled from a multivariate logistic dist.
@@ -548,14 +556,13 @@ FUNCTION void runSimulationModel(const int& rseed)
 	for(int i = mod_syr; i <= mod_nyr; i++) {
 		dvector t1 = value(pred_cm_comp(i));
 		dvector t2 = value(pred_sp_comp(i));
-
+		cout<<t2<<endl;
 		data_cm_comp(i)(sage,nage) = rmvlogistic(t1,0.30,rseed + i);
 		data_sp_comp(i)(sage,nage) = rmvlogistic(t2,0.30,rseed - i);
 	}
-	
+
 
 	// 9) calculate egg survey residuals and simulate fake survey.
-	calcSpawningStockRecruitment();
 	calcEggMiledaySurveyResiduals();
 	
 	dvector epsilon_egg_dep(mod_syr,mod_nyr);
@@ -607,7 +614,8 @@ FUNCTION void calcNaturalMortality()
 	
 	int iyr = mod_syr;
 	Mij.initialize();
-	
+	//COUT(log_natural_mortality);
+
 	for(int h = 1; h <= nMortBlocks; h++){
 		dvariable mi = mfexp(log_natural_mortality + log_m_devs(h));
 		
@@ -632,6 +640,8 @@ FUNCTION void calcSelectivity()
 	dvar_vector slx(sage,nage);
 	log_slx.initialize();
 	
+	
+
 	for(int h = 1; h <= nSlxBlks; h++){
 
 		switch(nSelType(h)){
@@ -685,7 +695,7 @@ FUNCTION void initializeStateVariables()
 		
 
 
-	// iniitialize first columb of numbers-at-age matrix
+	// iniitialize first column of numbers-at-age matrix
 	for(int i = mod_syr; i <= mod_nyr + 1; i++){
 		Nij(i,sage) = mfexp(log_rbar + log_rbar_devs(i));
 	}
@@ -716,34 +726,38 @@ FUNCTION void updateStateVariables()
 
 		for(int i = mod_syr; i <= mod_nyr; i++){
 
+
 			// step 1.
 			vj = elem_prod(Nij(i),Sij(i));
 
 			// step 2.
 			Qij(i) = vj / sum(vj);
 
-			// step 3.
-			dvector wa = data_cm_waa(i)(sage,nage);
-			wbar = wa * Qij(i);
+			// ADF&G's approach.
+			if( !dMiscCont(2) ) {
+				// step 3.
+				dvector wa = data_cm_waa(i)(sage,nage);
+				wbar = wa * Qij(i);
 			
-
-			// step 4.
-			// step 5.
-			// Condition on Ft
-			if( dMiscCont(2) ){
-				Pij(i) = elem_prod( Nij(i), exp(-Fij(i)) );
-				Cij(i) = elem_prod( Nij(i), 1.-exp(-Fij(i)));
-			} 
-			// Condition on Ct
-			else {                 
+				// step 4.
 				Cij(i) = data_catch(i,2) / wbar * Qij(i);
 				Pij(i) = posfun(Nij(i) - Cij(i),0.01,fpen); // should use posfun here
+				
+				// step 6. update numbers at age		
+				sj = mfexp(-Mij(i));
+				Nij(i+1)(sage+1,nage) =++ elem_prod(Pij(i)(sage,nage-1),sj(sage,nage-1));
+				Nij(i+1)(nage) += Pij(i,nage) * sj(nage);				
+			} 
+			// step 5.
+			// Condition on Ft
+			else {                 
+				Pij(i) = elem_prod( Nij(i), exp(-Fij(i)) );
+				Cij(i) = elem_prod( Nij(i), 1.-exp(-Fij(i)));
+
+				dvar_vector zi = Mij(i) + Fij(i);
+				Nij(i+1)(sage+1,nage) = ++ elem_prod(Nij(i)(sage,nage-1),zi(sage,nage-1));
 			}
 
-			// step 6. update numbers at age		
-			sj = mfexp(-Mij(i));
-			Nij(i+1)(sage+1,nage) =++ elem_prod(Pij(i)(sage,nage-1),sj(sage,nage-1));
-			Nij(i+1)(nage) += Pij(i,nage) * sj(nage);				
 
 
 		}
@@ -903,7 +917,7 @@ FUNCTION void calcObjectiveFunction()
 		nll(5) = norm2(log_rinit_devs);
 		nll(6) = norm2(log_rbar_devs);
 		if( dMiscCont(2) ) nll(7) = norm2(resd_catch);
-
+		// cout<<(data_sp_comp)<<endl;
 		f  = sum(nll) + 1000.0 * fpen;
 		if( dMiscCont(2) ){
 			if( !last_phase() ) {
