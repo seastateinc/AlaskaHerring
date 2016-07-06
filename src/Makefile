@@ -29,12 +29,12 @@ simdirs := $(shell echo 'cat(formatC(1:$(NSIMS),digits=3,flag="0"))' | R --vanil
 setsims := $(foreach dir,$(simdirs),$(dir)/setsims)
 runsims := $(foreach dir,$(simdirs),$(dir)/runsims)
 
-$(setsims):
+$(setsims): $(EXEC)
 	mkdir $(@D);
 	cp $(EXEC) $(EXEC).dat $(DAT) Makefile $(@D)
 	cd $(@D); touch setsims
 
-set: $(EXEC) $(setsims)
+set: $(setsims)
 
 
 $(runsims):
@@ -43,10 +43,19 @@ $(runsims):
 sim: set $(runsims)
 	touch sim
 
+
 clean:
 	rm -r 0* \
 	$(EXEC) $(EXEC).[bcehlprs]* *[0-9].cpp *[0-9].htp *.obj \
 	admb* admodel* fmin.log variance *.prj
 
+# Develop an R-script to read and summarise the data from simulations.
+
+READSIMS = 'source(file.path("readSims.R"))'
+
+sims.Rdata: sim
+	@echo $(READSIMS) | R --vanilla --slave
+
+collect: sims.Rdata
 
 ## end of makefile

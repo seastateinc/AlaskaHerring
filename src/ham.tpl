@@ -662,7 +662,7 @@ FUNCTION void calcSelectivity()
 
 FUNCTION void calcFishingMortalitiy()
 	/**
-		- Calculate Fishing mortality, and then Zij = Mij + Eij
+		- Calculate Fishing mortality, and then Zij = Mij + Fij
 		*/
 
 	for(int i = mod_syr; i <= mod_nyr; i++) {
@@ -753,7 +753,7 @@ FUNCTION void updateStateVariables()
 			else {                 
 				Pij(i) = elem_prod( Nij(i), exp(-Fij(i)) );
 				Cij(i) = elem_prod( Nij(i), 1.-exp(-Fij(i)));
-
+				
 				dvar_vector zi = Mij(i) + Fij(i);
 				Nij(i+1)(sage+1,nage) = ++ elem_prod(Nij(i)(sage,nage-1),zi(sage,nage-1));
 			}
@@ -851,7 +851,7 @@ FUNCTION void calcAgeCompResiduals()
 			}
 
 			// spawning age-comp prediction
-			pred_sp_comp(i) = Oij(i) / sum(Oij(i));
+			pred_sp_comp(i) = (Oij(i)+TINY) / sum(Oij(i)+TINY);
 			if( data_sp_comp(i,sage) >= 0 ){
 				resd_sp_comp(i) = data_sp_comp(i)(sage,nage) - pred_sp_comp(i);
 			}
@@ -906,14 +906,48 @@ FUNCTION void calcCatchResiduals()
 
 FUNCTION void calcObjectiveFunction()
 	/**
-		-	
+		-	THIS FUNCTION IS ORGANIZED AS FOLLOWS:
+			1. Penalized loglikelihoods (penll)
+			2. Negative logliklihoods (nll)
+			3. Constraints (cons)
 		*/
+
+		// 1. Penalized logliklelihoods
+		dvar_vector penll(1,2);
+
+
+		// 2. Negative loglikelihoods
 		dvar_vector nll(1,7);
+
+		// Mulitvariate logistic likelihood for composition data.
+		double sp_tau2;
+		double minp = 0.00;
+		dmatrix d_sp_comp = trans(trans(data_sp_comp).sub(sage,nage)).sub(mod_syr,mod_nyr);
+		nll(1) = dmvlogistic(d_sp_comp,pred_sp_comp,resd_sp_comp,sp_tau2,minp);
+		
+		double cm_tau2;
+		dmatrix d_cm_comp  = trans(trans(data_cm_comp).sub(sage,nage)).sub(mod_syr,mod_nyr);
+		nll(2) = dmvlogistic(d_cm_comp,pred_cm_comp,resd_cm_comp,cm_tau2,minp);
+
+		// Negative loglikelihood for egg deposition data
+		dvector std_egg_dep = TINY + column(data_egg_dep,3)(mod_syr,mod_nyr);
+		nll(3) = dnorm(resd_egg_dep,std_egg_dep);
+
+		// Negative loglikelihood for milt mile day
+		dvector std_mileday = TINY + column(data_mileday,3)(mod_syr,mod_nyr);
+		nll(4) = dnorm(resd_mileday,std_mileday);
+
+		// Negative loglikelihood for stock-recruitment data
+		dvector std_rec(rec_syr,mod_nyr+1);
+		std_rec = 0.6;
+		nll(5) = dnorm(resd_rec,std_rec);
+		
+		cout<<"nll = "<<(nll(1,5))<<endl;
 		nll.initialize();
-		nll(1) = norm2(resd_sp_comp);
-		nll(2) = norm2(resd_cm_comp);
-		nll(3) = norm2(resd_egg_dep);
-		nll(4) = norm2(resd_rec);
+		//nll(1) = norm2(resd_sp_comp);
+		//nll(2) = norm2(resd_cm_comp);
+		//nll(3) = norm2(resd_egg_dep);
+		//nll(4) = norm2(resd_rec);
 		nll(5) = norm2(log_rinit_devs);
 		nll(6) = norm2(log_rbar_devs);
 		if( dMiscCont(2) ) nll(7) = norm2(resd_catch);
@@ -934,6 +968,17 @@ FUNCTION void calcObjectiveFunction()
 			COUT(f);
 			if(fpen > 0 ){cout<<fpen<<endl;}
 		}  
+
+
+  //FUNCTION dvariable dnorm(const dvar_vector residual, const dvector std)
+	//RETURN_ARRAYS_INCREMENT();
+	//double pi=3.141593;
+	//int n=size_count(residual);
+	//dvector var=elem_prod(std,std);
+	//dvar_vector SS=elem_prod(residual,residual);
+	//RETURN_ARRAYS_DECREMENT();
+	//return(0.5*n*log(2.*pi)+sum(log(std))+sum(elem_div(SS,2.*var)));
+
 
 
 GLOBALS_SECTION
@@ -962,6 +1007,94 @@ GLOBALS_SECTION
   }
 
 
+  dvariable dmvlogistic(const dmatrix o, const dvar_matrix& p,dvar_matrix& nu, double& tau2,const double minp)
+	{	//returns the negative loglikelihood using the MLE for the variance
+	/*
+		This is a modified version of the dmvlogistic negative log likelihood
+		where proportions at age less than minp are pooled into the consecutive 
+		age-classes.  See last paragraph in Appendix A of Richards, Schnute and
+		Olsen 1997. 
+		
+		NB minp must be greater than 0, otherwise this algorithm returns an
+		error if one of the observed proportions is zero.
+		
+		-1) first count the number of observations for each year > minp
+		-2) normalized observed and predicted age-proportions
+		-3) loop over ages, and check if observed proportion is < minp
+				-if yes, then add observed proprtion to bin k
+				-if no then add observed proportion to bin k and increment
+				 bin k if k is currently less than the number of bins.
+		-4) do the same grouping for the predicted proportions.
+		-5) use ivector iiage to correctly assign residuals into nu
+		
+		FEB 8, 2011.  Fixed a bug in the variance calculation & 
+		likelihood scaling that was discovered at the 2011 Hake
+		assessment STAR panel in Seattle.
+	*/
+	RETURN_ARRAYS_INCREMENT();
+	int i,j,k,n;
+	int age_counts=0;
+	int a = o.colmin();
+	int A=o.colmax();
+	double tiny=0.001/(A-a+1);
+	int t=o.rowmin();
+	int T=o.rowmax();
+	dvariable tau_hat2;		//mle of the variance
+	//dvar_matrix nu(t,T,a,A);
+	nu.initialize();
+	
+
+	for(i=t; i<=T; i++)
+	{	
+		n=0;
+		dvector oo = o(i)/sum(o(i));
+		dvar_vector pp = p(i)/sum(p(i));
+		
+		//count # of observations greater than minp (2% is a reasonable number)
+		for(j=a;j<=A;j++)
+			if(oo(j) > minp)n++;
+		
+		ivector iiage(1,n);
+		dvector o1(1,n); o1.initialize();
+		dvar_vector p1(1,n); p1.initialize();
+		k=1;
+		for(j=a;j<=A;j++)
+		{
+			if(oo(j)<=minp)
+			{
+				o1(k)+=oo(j);
+				p1(k)+=pp(j);
+			}
+			else
+			{
+				o1(k)+=oo(j);
+				p1(k)+=pp(j);
+				if(k<=n)iiage(k)=j;		//ivector for the grouped residuals
+				if(k<n) k++;
+			}
+		}
+		
+		//assign residuals to nu based on iiage index
+		dvar_vector t1 = log(o1)-log(p1) - mean(log(o1)-log(p1));
+		
+
+		for(j=1;j<=n;j++)
+			nu(i)(iiage(j))=t1(j);
+		
+		age_counts += n-1;
+	}
+	//Depricated  Wrong Variance & likelihood calculation.
+	//tau_hat2 = 1./(age_counts*(T-t+1))*norm2(nu);
+	//dvariable nloglike =(age_counts*(T-t+1))*log(tau_hat2);
+	
+	//Feb 8, 2011  Fixed variance & likelihood
+	tau_hat2 = 1./(age_counts)*norm2(nu);
+	dvariable nloglike =(age_counts)*log(tau_hat2);
+	tau2=value(tau_hat2); //mle of the variance 
+	RETURN_ARRAYS_DECREMENT();
+	return(nloglike);
+	}
+
 REPORT_SECTION
 // Write out Raw Data (Useful for simulation studies)
 // Note that I use a Macro called REPORT here to ensure a standard format.
@@ -984,7 +1117,7 @@ REPORT_SECTION
 	REPORT(data_mileday);
 	REPORT(EOF)
 // END of Replicated Data File. (run model with -noest to check data)
-
+	
 // Vectors of years.
 	ivector year(mod_syr,mod_nyr);
 	year.fill_seqadd(mod_syr,1);
@@ -1027,7 +1160,8 @@ REPORT_SECTION
 	REPORT(resd_sp_comp);
 	REPORT(resd_cm_comp);
 	
-
+// Initial parameter values from simulation studies.
+	REPORT(theta_ival);
 
 
 
