@@ -52,9 +52,11 @@ clean:
 # Develop an R-script to read and summarise the data from simulations.
 
 READSIMS = 'source(file.path("../app/readSims.R"))'
+RENDEREP = 'library(rmarkdown); render("../app/ham.Rmd",output_file="ham2.html")'
 
 sims.Rdata: sim
 	@echo $(READSIMS) | R --vanilla --slave
+	@echo $(RENDEREP) | R --vanilla --slave
 
 collect: sims.Rdata
 

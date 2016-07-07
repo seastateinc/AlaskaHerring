@@ -51,8 +51,10 @@ DATA_SECTION
 // | rseed			-> random number seed for simulation 
 	int b_simulation_flag;
 	int rseed;
+	int retro_yrs;
 	LOCAL_CALCS
 		int on = 0;
+
 		b_simulation_flag = 0;
 		if (ad_comm::argc > 1)
 		{
@@ -63,6 +65,17 @@ DATA_SECTION
 				b_simulation_flag = 1;
 				rseed = atoi(ad_comm::argv[on+1]);
 			}
+
+			retro_yrs = 0;
+			if ( (on=option_match(ad_comm::argc,ad_comm::argv,"-retro")) > -1 )
+			{
+				retro_yrs = atoi(ad_comm::argv[on+1]);
+				cout<<"|—————————————————————————————————————————————————|\n";
+				cout<<"| Implementing Retrospective analysis             |\n";
+				cout<<"|—————————————————————————————————————————————————|\n";
+				cout<<"| Number of retrospective years = "<<retro_yrs<<endl;
+			}
+
 		}
 	END_CALCS
 // |---------------------------------------------------------------------------|
@@ -273,6 +286,11 @@ DATA_SECTION
 			exit(1);
 		}
 	END_CALCS
+
+// |---------------------------------------------------------------------------|
+// | RETROSPECTIVE ADJUSTMENTS
+// |---------------------------------------------------------------------------|
+	!! mod_nyr = mod_nyr - retro_yrs;
 
 INITIALIZATION_SECTION
 	theta theta_ival;
@@ -600,32 +618,35 @@ FUNCTION void initializeModelParameters()
 
 FUNCTION void initializeMaturitySchedules() 
 	int iyr = mod_syr;
+	int jyr;
 	mat.initialize();
 	for(int h = 1; h <= nMatBlocks; h++) {
 		dvariable mat_a = mat_params(h,1);
 		dvariable mat_b = mat_params(h,2);
 
+		jyr = h != nMatBlocks ? nMatBlockYear(h) : nMatBlockYear(h)-retro_yrs;
 		// fill maturity array using logistic function
 		do{
 			mat(iyr++) = plogis(age,mat_a,mat_b);
-		} while(iyr <= nMatBlockYear(h));	
+		} while(iyr <= jyr);	
 	}
 	
 
 FUNCTION void calcNaturalMortality()
 	
 	int iyr = mod_syr;
+	int jyr;
 	Mij.initialize();
 	//COUT(log_natural_mortality);
-
 	for(int h = 1; h <= nMortBlocks; h++){
 		dvariable mi = mfexp(log_natural_mortality + log_m_devs(h));
 		
+		jyr = h != nMortBlocks ? nMortBlockYear(h) : nMortBlockYear(h)-retro_yrs;
 		// fill mortality array by block
 		do{
 			//cout<<iyr<<"\t"<<theta<<endl;
 			Mij(iyr++) = mi;
-		} while(iyr <= nMortBlockYear(h));
+		} while(iyr <= jyr);
 	}		
 	//COUT(Mij)
 
@@ -654,8 +675,8 @@ FUNCTION void calcSelectivity()
 			break;
 		}
 		
-
-		for(int i = nslx_syr(h); i <= nslx_nyr(h); i++){
+		int jyr = h != nSlxBlks ? nslx_nyr(h):nslx_nyr(h)-retro_yrs;
+		for(int i = nslx_syr(h); i <= jyr; i++){
 			log_slx(i) = log(slx) - log(mean(slx));
 		}
 	}
