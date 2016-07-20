@@ -17,7 +17,7 @@ You can obtain the source code via cloning this project using Git, or you may al
 
 Go to the [Github code repository for Ham](https://github.com/seastateinc/AlaskaHerring), and click on the Clone or download button.
 
-![Select the Download Zip option.](../docs/CloneZip.png)
+![Select the Download Zip option.](https://github.com/seastateinc/AlaskaHerring/blob/develop/docs/CloneZip.png)
 
 To Do List
 
