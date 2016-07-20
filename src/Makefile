@@ -6,8 +6,8 @@ NSIMS = 10
 
 
 
-all: $(EXEC)
-	
+
+
 
 $(EXEC): $(TPL)
 	@admb -g $(EXEC)
