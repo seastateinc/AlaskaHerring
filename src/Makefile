@@ -6,7 +6,6 @@ NSIMS = 10
 
 
 
-
 all: $(EXEC)
 	
 
