@@ -11,13 +11,16 @@ This Repository docments changes made to the Age-structured Model for Alaska her
 ### Installation
 You can obtain the source code via cloning this project using Git, or you may also download a zip file with the latest code. 
 
-#### Clone
-
-#### Download Zip file
 
 Go to the [Github code repository for Ham](https://github.com/seastateinc/AlaskaHerring), and click on the Clone or download button.
 
 ![Select the Download Zip option.](https://github.com/seastateinc/AlaskaHerring/blob/develop/docs/CloneZip.png)
+
+I would recommend using Git and Github, as they serve as valuable tools for version control, and tracking code changes over time.
+
+
+
+----
 
 To Do List
 
