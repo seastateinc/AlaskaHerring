@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  5 JUL 2016 17:53
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  7 JUL 2016 14:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -708,27 +708,27 @@ Overfull \hbox (3.96089pt too wide) in paragraph at lines 172--173
 Package natbib Warning: Empty `thebibliography' environment on input line 3.
 
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 278.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 281.
  [4
 
-] [5]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 278.
+] [5] [6]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 281.
  (./HerringModelDocumentation.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 278.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 278.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 281.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 281.
 Package rerunfilecheck Info: File `HerringModelDocumentation.out' has not chang
 ed.
 (rerunfilecheck)             Checksum: 24DB9E3EF760147C71372DA1C3106D7A;335.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 278.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 281.
  ) 
 Here is how much of TeX's memory you used:
- 8406 strings out of 493089
- 118932 string characters out of 6134842
+ 8407 strings out of 493089
+ 118938 string characters out of 6134842
  228945 words of memory out of 5000000
  11712 multiletter control sequences out of 15000+600000
  19050 words of font info for 76 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 29i,13n,43p,796b,352s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 29i,18n,43p,796b,352s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
@@ -741,10 +741,10 @@ l/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/t
 exlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/te
 xlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texl
 ive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on HerringModelDocumentation.pdf (5 pages, 136800 bytes).
+Output written on HerringModelDocumentation.pdf (6 pages, 138021 bytes).
 PDF statistics:
- 151 PDF objects out of 1000 (max. 8388607)
- 130 compressed objects within 2 object streams
- 39 named destinations out of 1000 (max. 500000)
+ 155 PDF objects out of 1000 (max. 8388607)
+ 133 compressed objects within 2 object streams
+ 40 named destinations out of 1000 (max. 500000)
  49 words of extra memory for PDF output out of 10000 (max. 10000000)
 

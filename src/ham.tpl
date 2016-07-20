@@ -574,7 +574,7 @@ FUNCTION void runSimulationModel(const int& rseed)
 	for(int i = mod_syr; i <= mod_nyr; i++) {
 		dvector t1 = value(pred_cm_comp(i));
 		dvector t2 = value(pred_sp_comp(i));
-		cout<<t2<<endl;
+		// cout<<t2<<endl;
 		data_cm_comp(i)(sage,nage) = rmvlogistic(t1,0.30,rseed + i);
 		data_sp_comp(i)(sage,nage) = rmvlogistic(t2,0.30,rseed - i);
 	}

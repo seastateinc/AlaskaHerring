@@ -1131,7 +1131,7 @@ FUNCTION get_forecast
     {
       for_naa(j)=post_naa(myrs,j-1)*S_for;                           //forecast naa, ages 4 - 7
     }
-
+    // Stupid!  No need for a loop for the plus group.
   for (int j=nages;j<=nages;j++)
     {
       for_naa(j)=post_naa(myrs,j-1)*S_for+post_naa(myrs,j)*S_for;    //forecast naa, age 8

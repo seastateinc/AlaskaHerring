@@ -204,14 +204,17 @@
         \ln(\alpha),\ln(\beta),\vec{\delta} \} \\[1ex]
       %%
       & \mbox{Initial States ($i=1980$)} \nonumber \\
-      & \iota_j = \exp(-M*(j-\mbox{min}(j))) &\mbox{where}\quad j = 3:8 \quad \mbox{years} \\
-      & N_{i,j} = \ddot{R} \exp(\delta_{i-j}) \iota_j & i=1980,\forall j \\
-      & N_{i,j} = \bar{R} \exp(\delta_i) & \forall i, j=3 \\
+      & \iota_j = \begin{cases}
+          \exp(-M*(j-\mbox{min}(j))) & \quad \mbox{where } 3 \leq j \leq 7 \\[1ex]
+          \dfrac{\exp(-M*(j-\mbox{min}(j)))}{1-\exp(-M)} & \quad \mbox{where } j=8 \\
+          \end{cases} \\[1ex]
+      & N_{i,j} = \ddot{R} \exp(\delta_{i-j}) \iota_j \qquad \qquad  i=1980,\forall j \\
+      & N_{i,j} = \bar{R} \exp(\delta_i) \qquad  \quad \qquad \quad \forall i, j=3 \\
       %%
       & \mbox{Dynamic States ($i > 1980$)} \nonumber\\
       & Q_{i,j} = \frac{N_{i,j} S_{i,j}}{\sum_j N_{i,j} S_{i,j}} \\
       & \bar{w}_i  = \sum_j w_j  Q_{i,j} \\
-      & C_{i,j} = \frac{\hat{c}_{i}Q_{i,j}}{\bar{w}_i} &\mbox{where $\hat{c}_i$ is the observed catch (mt)} \\
+      & C_{i,j} = \frac{\hat{c}_{i}Q_{i,j}}{\bar{w}_i} \qquad \mbox{where $\hat{c}_i$ is the observed catch (mt)} \\
       & \acute{N}_{i,j} = N_{i,j} \exp(-F_{i,j}) \\
       & N_{i+1,j+1} = \acute{N}_{i,j} \exp(-M_{i,j}) \\
       \hline \nonumber
