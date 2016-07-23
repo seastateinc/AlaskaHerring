@@ -15,16 +15,21 @@ all: $(EXEC) $(EXEC).rep
 
 $(EXEC): $(DIST)
 	cp $(DIST) $@
-	@echo "All done"
+
 
 
 $(EXEC).rep: $(EXEC) 
 	./$(EXEC) -ind $(DATA) $(ARGS)
-	@echo "Done here to"
+
+
 
 run: $(DATA)
 	./$(EXEC) -ind $(DATA) $(ARGS)
 
 
 clean:
-	rm -f $(EXEC) 
+	@rm -f $(EXEC) 
+	@rm -f admodel.cov
+	@rm -f admodel.hes
+	@rm -f admodel.dep
+	@rm -f fmin.log
