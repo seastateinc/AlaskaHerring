@@ -11,7 +11,7 @@ library(tidyr)
 
 # Read in the data from the model report, par, and cor files.
 source("./globals.R")
-D <- read.admb("../src/ham")
+D <- read.admb("../models_2015/sitka/ham")
 
 # ---------------------------------------------------------------------------- #
 # DATA SECTION
@@ -26,7 +26,7 @@ plot.catch <- function(D=D, nm = "data_ct_raw",...) {
 
 	ggplot(df,aes(Year,Catch)) +
 		geom_pointrange(aes(ymin = lower, ymax = upper),size=0.5,fatten=2) + 
-		labs(...)
+		labs(x="Year",...)
 }
 
 
