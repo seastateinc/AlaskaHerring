@@ -60,12 +60,13 @@ plot.comp <- function(D=D, nm = "data_cm_comp",...) {
 }
 
 
+
 plot.ssb <- function(D=D){
 	qplot(D$year,D$ssb/1000,geom="line") + ylim(c(0,NA)) +
 	labs(x="Year",y="Female Spawning Stock Biomass (1000 mt)")
 }
 
-plot.datafit <- function(D=D, sfx="egg_dep") {
+plot.datafit <- function(D=D, sfx="egg_dep", fit=FALSE) {
 	data <- paste0("data_",sfx)
 	data <- as.data.frame(D[[data]])
 	colnames(data) <- c("year","index","log.se")
@@ -83,8 +84,8 @@ plot.datafit <- function(D=D, sfx="egg_dep") {
 
 	ggplot(df,aes(year,index)) + 
 	geom_pointrange(aes(ymin = lower, ymax = upper),size=0.5,fatten=2) +
-	geom_line(aes(year,pred),alpha=0.8) + 
-	labs(x="Year",y="Egg Deposition (trillions)")
+	labs(x="Year",y="Egg Deposition (trillions)") +
+	if(fit) geom_line(aes(year,pred),alpha=0.8) 
 
 }
 
