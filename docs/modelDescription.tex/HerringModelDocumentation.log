@@ -1,5 +1,9 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  25 JUL 2016 14:53
+=======
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  25 JUL 2016 14:29
+>>>>>>> Stashed changes
 =======
 This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  25 JUL 2016 14:29
 >>>>>>> Stashed changes
@@ -805,11 +809,16 @@ Overfull \hbox (29.57018pt too wide) in paragraph at lines 806--807
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 Overfull \hbox (23.74413pt too wide) in paragraph at lines 777--778
+=======
+Overfull \hbox (23.0001pt too wide) in paragraph at lines 807--808
+>>>>>>> Stashed changes
 [][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 
+<<<<<<< Updated upstream
 Overfull \hbox (16.69414pt too wide) in paragraph at lines 781--782
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
 =======
@@ -824,6 +833,13 @@ Overfull \hbox (3.2899pt too wide) in paragraph at lines 808--809
  []
 
 
+=======
+Overfull \hbox (3.2899pt too wide) in paragraph at lines 808--809
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+>>>>>>> Stashed changes
 Overfull \hbox (29.57018pt too wide) in paragraph at lines 811--812
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
@@ -887,6 +903,7 @@ Here is how much of TeX's memory you used:
 ></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 /usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></
 usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></us
 r/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/
@@ -899,6 +916,8 @@ ive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texli
 ve/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
 Output written on HerringModelDocumentation.pdf (12 pages, 187134 bytes).
 =======
+=======
+>>>>>>> Stashed changes
 /usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></
 usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></u
 sr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr
@@ -913,6 +932,9 @@ ve/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive
 2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2
 015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
 Output written on HerringModelDocumentation.pdf (16 pages, 251005 bytes).
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 PDF statistics:
  645 PDF objects out of 1000 (max. 8388607)

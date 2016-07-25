@@ -487,8 +487,11 @@ PROCEDURE_SECTION
   calcAgeCompResiduals();
   if(DEBUG_FLAG) cout<<"--> Ok after calcAgeCompResiduals           <--"<<endl;
 
-  calcEggMiledaySurveyResiduals();
-  if(DEBUG_FLAG) cout<<"--> Ok after calcEggMiledaySurveyResiduals  <--"<<endl;
+  calcEggSurveyResiduals();
+  if(DEBUG_FLAG) cout<<"--> Ok after calcEggSurveyResiduals         <--"<<endl;
+
+  calcMiledaySurveyResiduals();
+  if(DEBUG_FLAG) cout<<"--> Ok after calcMiledaySurveyResiduals     <--"<<endl;
 
   //if( dMiscCont(2) ) {
     calcCatchResiduals();
@@ -582,7 +585,7 @@ FUNCTION void runSimulationModel(const int& rseed)
 
 
   // 9) calculate egg survey residuals and simulate fake survey.
-  calcEggMiledaySurveyResiduals();
+  calcEggSurveyResiduals();
   
   dvector epsilon_egg_dep(mod_syr,mod_nyr);
   epsilon_egg_dep.fill_randn(rng);
@@ -595,6 +598,8 @@ FUNCTION void runSimulationModel(const int& rseed)
   }
 
   // 10) calculate mile_days
+  calcMiledaySurveyResiduals();
+  
   dvector epsilon_mileday(mod_syr,mod_nyr);
   epsilon_mileday.fill_randn(rng);
   for(int i = mod_syr; i <= mod_nyr; i++) {
@@ -764,11 +769,13 @@ FUNCTION void updateStateVariables()
       
         // step 4.
         Cij(i) = data_catch(i,2) / wbar * Qij(i);
-        Pij(i) = posfun(Nij(i) - Cij(i),0.01,fpen); // should use posfun here
+        // should use posfun here
+        Pij(i) = posfun(Nij(i) - Cij(i),0.01,fpen); 
         
         // step 6. update numbers at age    
         sj = mfexp(-Mij(i));
-        Nij(i+1)(sage+1,nage) =++ elem_prod(Pij(i)(sage,nage-1),sj(sage,nage-1));
+        Nij(i+1)(sage+1,nage) =++ elem_prod(Pij(i)(sage,nage-1),
+                                            sj(sage,nage-1));
         Nij(i+1)(nage) += Pij(i,nage) * sj(nage);       
       } 
       // step 5.
@@ -792,22 +799,22 @@ FUNCTION void updateStateVariables()
 
 FUNCTION void calcSpawningStockRecruitment()
   /**
-    - The functional form of the stock recruitment model follows that of a 
-      Ricker model, where R = so * SSB * exp(-beta * SSB).  The two parameters
-      so and beta where previously estimated as free parameters in the old
-      herring model.  Herein this fucntion I derive so and beta from the 
-      leading parameters Ro and reck; Ro is the unfished sage recruits, and reck
-      is the recruitment compensation parameter, or the relative improvement in
-      juvenile survival rates as the spawning stock SSB tends to 0.  Simply a 
-      multiple of the replacement line Ro/Bo.
+  The functional form of the stock recruitment model follows that of a 
+  Ricker model, where R = so * SSB * exp(-beta * SSB).  The two parameters
+  so and beta where previously estimated as free parameters in the old
+  herring model.  Herein this fucntion I derive so and beta from the 
+  leading parameters Ro and reck; Ro is the unfished sage recruits, and reck
+  is the recruitment compensation parameter, or the relative improvement in
+  juvenile survival rates as the spawning stock SSB tends to 0. Simply a 
+  multiple of the replacement line Ro/Bo.
 
-      At issue here is time varying maturity and time-varying natural mortality.
-      When either of these two variables are assumed to change over time, then
-      the underlying stock recruitment relationship will also change. This 
-      results in a non-stationary distribution.  For the purposes of this 
-      assessment model, I use the average mortality and maturity schedules to
-      derive the spawning boimass per recruit, which is ultimately used in 
-      deriving the parameters for the stock recruitment relationship.
+  At issue here is time varying maturity and time-varying natural mortality.
+  When either of these two variables are assumed to change over time, then
+  the underlying stock recruitment relationship will also change. This 
+  results in a non-stationary distribution.  For the purposes of this 
+  assessment model, I use the average mortality and maturity schedules to
+  derive the spawning boimass per recruit, which is ultimately used in 
+  deriving the parameters for the stock recruitment relationship.
     */
 
   /*
@@ -854,7 +861,8 @@ FUNCTION void calcSpawningStockRecruitment()
 
   spawners = ssb(mod_syr,mod_nyr-sage+1).shift(rec_syr);
   recruits = elem_prod( so*spawners , mfexp(-beta*spawners) );
-  resd_rec = log(column(Nij,sage)(rec_syr,mod_nyr+1)+TINY) - log(recruits+TINY);
+  resd_rec = log(column(Nij,sage)(rec_syr,mod_nyr+1)+TINY) 
+             - log(recruits+TINY);
 
 
 
@@ -882,7 +890,8 @@ FUNCTION void calcAgeCompResiduals()
     }
 
     //COUT(resd_sp_comp);
-FUNCTION void calcEggMiledaySurveyResiduals()
+
+FUNCTION void calcEggSurveyResiduals()
   /**
     - Observed egg data is in trillions of eggs
     - Predicted eggs is the mature female numbers-at-age multiplied 
@@ -899,6 +908,7 @@ FUNCTION void calcEggMiledaySurveyResiduals()
       }
     }
 
+FUNCTION void calcMiledaySurveyResiduals()
     resd_mileday.initialize();
     pred_mileday.initialize();
     int n = 1;
