@@ -99,6 +99,9 @@
 \newcommand{\fmsy}{$F_{\textnormal{MSY}}$}
 \newcommand{\bmsy}{$B_{\textnormal{MSY}}$}
 
+\newcommand{\ham}{HAM}
+
+
 \begin{document}
   \maketitle
 
@@ -179,18 +182,90 @@
 
 
   \clearpage
-  \section{Methods} % (fold)
+  \section{Technical description of the proposed model changes} % (fold)
   \label{sec:methods}
   
   \subsection{Input Data} % (fold)
   \label{sub:input_data}
-  
+    The best resourcee for looking at the input data is the html file that describes the input data. There are 7 major sections to the data file.
+    \begin{enumerate}
+      \item Model dimensions.
+      \item Fecundity regression coefficients.
+      \item Total Annual Catch.
+      \item Empirical Weight-at-age (spawn and commercial).
+      \item Age-composition (spawn and commercial).
+      \item Egg deposition data.
+      \item Mile milt days.
+    \end{enumerate}
+
+    These are the same data inputs that were used in the ASA model; however, there have a been a number of siginificant changes to the input data file.  The most siginificant change is the addition of the log standar error for each catch, egg deposition, and spawn survey observation.  
   % subsection input_data (end)
+
+  \subsection{Control file} % (fold)
+  \label{sub:control_file}
+    There are also siginficant changes to the control file.  In fact, its a completely different control file than what was used in the ASA model.  Again, the best resource for looking at the specific contents of the control file, is the control file itself. 
+
+    To highlight some of the major changes, the control file now consists of a design matrix for controling the leading model parameters; specificially, the bounds and phases in which these parameters are estimated.  There is a block for time-varying maturity, a block for time-varying naural mortality rate deviations.  A block for selectivity, where the user can choose among alternative parametric and non-parametric selectivity curves. Lastly, there is a vector of other miscellaneous model controls for, \textit{inter alia}, re-scaling catch, conditioning the model on catch or effort.  
+
+  % subsection control_file (end)
+
+  \subsection{Age-schedule information} % (fold)
+  \label{sub:age_schedule_information}
+    Age-schedule information is part date input: weight-at-age, or maturity-at-age via regression coefficients. The other part of age-schedule information is estimated based on fitting the model to data: selectivity-at-age, maturity-at-age.  
+
+    \subsubsection{Maturity-at-age} % (fold)
+    \label{ssub:maturity_at_age}
+      For the maturity-at-age, the \ham\ assumes that age-specific maturity follows a logistic relationship, where the estimated paraemeters define the age-at-50\% maturity and the standard deviation, for each unique block period (the block periods are user defined). 
+
+       The source code for the TPL file is as follows:
+      \lstinputlisting[language=C++, firstline=620, lastline=633]{../../src/ham.tpl}
+      where \texttt{plogis} is a built in ADMB function for the logistic: \[f(x) =  (1+\exp(-(x-\mu)/\sigma))^{-1} \] where $\mu$ and $\sigma$ are the location and scale parameters that are estimated.
+    
+    % subsubsection maturity_at_age (end)
+
+    \subsubsection{Natural mortality} % (fold)
+    \label{ssub:natural_mortality}
+    
+      Natural mortality is both age- and time-specific.  At the time of writing, there is no code that allows for age-dependent natural mortality, but this option is easily added as a feature to the \ham.
+
+      The source code for the TPL file is as follows:
+      \lstinputlisting[language=C++, firstline=636, lastline=651]{../../src/ham.tpl}
+      where the Matrix $M_{i,j}$ is the instananeous natural mortality rate for year $i$ and age $j$.  At this point the code just fills each row of the matrix with the same annual natural mortality rate (i.e., age-independent).  This is where you would want to modify the code to allow for age-dependent natural mortality rates.
+    % subsubsection natural_mortality (end)
+
+    \subsubsection{Selectivity} % (fold)
+    \label{ssub:selectivity}
+      Currently only the logistic selectivity option is implemented. But the source code is structured such that alternative parametric and non-parametric functions can be easily added to the source code using a swtich statement.
+
+       The source code for the TPL file is as follows:
+      \lstinputlisting[language=C++, firstline=653, lastline=683]{../../src/ham.tpl}
+
+      The matrix $S_{i,j}$ is the relative selectivity for age $j$ in year $i$.  Additional functions for computing the vector \texttt{slx} can be new cases (e.g. case 2:  // coefficients).
+
+      There is a very important feature in the selectivity is parameterized in this model.  The reason for this particular parameterization is to ensure the objective function remains continuous and differentiable.  In each year, the vector of age-specific selectivity coefficients is scaled to have a mean value of 1.0.  This is accomplished, in log-space, but subtracting the mean from the vector of age-specific selectivities.  This avoids having to use the max function; the use of the max function can lead to a discontinuity in the objective function which result in non-convergence.  The tradeoff for this numerical stability is that the interpretation of Fishing mortality rates changes.  The estimator is calculating the average-age-specific fishing mortality rate.  The fully-selected fishing mortality rate is more commonly used metric, and this is easily accommodated post-estimation by re-scaling the vector of fishing mortality rates by the maximum age-specific selectivity in each year. 
+
+      If the previous paragraph didn't make sense, go read the R-code.
+    % subsubsection selectivity (end)
+
+  % subsection age_schedule_information (end)
+
+  \subsection{Fishing mortality} % (fold)
+  \label{sub:fishing_mortality}
+  If the model is conditioned on effort, then a routine that calculates the age-specific fishing mortality rate is invoked.  In this routine, a vector of fishing mortality rate parametes, in log-space, is estimated, and the age-specific fishing mortality rate is the product of the fishing rate and age-specific selectivity.  The source code for this routine is as follows:
+  \lstinputlisting[language=C++, firstline=686, lastline=693]{../../src/ham.tpl}
+
+  If the model is conditioned on catch (NB this is the method the ASA model uses), then there is a resulting difference equation which has the potential to result in negative numbers-at-age, which results in negative Infinity in log-space.  To guard against this, many excel users would simply use a Max function to ensure that a positive number is returned.  This is another occurance where the objective function is disconituous and subject to non-convergence issues.  AD Model Builder has a function \texttt{posfun} that can be used to ensure the objective function remains continuous and differentiable.
+  % subsection fishing_mortality (end)
+
 
   \subsection{Population dynamics} % (fold)
   \label{sub:population_dynamics}
-  
   Estimated parameters for the population dynamics model include the initial abundance of ages 3-9+ for the intial year, abundance of age-3 recruits each year, and the natural mortality rate. In the original parameterizeation of the model, these initial recruitments and the vector of initial numbers-at-age result in creating $(N + A-1)$ scaling parameters.  To reduce the potential confounding with other global scaling parmaters, updates to the model code include estimation of two recruitment scaling parameters, and two vectors of deviates that represent deviations from the mean. This modification reduces the potential for parameter confounding among the many paraemters that affect global scaling (i.e., catchabiltiy coefficients, natural mortlaity rates).
+
+    
+  
+
+  
 
   \begin{table}[h]
     \centering
@@ -199,7 +274,7 @@
     \tableEq
     \begin{align}
       \hline \nonumber
-      & \mbox{Model parameters} \nonumber\\
+      & \mbox{Model parameters} & \nonumber\\
       & \theta = \{\ln(M),\ln(\bar{R}),\ln(\ddot{R}), 
         \ln(\alpha),\ln(\beta),\vec{\delta} \} \\[1ex]
       %%
@@ -207,20 +282,36 @@
       & \iota_j = \begin{cases}
           \exp(-M*(j-\mbox{min}(j))) & \quad \mbox{where } 3 \leq j \leq 7 \\[1ex]
           \dfrac{\exp(-M*(j-\mbox{min}(j)))}{1-\exp(-M)} & \quad \mbox{where } j=8 \\
-          \end{cases} \\[1ex]
-      & N_{i,j} = \ddot{R} \exp(\delta_{i-j}) \iota_j \qquad \qquad  i=1980,\forall j \\
-      & N_{i,j} = \bar{R} \exp(\delta_i) \qquad  \quad \qquad \quad \forall i, j=3 \\
+          \end{cases} & \mbox{survivorship} \label{eq.survivorship}\\[1ex]
+      & N_{i,j} = \ddot{R} \exp(\delta_{i-j}) \iota_j \qquad \qquad  i=1980,\forall j & \mbox{initial numbers-at-age} \label{eq.initialnumbersatage} \\
+      & N_{i,j} = \bar{R} \exp(\delta_i) \qquad  \quad \qquad \quad \forall i, j=3 & \mbox{age-3 recruits} \label{eq.initialrecruits} \\[1ex]
       %%
       & \mbox{Dynamic States ($i > 1980$)} \nonumber\\
-      & Q_{i,j} = \frac{N_{i,j} S_{i,j}}{\sum_j N_{i,j} S_{i,j}} \\
-      & \bar{w}_i  = \sum_j w_j  Q_{i,j} \\
-      & C_{i,j} = \frac{\hat{c}_{i}Q_{i,j}}{\bar{w}_i} \qquad \mbox{where $\hat{c}_i$ is the observed catch (mt)} \\
+      & Q_{i,j} = \frac{N_{i,j} S_{i,j}}{\sum_j N_{i,j} S_{i,j}} &\mbox{vulnerable proportions} \\
+      & \bar{w}_i  = \sum_j w_j  Q_{i,j} &\mbox{average weight of catch} \\
+      & C_{i,j} = \frac{\hat{c}_{i}Q_{i,j}}{\bar{w}_i} \qquad \mbox{where $\hat{c}_i$ is the observed catch (mt)} &\mbox{$C_{i,j}$ catch-at-age} \\
       & \acute{N}_{i,j} = N_{i,j} \exp(-F_{i,j}) \\
       & N_{i+1,j+1} = \acute{N}_{i,j} \exp(-M_{i,j}) \\
       \hline \nonumber
     \end{align}
     \normalEq
   \end{table}
+
+  \subsubsection{Initial state variables.} % (fold)
+    \label{ssub:initial_state_variables_}
+    
+    In this routine, the objective is to set the initial values for the numbers-at-age matrix $N_{i,j}$.  Specifically, the row dimensions of the matrix are from the start year to the terminal year + 1, the column dimensions are the ages.  This routine first calculates the survivorship to age $j$ based on natural mortality rates, then initializes the first row of $N_{i,j}$ matrix using the average initial recruitment and deviations around that average recruitment multiplied by the survivorship at age $j$.  The source code also includes the taylor series for the plus group:
+    \lstinputlisting[language=C++, firstline=697, lastline=724]{../../src/ham.tpl}
+
+    The survivorship calculation \texttt{lx} correspondds to \eqref{eq.survivorship} in Table \ref{tab:PopulationDynamics}, and the numbers-at-age in the initial year and age-3 recruits corresponds to \eqref{eq.initialnumbersatage} and \eqref{eq.initialrecruits}, respectively.
+    % subsubsection initial_state_variables_ (end)
+
+    \subsubsection{Update state variables} % (fold)
+    \label{ssub:update_state_variables}
+    In this routine, the numbers-at-age are propogated in time, where the-age specific survival rate is partitioned into two periods: a fishing period, and a period of natural mortality.  The ASA model currently in use for Sitka sound herring assumes a pulse fishery.  At the start of each time step, the model first calculates the predicted catch-at-age in numbers in year $i$. This is done by first converting the catch weight to catch in numbers by dividing by the predicted average of the catch.  This corresponds to the \texttt{wbar} variable in the following code chunk (note the dependencey on predicted proportions-at-age):
+    \lstinputlisting[language=C++, firstline=729, lastline=783]{../../src/ham.tpl}
+    Once the catch-at-age data is calculated, the pulse fishery proceeds by subtracting the $C_{ij}$  from the $N_{i,j}$.  The last two steps correspond to step 4 in the annotated code chunk. The last steps the survive the remaining numbers-at-age using the natrual mortality rate in year $i$. Then finally, update the numbers-at-age $j$ to $j+1$ in year $i$ to year $i+1$.
+    % subsubsection update_state_variables (end)
 
   % subsection population_dynamics (end)
 
