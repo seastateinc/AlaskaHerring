@@ -287,12 +287,17 @@
       & N_{i,j} = \bar{R} \exp(\delta_i) \qquad  \quad \qquad \quad \forall i, j=3 & \mbox{age-3 recruits} \label{eq.initialrecruits} \\[1ex]
       %%
       & \mbox{Dynamic States ($i > 1980$)} \nonumber\\
-      & Q_{i,j} = \frac{N_{i,j} S_{i,j}}{\sum_j N_{i,j} S_{i,j}} &\mbox{vulnerable proportions} \\
+      & Q_{i,j} = \frac{N_{i,j} S_{i,j}}{\sum_j N_{i,j} S_{i,j}} &\mbox{vulnerable proportions} \label{eq.predQij} \\
       & \bar{w}_i  = \sum_j w_j  Q_{i,j} &\mbox{average weight of catch} \\
       & C_{i,j} = \frac{\hat{c}_{i}Q_{i,j}}{\bar{w}_i} \qquad \mbox{where $\hat{c}_i$ is the observed catch (mt)} &\mbox{$C_{i,j}$ catch-at-age} \\
       & \acute{N}_{i,j} = N_{i,j} \exp(-F_{i,j}) \\
-      & N_{i+1,j+1} = \acute{N}_{i,j} \exp(-M_{i,j}) \\
+      & N_{i+1,j+1} = \acute{N}_{i,j} \exp(-M_{i,j}) \\[1ex]
+      %%
+      & \mbox{Spawning stock biomass} \nonumber\\
+      & B_{i} = \sum_j (N_{ij}-C_{ij}) \omega_{ij} w_j & \mbox{Spawning stock biomass} \label{eq.ssb}\\
+      & \mbox{Stock-recruitment} \nonumber\\
       \hline \nonumber
+      %%
     \end{align}
     \normalEq
   \end{table}
@@ -308,14 +313,66 @@
 
     \subsubsection{Update state variables} % (fold)
     \label{ssub:update_state_variables}
-    In this routine, the numbers-at-age are propogated in time, where the-age specific survival rate is partitioned into two periods: a fishing period, and a period of natural mortality.  The ASA model currently in use for Sitka sound herring assumes a pulse fishery.  At the start of each time step, the model first calculates the predicted catch-at-age in numbers in year $i$. This is done by first converting the catch weight to catch in numbers by dividing by the predicted average of the catch.  This corresponds to the \texttt{wbar} variable in the following code chunk (note the dependencey on predicted proportions-at-age):
-    \lstinputlisting[language=C++, firstline=729, lastline=783]{../../src/ham.tpl}
-    Once the catch-at-age data is calculated, the pulse fishery proceeds by subtracting the $C_{ij}$  from the $N_{i,j}$.  The last two steps correspond to step 4 in the annotated code chunk. The last steps the survive the remaining numbers-at-age using the natrual mortality rate in year $i$. Then finally, update the numbers-at-age $j$ to $j+1$ in year $i$ to year $i+1$.
+    In this routine, the numbers-at-age are propagated in time, where the-age specific survival rate is partitioned into two periods: a fishing period, and a period of natural mortality.  The ASA model currently in use for Sitka sound herring assumes a pulse fishery.  At the start of each time step, the model first calculates the predicted catch-at-age in numbers in year $i$. This is done by first converting the catch weight to catch in numbers by dividing by the predicted average of the catch.  This corresponds to the \texttt{wbar} variable in the following code chunk (note the dependencey on predicted proportions-at-age):
+    \lstinputlisting[language=C++, firstline=729, lastline=792]{../../src/ham.tpl}
+    Once the catch-at-age data is calculated, the pulse fishery proceeds by subtracting the $C_{ij}$  from the $N_{i,j}$.  The last two steps correspond to step 4 in the annotated code chunk. The last steps the survive the remaining numbers-at-age using the natural mortality rate in year $i$. Then finally, update the numbers-at-age $j$ to $j+1$ in year $i$ to year $i+1$, including the plus group for the terminal age-group.
     % subsubsection update_state_variables (end)
 
+    \subsubsection{Stock-recruitment \& Spawning stock biomass} % (fold)
+    \label{ssub:stock_recruitment_&_spawning_stock_biomass}
+    The spawning stock biomass (after roe-fishery removal) is the product of the remaining numbers-at-age, the maturity-at-age, and the weight-at-age from spawn samples.  The equation is defined in \eqref{eq.ssb} in Table \ref{tab:PopulationDynamics}.  Note that the lag between spawning biomass and age-3 recruits is taken into account.
+
+    The stock recruitment relationship assumes that recruitment follows a Ricker type.  The form  of the Ricker model is as follows \[ R = s_o B_i \exp(-\beta B_i + \epsilon_i)\] where the parameter $s_o$ is the slope at the origin (or maximum number of recruits per spawning unit), and $\beta$ defines slope of $\ln(R_i/B_i)$ versus the independent variable $B_i$.  These two parameters are derived from the leading parameters the unfished recruitment $R_0$ and the steepness of the stock recruitment relationship as defined by \citep{mace1988generalised,}.
+
+    The source code for the stock-recruitment relationship is well annotated and describes some of the derivations:
+    \begin{small}
+    \lstinputlisting[language=C++, firstline=795, lastline=860]{../../src/ham.tpl}
+      
+    \end{small}
+
+    There is an issue with regards to calculating reference points in cases where there is non-stationarity (i.e., any time varying parameters such as natural mortality, maturity etc.).  At what period should be used to define the average weight-at-age for spawning herring? What period should be used for calculating the average maturity?  All of these are subjective decisions, and based on my experience will have little impact on the overall fit to the data, but could have major implications for harvest policy changes. 
+
+    % subsubsection stock_recruitment_&_spawning_stock_biomass (end)
   % subsection population_dynamics (end)
 
+  \subsection{Observation models} % (fold)
+  \label{sub:observation_models}
+    \subsubsection{Age composition} % (fold)
+    \label{ssub:age_composition}
+    The predicted age-composition is based on the vulnerable proportions at age $Q_{i,j}$ in \eqref{eq.predQij}.  The residual difference is used to compute the negative log likelihood in the objective function.  The code for the age composition residual calculation is as follows:
+    \lstinputlisting[language=C++, firstline=864, lastline=885]{../../src/ham.tpl}
+    Note that both the residual difference between the commercial and spawning samples are calculated in this routine.  If there are missing data for a given year (denoted by a -9.0 in the data file), then the residual difference is set to 0 for that year and there is no contribution to the negative log likelihood.
+    % subsubsection age_composition (end)
 
+    \subsubsection{Egg deposition} % (fold)
+    \label{ssub:egg_deposition}
+    The observation model for the egg deposition data treats these observations as estimates of absolute abundance.  Therefore, there is no associated scaling parameter that is estimated. The observation errors in the egg deposition data are assumed to be lognormal.  The predicted age-deposition data is based on the female (assuming a 50:50 sex ratio) mature numbers-at-age multiplied by the fecundity at age.  The annotated source code is as follows:
+    \lstinputlisting[language=C++, firstline=864, lastline=885]{../../src/ham.tpl}
+
+    % subsubsection egg_deposition (end)
+
+    \subsubsection{Aerial surveys} % (fold)
+    \label{ssub:aerial_surveys}
+    
+    % subsubsection aerial_surveys (end)
+
+    \subsubsection{Predicted catch} % (fold)
+    \label{ssub:predicted_catch}
+    
+    % subsubsection predicted_catch (end)
+  % subsection observation_models (end)
+
+  \subsection{Objective function} % (fold)
+  \label{sub:objective_function}
+    \subsection{Negative log-likelihoods} % (fold)
+    \label{sub:negative_log_likelihoods}
+    
+    % subsection negative_log_likelihoods (end)
+    \subsection{Penalties} % (fold)
+    \label{sub:penalties}
+    
+    % subsection penalties (end)
+  % subsection objective_function (end)
 \begin{table}
   \centering
   \caption{Mathematical notation, symbols and descriptions.}

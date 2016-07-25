@@ -12,3 +12,12 @@
 \BOOKMARK [2][-]{subsection.3.5}{Population dynamics}{section.3}% 12
 \BOOKMARK [3][-]{subsubsection.3.5.1}{Initial state variables.}{subsection.3.5}% 13
 \BOOKMARK [3][-]{subsubsection.3.5.2}{Update state variables}{subsection.3.5}% 14
+\BOOKMARK [3][-]{subsubsection.3.5.3}{Stock-recruitment \046 Spawning stock biomass}{subsection.3.5}% 15
+\BOOKMARK [2][-]{subsection.3.6}{Observation models}{section.3}% 16
+\BOOKMARK [3][-]{subsubsection.3.6.1}{Age composition}{subsection.3.6}% 17
+\BOOKMARK [3][-]{subsubsection.3.6.2}{Egg deposition}{subsection.3.6}% 18
+\BOOKMARK [3][-]{subsubsection.3.6.3}{Aerial surveys}{subsection.3.6}% 19
+\BOOKMARK [3][-]{subsubsection.3.6.4}{Predicted catch}{subsection.3.6}% 20
+\BOOKMARK [2][-]{subsection.3.7}{Objective function}{section.3}% 21
+\BOOKMARK [2][-]{subsection.3.8}{Negative log-likelihoods}{section.3}% 22
+\BOOKMARK [2][-]{subsection.3.9}{Penalties}{section.3}% 23
