@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  24 JUL 2016 22:08
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  25 JUL 2016 14:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -777,8 +777,13 @@ Overfull \hbox (101.29399pt too wide) in paragraph at lines 771--772
  []
 
 
-Overfull \hbox (108.34398pt too wide) in paragraph at lines 781--782
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+Overfull \hbox (23.74413pt too wide) in paragraph at lines 777--778
+[][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (16.69414pt too wide) in paragraph at lines 781--782
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 ) (./HerringModelDocumentation.bbl
@@ -818,7 +823,7 @@ exlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/te
 xlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texl
 ive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texli
 ve/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on HerringModelDocumentation.pdf (12 pages, 186688 bytes).
+Output written on HerringModelDocumentation.pdf (12 pages, 187134 bytes).
 PDF statistics:
  425 PDF objects out of 1000 (max. 8388607)
  394 compressed objects within 4 object streams

@@ -1,15 +1,15 @@
 # Fdb version 3
-["bibtex HerringModelDocumentation"] 1469422693 "HerringModelDocumentation.aux" "HerringModelDocumentation.bbl" "HerringModelDocumentation" 1469423331
+["bibtex HerringModelDocumentation"] 1469422693 "HerringModelDocumentation.aux" "HerringModelDocumentation.bbl" "HerringModelDocumentation" 1469483611
   "/Users/steve/Documents/ARTICLES/Articles-1.bib" 1458491886 362543 72e9ffe1496a650a17d07fc3f90ba05b ""
   "/usr/local/texlive/2015/texmf-dist/bibtex/bst/base/apalike.bst" 1292289607 24635 604dafcc79f521a11ea73e506e1fbd98 ""
-  "HerringModelDocumentation.aux" 1469423330 8178 338730e1334c54fcf63ccc255caf10a7 ""
+  "HerringModelDocumentation.aux" 1469483611 8178 338730e1334c54fcf63ccc255caf10a7 ""
   "HerringModelDocumentation.bcf" 0 -1 0 ""
   (generated)
-  "HerringModelDocumentation.bbl"
   "HerringModelDocumentation.blg"
-["pdflatex"] 1469423328 "HerringModelDocumentation.tex" "HerringModelDocumentation.pdf" "HerringModelDocumentation" 1469423331
-  "../../src/ham.tpl" 1469422901 41375 117ca1b8c5ed465b6d2f6e9e7c8e892c ""
-  "./HerringModelDocumentation.out" 1469423330 968 a45d035281d8f24fc6ab8a91c35169a4 ""
+  "HerringModelDocumentation.bbl"
+["pdflatex"] 1469483609 "HerringModelDocumentation.tex" "HerringModelDocumentation.pdf" "HerringModelDocumentation" 1469483611
+  "../../src/ham.tpl" 1469483525 41627 1c0a20b96e88bb6ca175014a60ddc4a7 ""
+  "./HerringModelDocumentation.out" 1469483611 968 a45d035281d8f24fc6ab8a91c35169a4 ""
   "/usr/local/texlive/2015/texmf-dist/fonts/map/fontname/texfonts.map" 1272929888 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
   "/usr/local/texlive/2015/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy6.tfm" 1246382020 1124 14ccf5552bc7f77ca02a8a402bea8bfb ""
   "/usr/local/texlive/2015/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy7.tfm" 1246382020 1120 7f9f170e8aa57527ad6c49feafd45d54 ""
@@ -127,12 +127,12 @@
   "/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1432479641 1764542 91654ba72bdb667e84ea24f076ae16d8 ""
   "/usr/local/texlive/2015/texmf-var/web2c/pdftex/pdflatex.fmt" 1432479681 3849859 39a7d258195bde2394e244961601fbc5 ""
   "/usr/local/texlive/2015/texmf.cnf" 1432479636 577 0d611272082f3cdb8e80e09a3c69cf07 ""
-  "HerringModelDocumentation.aux" 1469423330 8178 338730e1334c54fcf63ccc255caf10a7 ""
-  "HerringModelDocumentation.bbl" 1469422693 49 0eba253fc001332e731e8aba3f23127b "bibtex HerringModelDocumentation"
-  "HerringModelDocumentation.out" 1469423330 968 a45d035281d8f24fc6ab8a91c35169a4 ""
-  "HerringModelDocumentation.tex" 1469423328 21221 4b00a35b42fc93c524ff6da504246e6e ""
+  "HerringModelDocumentation.aux" 1469483611 8178 338730e1334c54fcf63ccc255caf10a7 ""
+  "HerringModelDocumentation.bbl" 1469483525 49 0eba253fc001332e731e8aba3f23127b "bibtex HerringModelDocumentation"
+  "HerringModelDocumentation.out" 1469483611 968 a45d035281d8f24fc6ab8a91c35169a4 ""
+  "HerringModelDocumentation.tex" 1469483525 21221 4b00a35b42fc93c524ff6da504246e6e ""
   (generated)
-  "HerringModelDocumentation.pdf"
-  "HerringModelDocumentation.log"
-  "HerringModelDocumentation.aux"
   "HerringModelDocumentation.out"
+  "HerringModelDocumentation.aux"
+  "HerringModelDocumentation.log"
+  "HerringModelDocumentation.pdf"
