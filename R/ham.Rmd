@@ -12,6 +12,9 @@ output:
 # Overview
 The following output is based on the R-scripts in ham.R, and references therein.  This document is produced using RMarkdown, where code chunks are directly embedded, and the document is dynamic in the sense that if the data, model, code, or parameter in the model changes, these figures, tables and summaries are automatically updated.
 
+#Lucie
+Oh my daughter is messing around.
+
 ![Lucie though it was important to admit that I'm a Brony](mylittlepony.jpeg)
 
 ----

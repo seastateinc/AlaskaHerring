@@ -48,7 +48,8 @@ $(rundirs):
 
 retro: $(EXEC) $(makdirs) $(rundirs)
 	touch RETRODONE
-	
+
+# Simulation Rule
 
 clean:
 	@rm -f $(EXEC) 
