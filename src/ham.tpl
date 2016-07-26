@@ -413,7 +413,7 @@ PARAMETER_SECTION
   objective_function_value f;
 
   number fpen;
-
+  sdreport_number sd_terminal_ssb;
 
 PRELIMINARY_CALCS_SECTION
 
@@ -503,6 +503,8 @@ PROCEDURE_SECTION
   calcObjectiveFunction();
   if(DEBUG_FLAG) cout<<"--> Ok after calcObjectiveFunction          <--"<<endl;
   
+  sd_terminal_ssb = ssb(mod_nyr);
+
 // |---------------------------------------------------------------------------|
 
   

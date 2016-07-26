@@ -22,12 +22,12 @@ $(EXEC): $(DIST)
 
 
 
-$(EXEC).rep: $(EXEC) $(DATA)
+$(EXEC).rep: $(EXEC) $(DATA) $(DAT) $(CTL)
 	./$(EXEC) -ind $(DATA) $(ARGS)
 
 
 
-run: $(DATA)
+run: $(DATA) 
 	./$(EXEC) -ind $(DATA) $(ARGS)
 
 
@@ -37,19 +37,34 @@ retdirs := $(shell echo 'cat(formatC(1:$(NRET),digits=3,flag="0"))' | R --vanill
 makdirs := $(foreach dir, $(retdirs), $(dir)/makdirs)
 rundirs := $(foreach dir, $(retdirs), $(dir)/rundirs)
 
-$(makdirs): $(EXEC)
-	mkdir $(@D)
-	cp $(EXEC) $(DATA) $(DAT) $(CTL) Makefile $(@D)
+$(makdirs): 
+	mkdir -p rets/$(@D)
+	cp $(EXEC) $(DATA) $(DAT) $(CTL) Makefile rets/$(@D);
 	cd $(@D); touch makdirs
 
 $(rundirs): 
-	-cd $(@D); make run ARGS='-retro $(@D)'
-	cd $(@D); touch rundirs
+	@cd rets/$(@D); make run ARGS='-retro $(@D)'
+	@cd rets/$(@D); touch rundirs
 
 retro: $(EXEC) $(makdirs) $(rundirs)
 	touch RETRODONE
 
 # Simulation Rule
+NSIMS=2
+simdirs := $(shell echo 'cat(formatC(1:$(NSIMS),digits=3,flag="0"))' | R --vanilla --slave)
+setsims := $(foreach dir,$(simdirs),$(dir)/setsims)
+runsims := $(foreach dir,$(simdirs),$(dir)/runsims)
+
+$(setsims):
+	mkdir -p sims/$(@D);
+	cp $(EXEC) $(DATA) $(DAT) $(CTL) Makefile sims/$(@D);
+	cd $(@D); touch setsims
+
+$(runsims):
+	cd sims/$(@D); make run ARGS="-sim -$(@D)";
+
+sim: $(EXEC) $(setsims) $(runsims)
+	touch SIMSDONE
 
 clean:
 	@rm -f $(EXEC) 
@@ -57,5 +72,10 @@ clean:
 	@rm -f admodel.hes
 	@rm -f admodel.dep
 	@rm -f fmin.log
-	@rm -f $(EXEC).rep $(EXEC).par ham.[rpls]
-	@rm -r 0* 
+	@rm -f $(EXEC).rep $(EXEC).par ham.[bcerpls]*
+	@rm -r rets ||:
+	@rm -r sims ||:
+	@rm -f makedirs
+	@rm -f retro
+	@rm -f RETRODONE
+	@rm -f SIMSDONE

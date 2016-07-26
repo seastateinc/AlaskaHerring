@@ -1,6 +1,7 @@
 ---
 title: Herring Assessment Model (Input/Output for Sitka)
-author: Sea State
+author: Sea State Inc
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   html_document:
     fig_caption: true
@@ -176,8 +177,8 @@ As good practice, stock assessment models should pass the `self-testing' diagnos
 where the 123 is the random number seed for generating a unique sequence of random numbers that is repeatable.  Simple diagnostic plots of the relative error can be used to judge the precision and bias of estimated parameters. For example the following figure looks at how precisesly estimated the steepness of the stock recruitment relationship is (kappa), natural mortality, initial and average recruitment, and the average unfished recruitment (Ro). 
 
 ```{r}
-	source(file.path("readSims.R"))
-	print(p + ggtitle("Precision and Bias"))
+	# source(file.path("readSims.R"))
+	# print(p + ggtitle("Precision and Bias"))
 ```
 
 You can easily write an R-script, or makefile, to automate the process of running many simulations, reading the results, and producing summary statistics and plots.
