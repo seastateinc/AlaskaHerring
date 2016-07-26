@@ -372,10 +372,11 @@
     \label{ssub:negative_loglikelihoods}
     The negative loglikelihoods 
     % subsubsection negative_loglikelihoods (end)
-    There are five 6 negative loglikelihoods functions in the objective function that correspond to the 5 different data elements and the residual process errors associated with a stock-recruitment relationship. The following table summarises the available options currently implemented.
+    There are five 6 negative loglikelihoods functions in the objective function that correspond to the 5 different data elements and the residual process errors associated with a stock-recruitment relationship. Table \ref{tab:likelihoodOptions} summarises the available options currently implemented.
 
     \begin{table}[h]
       \caption{Data and types of likelihoods implemented}
+      \label{tab:likelihoodOptions}
       \begin{tabular}{l|c|c|c|c}
         \hline
         Data & normal & log-normal & multivariate-logistic & multinomial\\
@@ -388,10 +389,20 @@
         Stock-Recruitment & & X & \\
       \end{tabular}
     \end{table}
+
+    The source code for the negative loglikelihoods follows:
+    \lstinputlisting[language=C++, firstline=959, lastline=989]{../../src/ham.tpl}
     
+    For the composition data, the multivariate logistic likelihood is currently implemented, as this is a self-scaling likelihood.  A good reference for this particular likelihood and how its implemented in AD Model Builder can be found in \cite{schnute1995influence}.  More recent work on the weighting of composition data is available in \cite{francis2011data}.  The function \texttt{dmvlogistic} requires 5 arguments: the observed and predicted composition matrixes, a matrix for returning the residuals, a variable for the conditional MLE of the variance of the observation errors, and a threshold value called \texttt{minp}. The multivariate logistic likelihood does not accommodate 0 observations for age proportions.  Therefore there are two options for dealing with 0s: 1) add a small constant to all observed and predicted observations and re-normalize, or 2) pool the adjacent cohorts if the observed proportion is less than some minimum observed proportion.  The first option is widely used in programs such as stock synthesis, and is akin to manufacturing data.  If a particular cohort is relatively weak, and only partially selected, the sample size required to observed just one individual of a certain age in a given year could be infinitely large.  Instead of adding a constant, option 2 pools the data such that the likelihood of ages, for example, 3-4 are evaluated jointly, rather than the likelihood of age-3 plus the likelihood of age-4.  This pooling of the data and predictions does not require the addition of a constant that could potentially bias the result.  A good practice that I've found is to just set \texttt{minp=0}, and then conduct sensitivity tests using where proportions less than 1\% or 2\% etc are pooled into the adjacent cohort.
+
+    In the case of the likelihoods for the egg deposition index, aerial surveys, and catch data, the function \texttt{dnorm} is used, where the arguments are the vector of residuals, and a vector of standard-deviations for each observation.  Note that you can effectively turn individual years of data off by setting the \texttt{log.se} value to a large number (e.g., 5.0).
+
     \subsubsection{Penalties} % (fold)
     \label{ssub:penalties}
-    
+    Currently the code for the penalties is as follows:
+    \lstinputlisting[language=C++, firstline=995, lastline=1011]{../../src/ham.tpl}
+
+    The penalties are implemented in a phased approach, where in the initial phases of parameter estimation, the penalties initially have small standard deviations. This increases the overall efficiency of the non-linear search routine to help resolve the overall scaling. Then in the terminal phase, these penalties are relaxed (increased variance) such that they provide little or no influence on the gradient structure.  A similar strategy is also used with the recruitment deviation parameters.
     % subsubsection penalties (end)
   % subsection objective_function (end)
 \begin{table}
