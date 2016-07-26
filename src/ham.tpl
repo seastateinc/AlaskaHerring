@@ -408,6 +408,9 @@ PARAMETER_SECTION
   matrix pred_sp_comp(mod_syr,mod_nyr,sage,nage);
   matrix resd_sp_comp(mod_syr,mod_nyr,sage,nage);
 
+// |---------------------------------------------------------------------------|
+// | OBJECTIVE FUNCTION VALUE
+// |---------------------------------------------------------------------------|
   objective_function_value f;
 
   number fpen;
@@ -442,7 +445,7 @@ PRELIMINARY_CALCS_SECTION
 
 
 PROCEDURE_SECTION
-  
+ 
 // |---------------------------------------------------------------------------|
 // | RUN STOCK ASSEAAMENT MODEL ROUTINES
 // |---------------------------------------------------------------------------|
