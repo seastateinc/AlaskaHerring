@@ -4,45 +4,45 @@ The top-level auxiliary file: HerringModelDocumentation.aux
 The style file: apalike.bst
 Database file #1: $HOME/Documents/ARTICLES/Articles-1.bib
 Warning--I didn't find a database entry for ""
-You've used 1 entry,
+You've used 2 entries,
             1935 wiz_defined-function locations,
-            476 strings with 3916 characters,
-and the built_in function-call counts, 337 in all, are:
-= -- 29
-> -- 13
-< -- 1
-+ -- 6
-- -- 4
-* -- 23
-:= -- 64
-add.period$ -- 3
-call.type$ -- 1
-change.case$ -- 6
-chr.to.int$ -- 1
-cite$ -- 1
-duplicate$ -- 14
-empty$ -- 24
-format.name$ -- 7
-if$ -- 63
+            484 strings with 4134 characters,
+and the built_in function-call counts, 741 in all, are:
+= -- 71
+> -- 26
+< -- 2
++ -- 10
+- -- 8
+* -- 60
+:= -- 132
+add.period$ -- 6
+call.type$ -- 2
+change.case$ -- 13
+chr.to.int$ -- 2
+cite$ -- 2
+duplicate$ -- 28
+empty$ -- 54
+format.name$ -- 14
+if$ -- 142
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 2
-newline$ -- 8
-num.names$ -- 3
-pop$ -- 9
+missing$ -- 3
+newline$ -- 13
+num.names$ -- 6
+pop$ -- 13
 preamble$ -- 1
-purify$ -- 7
+purify$ -- 14
 quote$ -- 0
-skip$ -- 11
+skip$ -- 22
 stack$ -- 0
-substring$ -- 14
-swap$ -- 1
+substring$ -- 51
+swap$ -- 2
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 4
+type$ -- 10
 warning$ -- 0
-while$ -- 2
+while$ -- 6
 width$ -- 0
-write$ -- 14
+write$ -- 27
 (There was 1 warning)

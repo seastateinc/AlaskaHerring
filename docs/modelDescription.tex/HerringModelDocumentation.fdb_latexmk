@@ -1,41 +1,15 @@
 # Fdb version 3
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-["bibtex HerringModelDocumentation"] 1469422693 "HerringModelDocumentation.aux" "HerringModelDocumentation.bbl" "HerringModelDocumentation" 1469483611
-  "/Users/steve/Documents/ARTICLES/Articles-1.bib" 1458491886 362543 72e9ffe1496a650a17d07fc3f90ba05b ""
+["bibtex HerringModelDocumentation"] 1469504976 "HerringModelDocumentation.aux" "HerringModelDocumentation.bbl" "HerringModelDocumentation" 1469505278
+  "/Users/stevenmartell1/Documents/ARTICLES/Articles-1.bib" 1454351118 361451 353ac44f83f5514834fc0020928e6600 ""
   "/usr/local/texlive/2015/texmf-dist/bibtex/bst/base/apalike.bst" 1292289607 24635 604dafcc79f521a11ea73e506e1fbd98 ""
-  "HerringModelDocumentation.aux" 1469483611 8178 338730e1334c54fcf63ccc255caf10a7 ""
-=======
-["bibtex HerringModelDocumentation"] 1469478696 "HerringModelDocumentation.aux" "HerringModelDocumentation.bbl" "HerringModelDocumentation" 1469482159
-  "/Users/steve/Documents/ARTICLES/Articles-1.bib" 1458491886 362543 72e9ffe1496a650a17d07fc3f90ba05b ""
-  "/usr/local/texlive/2015/texmf-dist/bibtex/bst/base/apalike.bst" 1292289607 24635 604dafcc79f521a11ea73e506e1fbd98 ""
-  "HerringModelDocumentation.aux" 1469482159 10505 623ecc2446f1c5e19dcfbfa53c2e37c8 ""
->>>>>>> Stashed changes
-=======
-["bibtex HerringModelDocumentation"] 1469478696 "HerringModelDocumentation.aux" "HerringModelDocumentation.bbl" "HerringModelDocumentation" 1469482159
-  "/Users/steve/Documents/ARTICLES/Articles-1.bib" 1458491886 362543 72e9ffe1496a650a17d07fc3f90ba05b ""
-  "/usr/local/texlive/2015/texmf-dist/bibtex/bst/base/apalike.bst" 1292289607 24635 604dafcc79f521a11ea73e506e1fbd98 ""
-  "HerringModelDocumentation.aux" 1469482159 10505 623ecc2446f1c5e19dcfbfa53c2e37c8 ""
->>>>>>> Stashed changes
+  "HerringModelDocumentation.aux" 1469505278 10779 652b00795ddba070d9b42cf910ece290 ""
   "HerringModelDocumentation.bcf" 0 -1 0 ""
   (generated)
-  "HerringModelDocumentation.blg"
   "HerringModelDocumentation.bbl"
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-["pdflatex"] 1469483609 "HerringModelDocumentation.tex" "HerringModelDocumentation.pdf" "HerringModelDocumentation" 1469483611
-  "../../src/ham.tpl" 1469483525 41627 1c0a20b96e88bb6ca175014a60ddc4a7 ""
-  "./HerringModelDocumentation.out" 1469483611 968 a45d035281d8f24fc6ab8a91c35169a4 ""
-=======
-["pdflatex"] 1469482156 "HerringModelDocumentation.tex" "HerringModelDocumentation.pdf" "HerringModelDocumentation" 1469482159
-  "../../src/ham.tpl" 1469478868 41805 9e0046b9fe49b97138a019e92747da8d ""
-  "./HerringModelDocumentation.out" 1469482159 1640 fd6c5f9bb203dc7bc6cb8d5dcfc767e2 ""
->>>>>>> Stashed changes
-=======
-["pdflatex"] 1469482156 "HerringModelDocumentation.tex" "HerringModelDocumentation.pdf" "HerringModelDocumentation" 1469482159
-  "../../src/ham.tpl" 1469478868 41805 9e0046b9fe49b97138a019e92747da8d ""
-  "./HerringModelDocumentation.out" 1469482159 1640 fd6c5f9bb203dc7bc6cb8d5dcfc767e2 ""
->>>>>>> Stashed changes
+  "HerringModelDocumentation.blg"
+["pdflatex"] 1469505273 "HerringModelDocumentation.tex" "HerringModelDocumentation.pdf" "HerringModelDocumentation" 1469505278
+  "../../src/ham.tpl" 1469505273 41868 6d8657b747261de57090d7030087a1b8 ""
+  "./HerringModelDocumentation.out" 1469505278 1640 fd6c5f9bb203dc7bc6cb8d5dcfc767e2 ""
   "/usr/local/texlive/2015/texmf-dist/fonts/map/fontname/texfonts.map" 1272929888 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
   "/usr/local/texlive/2015/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy6.tfm" 1246382020 1124 14ccf5552bc7f77ca02a8a402bea8bfb ""
   "/usr/local/texlive/2015/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy7.tfm" 1246382020 1120 7f9f170e8aa57527ad6c49feafd45d54 ""
@@ -158,28 +132,14 @@
   "/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1432479641 1764542 91654ba72bdb667e84ea24f076ae16d8 ""
   "/usr/local/texlive/2015/texmf-var/web2c/pdftex/pdflatex.fmt" 1432479681 3849859 39a7d258195bde2394e244961601fbc5 ""
   "/usr/local/texlive/2015/texmf.cnf" 1432479636 577 0d611272082f3cdb8e80e09a3c69cf07 ""
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  "HerringModelDocumentation.aux" 1469483611 8178 338730e1334c54fcf63ccc255caf10a7 ""
-  "HerringModelDocumentation.bbl" 1469483525 49 0eba253fc001332e731e8aba3f23127b "bibtex HerringModelDocumentation"
-  "HerringModelDocumentation.out" 1469483611 968 a45d035281d8f24fc6ab8a91c35169a4 ""
-  "HerringModelDocumentation.tex" 1469483525 21221 4b00a35b42fc93c524ff6da504246e6e ""
-  (generated)
-  "HerringModelDocumentation.out"
-  "HerringModelDocumentation.aux"
-=======
-=======
->>>>>>> Stashed changes
-  "HerringModelDocumentation.aux" 1469482159 10505 623ecc2446f1c5e19dcfbfa53c2e37c8 ""
-  "HerringModelDocumentation.bbl" 1469478696 290 9bdde109f3692d1cc9bc8c238c204831 "bibtex HerringModelDocumentation"
-  "HerringModelDocumentation.out" 1469482159 1640 fd6c5f9bb203dc7bc6cb8d5dcfc767e2 ""
-  "HerringModelDocumentation.tex" 1469478691 25568 170bd4f8810f19b9985243d87f4abaaf ""
+  "HerringModelDocumentation.aux" 1469505278 10779 652b00795ddba070d9b42cf910ece290 ""
+  "HerringModelDocumentation.bbl" 1469504977 573 eca4be54442b65c62a77d4c11dd4c692 "bibtex HerringModelDocumentation"
+  "HerringModelDocumentation.out" 1469505278 1640 fd6c5f9bb203dc7bc6cb8d5dcfc767e2 ""
+  "HerringModelDocumentation.tex" 1469505262 26529 2f753939f54d8fc491db9fb09b67f9a3 ""
   (generated)
   "HerringModelDocumentation.aux"
-  "HerringModelDocumentation.out"
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-  "HerringModelDocumentation.log"
+  "HerringModelDocumentation.tex"
   "HerringModelDocumentation.pdf"
+  "HerringModelDocumentation.bbl"
+  "HerringModelDocumentation.log"
+  "HerringModelDocumentation.out"
