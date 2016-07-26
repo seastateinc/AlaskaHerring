@@ -367,14 +367,32 @@
 
   \subsection{Objective function} % (fold)
   \label{sub:objective_function}
-    \subsection{Negative log-likelihoods} % (fold)
-    \label{sub:negative_log_likelihoods}
+  The objective function is organized into two sections, the first contains the negative loglikelihoods for the data given the model parameters.  The second are a series of penalties, in the case of maximum likelihood estimation, prior density functions in the case of a Bayesian estimation.
+    \subsubsection{Negative loglikelihoods} % (fold)
+    \label{ssub:negative_loglikelihoods}
+    The negative loglikelihoods 
+    % subsubsection negative_loglikelihoods (end)
+    There are five 6 negative loglikelihoods functions in the objective function that correspond to the 5 different data elements and the residual process errors associated with a stock-recruitment relationship. The following table summarises the available options currently implemented.
+
+    \begin{table}[h]
+      \caption{Data and types of likelihoods implemented}
+      \begin{tabular}{l|c|c|c|c}
+        \hline
+        Data & normal & log-normal & multivariate-logistic & multinomial\\
+        \hline
+        Commercial Age-comps & & & X\\
+        Spawn Survey Age-comps & & & X\\
+        Egg deposition & & X & \\
+        Aerial survey & & X  & \\
+        Catch  & & X & \\
+        Stock-Recruitment & & X & \\
+      \end{tabular}
+    \end{table}
     
-    % subsection negative_log_likelihoods (end)
-    \subsection{Penalties} % (fold)
-    \label{sub:penalties}
+    \subsubsection{Penalties} % (fold)
+    \label{ssub:penalties}
     
-    % subsection penalties (end)
+    % subsubsection penalties (end)
   % subsection objective_function (end)
 \begin{table}
   \centering
