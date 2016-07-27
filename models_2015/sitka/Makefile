@@ -31,6 +31,9 @@ run: $(DATA)
 	./$(EXEC) -ind $(DATA) $(ARGS)
 
 
+mcmc: $(EXEC) $(DATA) $(CTL) $(DAT)
+	./$(EXEC) -ind $(DATA) $(ARGS) -mcmc -mcsave 10
+
 # Retrospective Rule
 NRET=1
 retdirs := $(shell echo 'cat(formatC(1:$(NRET),digits=3,flag="0"))' | R --vanilla --slave)
@@ -72,7 +75,7 @@ clean:
 	@rm -f admodel.hes
 	@rm -f admodel.dep
 	@rm -f fmin.log
-	@rm -f $(EXEC).rep $(EXEC).par ham.[bcerpls]*
+	@rm -f $(EXEC).rep $(EXEC).par ham.[bcehmrpls]*
 	@rm -r rets ||:
 	@rm -r sims ||:
 	@rm -f makedirs
