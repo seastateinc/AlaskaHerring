@@ -194,7 +194,7 @@ DATA_SECTION
 // | - theta_DM -> theta is a vector of estimated parameters.
   int n_theta;
   !! n_theta = 5;
-  init_matrix theta_DM(1,n_theta,1,4);
+  init_matrix theta_DM(1,n_theta,1,7);
   vector    theta_ival(1,n_theta);
   vector      theta_lb(1,n_theta);
   vector      theta_ub(1,n_theta);
