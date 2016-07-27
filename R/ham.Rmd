@@ -4,8 +4,9 @@ author: Sea State Inc
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   html_document:
-    fig_caption: true
+    toc: true
     toc_float: true
+    fig_caption: true
     code_folding: show
 ---
 ----
