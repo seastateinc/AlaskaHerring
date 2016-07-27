@@ -52,7 +52,7 @@ DATA_SECTION
   int b_simulation_flag;
   int rseed;
   int retro_yrs;
-  LOCAL_CALCS
+	LOCAL_CALCS
     int on = 0;
 
     b_simulation_flag = 0;
@@ -78,7 +78,7 @@ DATA_SECTION
 
     }
     
-  END_CALCS
+	END_CALCS
 // |---------------------------------------------------------------------------|
 
 
@@ -155,14 +155,14 @@ DATA_SECTION
   
   // Calculate average spawner weight-at-age for SR parameters
   vector avg_sp_waa(sage,nage);
-  LOCAL_CALCS
+	LOCAL_CALCS
     int n = data_sp_waa.rowmax() - data_sp_waa.rowmin() + 1;
     avg_sp_waa = colsum(data_sp_waa)(sage,nage) / n;
-  END_CALCS
+	END_CALCS
 
   // Calculate Fecundity-at-age based on regression coefficients.
   matrix Eij(mod_syr,mod_nyr,sage,nage);
-  LOCAL_CALCS
+	LOCAL_CALCS
     int iyr = mod_syr;
     
     for(int h = 1; h <= nFecBlocks; h++){
@@ -172,7 +172,7 @@ DATA_SECTION
         iyr ++;
       }while(iyr <= nFecBlockYears(h));
     }
-  END_CALCS
+	END_CALCS
 
 // |---------------------------------------------------------------------------|
 // | END OF DATA FILE
@@ -194,15 +194,21 @@ DATA_SECTION
 // | - theta_DM -> theta is a vector of estimated parameters.
   int n_theta;
   !! n_theta = 5;
-  init_matrix theta_DM(1,n_theta,1,4);
+  init_matrix theta_DM(1,n_theta,1,7);
   vector    theta_ival(1,n_theta);
   vector      theta_lb(1,n_theta);
   vector      theta_ub(1,n_theta);
   ivector    theta_phz(1,n_theta);
+  ivector theta_iprior(1,n_theta);
+  vector      theta_p1(1,n_theta);
+  vector      theta_p2(1,n_theta);
   !! theta_ival = column(theta_DM,1);
   !! theta_lb  = column(theta_DM,2);
   !! theta_ub  = column(theta_DM,3);
   !! theta_phz = ivector(column(theta_DM,4));
+  !! theta_iprior = ivector(column(theta_DM,5));
+  !! theta_p1 = column(theta_DM,6);
+  !! theta_p2 = column(theta_DM,7);
   
 
 // |---------------------------------------------------------------------------|
@@ -238,7 +244,7 @@ DATA_SECTION
   ivector       nslx_nyr(1,nSlxBlks);
 
 
-  LOCAL_CALCS
+	LOCAL_CALCS
     nSelType = ivector(column(selex_cont,2));
     nslx_phz = ivector(column(selex_cont,7));
     nslx_syr = ivector(column(selex_cont,8));
@@ -253,7 +259,7 @@ DATA_SECTION
         break;
       }
     }
-  END_CALCS
+	END_CALCS
 
 // |---------------------------------------------------------------------------|
 // | Miscellaneous Controls
@@ -268,25 +274,25 @@ DATA_SECTION
 
   // Rescale the catch data as needed.
   matrix  data_catch(dat_syr,dat_nyr,1,3);
-  LOCAL_CALCS
+	LOCAL_CALCS
     data_catch = data_ct_raw;
     for( int i = dat_syr; i <= dat_nyr; i++ ) {
       data_catch(i,2) = dMiscCont(1) * data_ct_raw(i,2);
     }
     if(dMiscCont(2)) cout<<"Condition model on Ft"<<endl;
-  END_CALCS
+	END_CALCS
 
 
 // |---------------------------------------------------------------------------|
 // | END OF Control FILE
 // |---------------------------------------------------------------------------|
   init_int ctl_eof;
-  LOCAL_CALCS
+	LOCAL_CALCS
     if(ctl_eof != 999){
       cout<<"Error reading control file, aborting."<<ctl_eof<<endl; 
       exit(1);
     }
-  END_CALCS
+	END_CALCS
 
 // |---------------------------------------------------------------------------|
 // | RETROSPECTIVE ADJUSTMENTS
@@ -340,19 +346,18 @@ PARAMETER_SECTION
 // | - log_slx_pars » parameters for selectivity models (ragged object).
   init_bounded_matrix_vector log_slx_pars(1,nSlxBlks,1,nslx_rows,1,nslx_cols,-25,25,nslx_phz);
   matrix log_slx(mod_syr,mod_nyr,sage,nage);
-  LOCAL_CALCS
-    if( ! global_parfile ){
-      for(int h = 1; h <= nSlxBlks; h++){
-        switch(nSelType(h)){
-          case 1: //logistic
-            log_slx_pars(h,1,1) = log(selex_cont(h,3));
-            log_slx_pars(h,1,2) = log(selex_cont(h,4));
-          break; 
-        }
-      } 
-    }
-
-  END_CALCS
+	LOCAL_CALCS
+	 if( ! global_parfile ){
+	   for(int h = 1; h <= nSlxBlks; h++){
+	     switch(nSelType(h)){
+	       case 1: //logistic
+	         log_slx_pars(h,1,1) = log(selex_cont(h,3));
+	         log_slx_pars(h,1,2) = log(selex_cont(h,4));
+	       break; 
+	     }
+	   } 
+	 }
+	END_CALCS
 
 // |---------------------------------------------------------------------------|
 // | FISHING MORTALITY RATE PARAMETERS
@@ -360,9 +365,9 @@ PARAMETER_SECTION
 // |
   !! int phz; phz = dMiscCont(2)==0?-1:1;
   init_bounded_vector log_ft_pars(mod_syr,mod_nyr,-30.,3.0,phz);
-  LOCAL_CALCS
-    if(b_simulation_flag) log_ft_pars = log(0.1);
-  END_CALCS
+	LOCAL_CALCS
+	  if(b_simulation_flag) log_ft_pars = log(0.1);
+	END_CALCS
 
 
 // |---------------------------------------------------------------------------|
@@ -408,10 +413,13 @@ PARAMETER_SECTION
   matrix pred_sp_comp(mod_syr,mod_nyr,sage,nage);
   matrix resd_sp_comp(mod_syr,mod_nyr,sage,nage);
 
+// |---------------------------------------------------------------------------|
+// | OBJECTIVE FUNCTION VALUE
+// |---------------------------------------------------------------------------|
   objective_function_value f;
 
   number fpen;
-
+  sdreport_number sd_terminal_ssb;
 
 PRELIMINARY_CALCS_SECTION
 
@@ -442,7 +450,7 @@ PRELIMINARY_CALCS_SECTION
 
 
 PROCEDURE_SECTION
-  
+ 
 // |---------------------------------------------------------------------------|
 // | RUN STOCK ASSEAAMENT MODEL ROUTINES
 // |---------------------------------------------------------------------------|
@@ -487,8 +495,11 @@ PROCEDURE_SECTION
   calcAgeCompResiduals();
   if(DEBUG_FLAG) cout<<"--> Ok after calcAgeCompResiduals           <--"<<endl;
 
-  calcEggMiledaySurveyResiduals();
-  if(DEBUG_FLAG) cout<<"--> Ok after calcEggMiledaySurveyResiduals  <--"<<endl;
+  calcEggSurveyResiduals();
+  if(DEBUG_FLAG) cout<<"--> Ok after calcEggSurveyResiduals         <--"<<endl;
+
+  calcMiledaySurveyResiduals();
+  if(DEBUG_FLAG) cout<<"--> Ok after calcMiledaySurveyResiduals     <--"<<endl;
 
   //if( dMiscCont(2) ) {
     calcCatchResiduals();
@@ -498,6 +509,8 @@ PROCEDURE_SECTION
   calcObjectiveFunction();
   if(DEBUG_FLAG) cout<<"--> Ok after calcObjectiveFunction          <--"<<endl;
   
+  sd_terminal_ssb = ssb(mod_nyr);
+
 // |---------------------------------------------------------------------------|
 
   
@@ -582,7 +595,7 @@ FUNCTION void runSimulationModel(const int& rseed)
 
 
   // 9) calculate egg survey residuals and simulate fake survey.
-  calcEggMiledaySurveyResiduals();
+  calcEggSurveyResiduals();
   
   dvector epsilon_egg_dep(mod_syr,mod_nyr);
   epsilon_egg_dep.fill_randn(rng);
@@ -595,6 +608,8 @@ FUNCTION void runSimulationModel(const int& rseed)
   }
 
   // 10) calculate mile_days
+  calcMiledaySurveyResiduals();
+  
   dvector epsilon_mileday(mod_syr,mod_nyr);
   epsilon_mileday.fill_randn(rng);
   for(int i = mod_syr; i <= mod_nyr; i++) {
@@ -728,86 +743,88 @@ FUNCTION void initializeStateVariables()
 
 FUNCTION void updateStateVariables()
   /**
-    - Update the numbers-at-age conditional on the catch-at-age.
-    - Assume a pulse fishery.
-    - step 1 calculate a vector of vulnerable-numbers-at-age
-    - step 2 calculate vulnerable proportions-at-age.
-    - step 3 calc average weight of catch (wbar) conditional on Qij.
-    - step 4 calc catch-at-age | catch in biomass Cij = Ct/wbar * Qij.
-    - step 5 condition on Ft or else condition on observed catch.
-    - step 6 update numbers-at-age (using a very dangerous difference eqn.)
-    */
+  - Update the numbers-at-age conditional on the catch-at-age.
+  - Assume a pulse fishery.
+  - step 1 calculate a vector of vulnerable-numbers-at-age
+  - step 2 calculate vulnerable proportions-at-age.
+  - step 3 calc average weight of catch (wbar) conditional on Qij.
+  - step 4 calc catch-at-age | catch in biomass Cij = Ct/wbar * Qij.
+  - step 5 condition on Ft or else condition on observed catch.
+  - step 6 update numbers-at-age (using a very dangerous difference eqn.)
+  */
 
-    Qij.initialize();
-    Cij.initialize();
-    Pij.initialize();
-    dvariable wbar;   // average weight of the catch.
-    dvar_vector vj(sage,nage);
-    //dvar_vector pj(sage,nage);
-    dvar_vector sj(sage,nage);
-    
-
-    for(int i = mod_syr; i <= mod_nyr; i++){
-
-
-      // step 1.
-      vj = elem_prod(Nij(i),Sij(i));
-
-      // step 2.
-      Qij(i) = vj / sum(vj);
-
-      // ADF&G's approach.
-      if( !dMiscCont(2) ) {
-        // step 3.
-        dvector wa = data_cm_waa(i)(sage,nage);
-        wbar = wa * Qij(i);
-      
-        // step 4.
-        Cij(i) = data_catch(i,2) / wbar * Qij(i);
-        Pij(i) = posfun(Nij(i) - Cij(i),0.01,fpen); // should use posfun here
-        
-        // step 6. update numbers at age    
-        sj = mfexp(-Mij(i));
-        Nij(i+1)(sage+1,nage) =++ elem_prod(Pij(i)(sage,nage-1),sj(sage,nage-1));
-        Nij(i+1)(nage) += Pij(i,nage) * sj(nage);       
-      } 
-      // step 5.
-      // Condition on Ft
-      else { 
-        // add flexibility here for Popes approx, or different seasons               
-        Pij(i) = elem_prod( Nij(i), exp(-Fij(i)) );
-        Cij(i) = elem_prod( Nij(i), 1.-exp(-Fij(i)));
-        
-        // the following assumes fishery is at the start of the year.
-        dvar_vector zi = Mij(i) + Fij(i);
-        Nij(i+1)(sage+1,nage) = ++ elem_prod(Nij(i)(sage,nage-1),
-                                             mfexp(-zi(sage,nage-1)));
-        Nij(i+1)(nage) += Nij(i,nage) * mfexp(-zi(nage));
-      }
-    }
+  Qij.initialize();
+  Cij.initialize();
+  Pij.initialize();
+  dvariable wbar;   // average weight of the catch.
+  dvar_vector vj(sage,nage);
+  //dvar_vector pj(sage,nage);
+  dvar_vector sj(sage,nage);
   
-    // cross check... Looks good.
-    // COUT(Cij(mod_syr) * data_cm_waa(mod_syr)(sage,nage));
+
+  for(int i = mod_syr; i <= mod_nyr; i++){
+
+
+    // step 1.
+    vj = elem_prod(Nij(i),Sij(i));
+
+    // step 2.
+    Qij(i) = vj / sum(vj);
+
+    // ADF&G's approach.
+    if( !dMiscCont(2) ) {
+      // step 3.
+      dvector wa = data_cm_waa(i)(sage,nage);
+      wbar = wa * Qij(i);
+    
+      // step 4.
+      Cij(i) = data_catch(i,2) / wbar * Qij(i);
+      // should use posfun here
+      Pij(i) = posfun(Nij(i) - Cij(i),0.01,fpen); 
+      
+      // step 6. update numbers at age    
+      sj = mfexp(-Mij(i));
+      Nij(i+1)(sage+1,nage) =++ elem_prod(Pij(i)(sage,nage-1),
+                                          sj(sage,nage-1));
+      Nij(i+1)(nage) += Pij(i,nage) * sj(nage);       
+    } 
+    // step 5.
+    // Condition on Ft
+    else { 
+      // add flexibility here for Popes approx, or different seasons               
+      Pij(i) = elem_prod( Nij(i), exp(-Fij(i)) );
+      Cij(i) = elem_prod( Nij(i), 1.-exp(-Fij(i)));
+      
+      // the following assumes fishery is at the start of the year.
+      dvar_vector zi = Mij(i) + Fij(i);
+      Nij(i+1)(sage+1,nage) = ++ elem_prod(Nij(i)(sage,nage-1),
+                                           mfexp(-zi(sage,nage-1)));
+      Nij(i+1)(nage) += Nij(i,nage) * mfexp(-zi(nage));
+    }
+  }
+
+  // cross check... Looks good.
+  // COUT(Cij(mod_syr) * data_cm_waa(mod_syr)(sage,nage));
 
 
 FUNCTION void calcSpawningStockRecruitment()
   /**
-    - The functional form of the stock recruitment model follows that of a 
-      Ricker model, where R = so * SSB * exp(-beta * SSB).  The two parameters
-      so and beta where previously estimated as free parameters in the old
-      herring model.  Herein this fucntion I derive so and beta from the 
-      leading parameters Ro and reck; Ro is the unfished sage recruits, and reck
-      is the recruitment compensation parameter, or the relative improvement in
-      juvenile survival rates as the spawning stock SSB tends to 0.  Simply a 
-      multiple of the replacement line Ro/Bo.
+  The functional form of the stock recruitment model follows that of a 
+  Ricker model, where R = so * SSB * exp(-beta * SSB).  The two parameters
+  so and beta where previously estimated as free parameters in the old
+  herring model.  Herein this fucntion I derive so and beta from the 
+  leading parameters Ro and reck; Ro is the unfished sage recruits, and reck
+  is the recruitment compensation parameter, or the relative improvement in
+  juvenile survival rates as the spawning stock SSB tends to 0. Simply a 
+  multiple of the replacement line Ro/Bo.
 
-      At issue here is time varying maturity and time-varying natural mortality.
-      When either of these two variables are assumed to change over time, then
-      the underlying stock recruitment relationship will also change. This 
-      results in a non-stationary distribution.  For the purposes of this 
-      assessment model, I use the average mortality and maturity schedules to
-      derive the spawning boimass per recruit, which is ultimately used in 
-      deriving the parameters for the stock recruitment relationship.
+  At issue here is time varying maturity and time-varying natural mortality.
+  When either of these two variables are assumed to change over time, then
+  the underlying stock recruitment relationship will also change. This 
+  results in a non-stationary distribution.  For the purposes of this 
+  assessment model, I use the average mortality and maturity schedules to
+  derive the spawning boimass per recruit, which is ultimately used in 
+  deriving the parameters for the stock recruitment relationship.
     */
 
   /*
@@ -854,167 +871,177 @@ FUNCTION void calcSpawningStockRecruitment()
 
   spawners = ssb(mod_syr,mod_nyr-sage+1).shift(rec_syr);
   recruits = elem_prod( so*spawners , mfexp(-beta*spawners) );
-  resd_rec = log(column(Nij,sage)(rec_syr,mod_nyr+1)+TINY) - log(recruits+TINY);
+  resd_rec = log(column(Nij,sage)(rec_syr,mod_nyr+1)+TINY) 
+             - log(recruits+TINY);
 
 
 
 FUNCTION void calcAgeCompResiduals()
   /**
-    - Commercial catch-age comp residuals
-    - Spawning survey catch-age comp residuals.
-    */
+  - Commercial catch-age comp residuals
+  - Spawning survey catch-age comp residuals.
+  */
 
-    resd_cm_comp.initialize();
-    resd_sp_comp.initialize();
-    for(int i = mod_syr; i <= mod_nyr; i++){
-      
-      // commercial age-comp prediction 
-      pred_cm_comp(i) = Qij(i);
-      if( data_cm_comp(i,sage) >= 0 ){
-        resd_cm_comp(i) = data_cm_comp(i)(sage,nage) - pred_cm_comp(i);
-      }
-
-      // spawning age-comp prediction
-      pred_sp_comp(i) = (Oij(i)+TINY) / sum(Oij(i)+TINY);
-      if( data_sp_comp(i,sage) >= 0 ){
-        resd_sp_comp(i) = data_sp_comp(i)(sage,nage) - pred_sp_comp(i);
-      }
+  resd_cm_comp.initialize();
+  resd_sp_comp.initialize();
+  for(int i = mod_syr; i <= mod_nyr; i++){
+    
+    // commercial age-comp prediction 
+    pred_cm_comp(i) = Qij(i);
+    if( data_cm_comp(i,sage) >= 0 ){
+      resd_cm_comp(i) = data_cm_comp(i)(sage,nage) - pred_cm_comp(i);
     }
 
-    //COUT(resd_sp_comp);
-FUNCTION void calcEggMiledaySurveyResiduals()
+    // spawning age-comp prediction
+    pred_sp_comp(i) = (Oij(i)+TINY) / sum(Oij(i)+TINY);
+    if( data_sp_comp(i,sage) >= 0 ){
+      resd_sp_comp(i) = data_sp_comp(i)(sage,nage) - pred_sp_comp(i);
+    }
+  }
+
+  //COUT(resd_sp_comp);
+
+FUNCTION void calcEggSurveyResiduals()
   /**
-    - Observed egg data is in trillions of eggs
-    - Predicted eggs is the mature female numbers-at-age multiplied 
-      by the fecundity-at-age, which comes from a regession of 
-      fecundity = slope * obs_sp_waa - intercept
-    - Note Eij is the Fecundity-at-age j in year i.
-    - 
-    */
-    resd_egg_dep.initialize();
-    for(int i = mod_syr; i <= mod_nyr; i++){
-      pred_egg_dep(i) = (0.5 * Oij(i)) * Eij(i);
-      if(data_egg_dep(i,2) > 0){
-        resd_egg_dep(i) = log(data_egg_dep(i,2)) - log(pred_egg_dep(i));
-      }
+  - Observed egg data is in trillions of eggs
+  - Predicted eggs is the mature female numbers-at-age multiplied 
+    by the fecundity-at-age, which comes from a regession of 
+    fecundity = slope * obs_sp_waa - intercept
+  - Note Eij is the Fecundity-at-age j in year i.
+  - 
+  */
+  resd_egg_dep.initialize();
+  for(int i = mod_syr; i <= mod_nyr; i++){
+    pred_egg_dep(i) = (0.5 * Oij(i)) * Eij(i);
+    if(data_egg_dep(i,2) > 0){
+      resd_egg_dep(i) = log(data_egg_dep(i,2)) - log(pred_egg_dep(i));
     }
+  }
 
-    resd_mileday.initialize();
-    pred_mileday.initialize();
-    int n = 1;
-    dvar_vector zt(mod_syr,mod_nyr); zt.initialize();
-    dvariable zbar = 0;
-    for(int i = mod_syr; i <= mod_nyr; i++){
-      if(data_mileday(i,2) > 0){
-        zt(i) = log(data_mileday(i,2)) - log(ssb(i));
-        zbar  = zt(i)/n + zbar *(n-1)/n;
-        n++ ;
-      }   
-    }
-    pred_mileday = ssb * exp(zbar);
-    resd_mileday = zt - zbar;
-    // COUT(resd_mileday);
+FUNCTION void calcMiledaySurveyResiduals()
+  /**
+  - Assumed index from aerial survey is a relative abundance
+  index. The slope of the regression ln(SSB) = q * ln(MileMilt) + 0
+  is computed on the fly in case of missing data. 
+  - See Walters and Ludwig 1994 for more details.
+  */
+  resd_mileday.initialize();
+  pred_mileday.initialize();
+  int n = 1;
+  dvar_vector zt(mod_syr,mod_nyr); zt.initialize();
+  dvariable zbar = 0;
+  for(int i = mod_syr; i <= mod_nyr; i++){
+    if(data_mileday(i,2) > 0){
+      zt(i) = log(data_mileday(i,2)) - log(ssb(i));
+      zbar  = zt(i)/n + zbar *(n-1)/n;
+      n++ ;
+    }   
+  }
+  pred_mileday = ssb * exp(zbar);
+  resd_mileday = zt - zbar;
+  // COUT(resd_mileday);
 
 FUNCTION void calcCatchResiduals()
   /**
-    - Catch residuals assuming a lognormal error structure.
-    */
-    pred_catch.initialize();
-    resd_catch.initialize();
-    for(int i = mod_syr; i <= mod_nyr; i++) {
-      if(data_catch(i,2) > 0) {
-        pred_catch(i) = Cij(i) * data_cm_waa(i)(sage,nage);
-        resd_catch(i) = log(data_catch(i,2)) - log(pred_catch(i));
-      }
+  - Catch residuals assuming a lognormal error structure.
+  */
+  pred_catch.initialize();
+  resd_catch.initialize();
+  for(int i = mod_syr; i <= mod_nyr; i++) {
+    if(data_catch(i,2) > 0) {
+      pred_catch(i) = Cij(i) * data_cm_waa(i)(sage,nage);
+      resd_catch(i) = log(data_catch(i,2)) - log(pred_catch(i));
     }
+  }
 
 FUNCTION void calcObjectiveFunction()
   /**
-    - THIS FUNCTION IS ORGANIZED AS FOLLOWS:
-      1. Negative logliklihoods (nll)
-      2. Penalized loglikelihoods (penll)
+  - THIS FUNCTION IS ORGANIZED AS FOLLOWS:
+    1. Negative logliklihoods (nll)
+    2. Penalized loglikelihoods (penll)
 
-    */
-
-
-
-    // 1. Negative loglikelihoods
-    dvar_vector nll(1,7);
-    nll.initialize();
-
-    // Mulitvariate logistic likelihood for composition data.
-    double sp_tau2;
-    double minp = 0.00;
-    dmatrix d_sp_comp = trans(trans(data_sp_comp).sub(sage,nage)).sub(mod_syr,mod_nyr);
-    nll(1) = dmvlogistic(d_sp_comp,pred_sp_comp,resd_sp_comp,sp_tau2,minp);
-    
-    // Mulitvariate logistic likelihood for composition data.
-    double cm_tau2;
-    dmatrix d_cm_comp  = trans(trans(data_cm_comp).sub(sage,nage)).sub(mod_syr,mod_nyr);
-    nll(2) = dmvlogistic(d_cm_comp,pred_cm_comp,resd_cm_comp,cm_tau2,minp);
-
-    // Negative loglikelihood for egg deposition data
-    dvector std_egg_dep = TINY + column(data_egg_dep,3)(mod_syr,mod_nyr);
-    nll(3) = dnorm(resd_egg_dep,std_egg_dep);
-
-    // Negative loglikelihood for milt mile day
-    dvector std_mileday = TINY + column(data_mileday,3)(mod_syr,mod_nyr);
-    nll(4) = dnorm(resd_mileday,std_mileday);
-
-    // Negative loglikelihood for stock-recruitment data
-    dvector std_rec(rec_syr,mod_nyr+1);
-    std_rec = 0.6;
-    nll(5) = dnorm(resd_rec,std_rec);
-    
-    // Negative loglikelihood for catch data
-    dvector std_catch = column(data_catch,3)(mod_syr,mod_nyr);
-    nll(6) = dnorm(resd_catch,std_catch);
-
-    
+  */
 
 
 
-    // 2. Penalized logliklelihoods
+  // 1. Negative loglikelihoods
+  dvar_vector nll(1,7);
+  nll.initialize();
 
-    
-    dvar_vector penll(1,4);
-    penll.initialize();
+  // Mulitvariate logistic likelihood for composition data.
+  double sp_tau2;
+  double minp = 0.00;
+  dmatrix d_sp_comp = trans(trans(data_sp_comp).sub(sage,nage)).sub(mod_syr,mod_nyr);
+  nll(1) = dmvlogistic(d_sp_comp,pred_sp_comp,resd_sp_comp,sp_tau2,minp);
+  
+  // Mulitvariate logistic likelihood for composition data.
+  double cm_tau2;
+  dmatrix d_cm_comp  = trans(trans(data_cm_comp).sub(sage,nage)).sub(mod_syr,mod_nyr);
+  nll(2) = dmvlogistic(d_cm_comp,pred_cm_comp,resd_cm_comp,cm_tau2,minp);
 
-    // | Terminal phase of estimation.
-    dvariable log_fbar = mean(log_ft_pars);
-    if( last_phase() ){
-      penll(1) = dnorm(log_rinit_devs,0.0,5.0);
-      penll(2) = dnorm(log_rbar_devs,0.0,5.0);
-      penll(3) = dnorm(log_fbar,0.2,2.0);
-    } else {
-      penll(1) = dnorm(log_rinit_devs,0.0,1.0);
-      penll(2) = dnorm(log_rbar_devs,0.0,1.0);
-      penll(3) = dnorm(log_fbar,0.2,0.07);      
-    }
+  // Negative loglikelihood for egg deposition data
+  dvector std_egg_dep = TINY + column(data_egg_dep,3)(mod_syr,mod_nyr);
+  nll(3) = dnorm(resd_egg_dep,std_egg_dep);
+
+  // Negative loglikelihood for milt mile day
+  dvector std_mileday = TINY + column(data_mileday,3)(mod_syr,mod_nyr);
+  nll(4) = dnorm(resd_mileday,std_mileday);
+
+  // Negative loglikelihood for stock-recruitment data
+  dvector std_rec(rec_syr,mod_nyr+1);
+  std_rec = 0.6;
+  nll(5) = dnorm(resd_rec,std_rec);
+  
+  // Negative loglikelihood for catch data
+  dvector std_catch = column(data_catch,3)(mod_syr,mod_nyr);
+  nll(6) = dnorm(resd_catch,std_catch);
+
+  
 
 
 
-    //if( dMiscCont(2) ) nll(7) = norm2(resd_catch);
-    //// cout<<(data_sp_comp)<<endl;
-    //f  = sum(nll) + 1000.0 * fpen;
-    //if( dMiscCont(2) ){
-    //  if( !last_phase() ) {
-    //    f += 100. * square(mean(log_ft_pars)-log(0.2));
-    //
-    //  } else {
-    //    f += 100. * square(mean(log_ft_pars)-log(0.2));
-    //  }
-    //}
+  // 2. Penalized logliklelihoods
+
+  
+  dvar_vector penll(1,4);
+  penll.initialize();
+
+  // | Terminal phase of estimation.
+  dvariable log_fbar = mean(log_ft_pars);
+  if( last_phase() ){
+    penll(1) = dnorm(log_rinit_devs,0.0,5.0);
+    penll(2) = dnorm(log_rbar_devs,0.0,5.0);
+    penll(3) = dnorm(log_fbar,0.2,2.0);
+  } else {
+    penll(1) = dnorm(log_rinit_devs,0.0,1.0);
+    penll(2) = dnorm(log_rbar_devs,0.0,1.0);
+    penll(3) = dnorm(log_fbar,0.2,0.07);      
+  }
 
 
-    f = sum(nll) + sum(penll) + fpen;
 
-    if(DEBUG_FLAG){
-      COUT(f);
-      COUT(nll);
-      COUT(penll);
-      if(fpen > 0 ){COUT(fpen);}
-    }  
+  //if( dMiscCont(2) ) nll(7) = norm2(resd_catch);
+  //// cout<<(data_sp_comp)<<endl;
+  //f  = sum(nll) + 1000.0 * fpen;
+  //if( dMiscCont(2) ){
+  //  if( !last_phase() ) {
+  //    f += 100. * square(mean(log_ft_pars)-log(0.2));
+  //
+  //  } else {
+  //    f += 100. * square(mean(log_ft_pars)-log(0.2));
+  //  }
+  //}
+
+
+  f = sum(nll) + sum(penll) + sum(calcPriors()) + fpen;
+
+  if(DEBUG_FLAG){
+    COUT(f);
+    COUT(nll);
+    COUT(penll);
+    COUT(calcPriors());
+    if(fpen > 0 ){COUT(fpen);}
+  }  
 
 
   //FUNCTION dvariable dnorm(const dvar_vector residual, const dvector std)
@@ -1026,6 +1053,57 @@ FUNCTION void calcObjectiveFunction()
   //RETURN_ARRAYS_DECREMENT();
   //return(0.5*n*log(2.*pi)+sum(log(std))+sum(elem_div(SS,2.*var)));
 
+FUNCTION dvar_vector calcPriors()
+  // |---------------------------------------------------------------------------------|
+  // | PRIORS FOR LEADING PARAMETERS p(theta)
+  // |---------------------------------------------------------------------------------|
+  // | - theta_prior is a switch to determine which statistical distribution to use.
+  // |
+  dvariable ptmp; 
+  dvar_vector priors(1,n_theta);
+  priors.initialize();
+
+  for(int i=1;i<=n_theta;i++)
+  {
+    ptmp = 0;
+    // for(j=1;j<=ipar_vector(i);j++)
+    // {
+      if( active(theta(i)) )
+      {
+        switch(theta_iprior(i))
+        {
+        case 1:   //normal
+          ptmp += dnorm(theta(i),theta_p1(i),theta_p2(i));
+          break;
+          
+        case 2:   //lognormal CHANGED RF found an error in dlnorm prior. rev 116
+          ptmp += dlnorm(theta(i),theta_p1(i),theta_p2(i));
+          break;
+          
+        case 3:   //beta distribution (0-1 scale)
+          double lb,ub;
+          lb=theta_lb(i);
+          ub=theta_ub(i);
+          ptmp += dbeta((theta(i)-lb)/(ub-lb),theta_p1(i),theta_p2(i));
+          break;
+          
+        case 4:   //gamma distribution
+          ptmp += dgamma(theta(i),theta_p1(i),theta_p2(i));
+          break;
+          
+        default:  //uniform density
+          if(theta_lb(i) > theta_ub(i)){
+            ptmp += log(1./(theta_lb(i)-theta_ub(i)));
+          } else {
+            ptmp += log(1./(theta_ub(i)-theta_lb(i)));
+          }
+          break;
+        }
+      }
+    // }
+    priors(i) = ptmp; 
+  }
+  return(priors);
 
 
 GLOBALS_SECTION

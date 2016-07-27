@@ -1,6 +1,6 @@
 EXEC=ham
-DAT=sitka_2.dat
-CTL=sitka_2.ctl
+DAT=craig_2.dat
+CTL=craig_2.ctl
 
 TPLS=../../src/$(EXEC).tpl
 DATA=$(EXEC).dat

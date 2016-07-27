@@ -130,6 +130,34 @@ plot.resd <- function(D=D, nm = "resd_cm_comp", ...) {
 	}
 }
 
+
+plot.ft.post <- function(D=D) {
+
+	# if(is.null(D$post.samp)) return()
+	ps <- D$post.samp
+	ix <- sample(1:ncol(ps),1000,replace=TRUE)
+	ps <- ps[ix,]
+	colnames(ps) <- D$fit$names[1:ncol(ps)]	
+
+	# select the log_ft_pars columns
+	px <- ps[,grepl("log_ft_pars",colnames(ps))]
+	yr <- seq(D$mod_syr,D$mod_nyr)	
+	px <- as.data.frame(px)
+	colnames(px) <- paste(yr)
+
+	# gather
+	gx <- gather(px,Year,Value)
+	# plot
+	ggplot(gx,aes(Year,exp(Value))) +
+	geom_violin(alpha=0.25,fill="red",size=0.15,
+	            draw_quantiles = c(0.25, 0.5, 0.75)) +
+	labs(x="Year",y="Average fishing mortality rate (ft)")+
+	ylim(c(0,NA))+
+	scale_x_discrete(breaks=seq(D$mod_syr,D$mod_nyr,by=5))
+
+}
+
+
 # ---------------------------------------------------------------------------- #
 # PLOTS FOR DATA SECTION
 # ---------------------------------------------------------------------------- #

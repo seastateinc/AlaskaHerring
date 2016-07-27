@@ -1,10 +1,12 @@
 ---
 title: Herring Assessment Model (Input/Output for Sitka)
-author: Sea State
+author: Sea State Inc
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   html_document:
-    fig_caption: true
+    toc: true
     toc_float: true
+    fig_caption: true
     code_folding: show
 ---
 ----
@@ -12,7 +14,6 @@ output:
 # Overview
 The following output is based on the R-scripts in ham.R, and references therein.  This document is produced using RMarkdown, where code chunks are directly embedded, and the document is dynamic in the sense that if the data, model, code, or parameter in the model changes, these figures, tables and summaries are automatically updated.
 
-![Lucie though it was important to admit that I'm a Brony](mylittlepony.jpeg)
 
 ----
 # Directory Structure
@@ -20,16 +21,21 @@ The following output is based on the R-scripts in ham.R, and references therein.
 The main root directory for this project is called HAM (short for Herring Age Model).
 
 	HAM
-		- R
-		- build
-			- release
-			- debug
+		- archive
+			-org.src
+		-docs
 		- models_2015
 			- craig
 			- seymour
 			- sitka
 			- tenakee
 		- src
+			- build
+				- release
+				- debug
+			ham.tpl
+			Makefile
+		- R
 		ReadMe.md
 		Makefile
 
@@ -173,11 +179,15 @@ As good practice, stock assessment models should pass the `self-testing' diagnos
 where the 123 is the random number seed for generating a unique sequence of random numbers that is repeatable.  Simple diagnostic plots of the relative error can be used to judge the precision and bias of estimated parameters. For example the following figure looks at how precisesly estimated the steepness of the stock recruitment relationship is (kappa), natural mortality, initial and average recruitment, and the average unfished recruitment (Ro). 
 
 ```{r}
-	source(file.path("readSims.R"))
-	print(p + ggtitle("Precision and Bias"))
+	# source(file.path("readSims.R"))
+	# print(p + ggtitle("Precision and Bias"))
 ```
 
 You can easily write an R-script, or makefile, to automate the process of running many simulations, reading the results, and producing summary statistics and plots.
 
 
+#Lucie
+Hi Dad.
+
+![I though it was important that you admit you're a Brony](mylittlepony.jpeg)
 
