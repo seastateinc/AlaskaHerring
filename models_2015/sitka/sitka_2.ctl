@@ -1,10 +1,16 @@
 ## —————————————————————————————————————————————————————————————————————————— ##
 ##                  DESIGN MATRIX FOR PARAMETER CONTROLS                      ##
+##  Prior descriptions   Parameter values                                     ##                                                       ##
+##  -0 uniform           (0,0)                                                ##
+##  -1 normal            (p1=mu,p2=sig)                                       ##
+##  -2 lognormal         (p1=log(mu),p2=sig)                                  ##
+##  -3 beta              (p1=alpha,p2=beta)                                   ##
+##  -4 gamma             (p1=alpha,p2=beta)                                   ##
 ## —————————————————————————————————————————————————————————————————————————— ##
 ## init   lower   upper    est  prior
 ## valu   bound   bound    phz   type    p1  p2   # PARAMETER                               ##
 ## —————————————————————————————————————————————————————————————————————————— ##
-  -1.05   -6.79    1.00      1      0     0   0   # log_natural_mortality
+  -1.05   -6.79    1.00      1      1   0.2 0.1   # log_natural_mortality
    7.50   -6.00   12.00      1      0     0   0   # log_rinit
    7.50   -6.00   12.00      1      0     0   0   # log_rbar
    7.50   -6.00   12.00      2      0     0   0   # log_ro

@@ -199,10 +199,16 @@ DATA_SECTION
   vector      theta_lb(1,n_theta);
   vector      theta_ub(1,n_theta);
   ivector    theta_phz(1,n_theta);
+  ivector theta_iprior(1,n_theta);
+  vector      theta_p1(1,n_theta);
+  vector      theta_p2(1,n_theta);
   !! theta_ival = column(theta_DM,1);
   !! theta_lb  = column(theta_DM,2);
   !! theta_ub  = column(theta_DM,3);
   !! theta_phz = ivector(column(theta_DM,4));
+  !! theta_iprior = ivector(column(theta_DM,5));
+  !! theta_p1 = column(theta_DM,6);
+  !! theta_p2 = column(theta_DM,7);
   
 
 // |---------------------------------------------------------------------------|
@@ -1046,6 +1052,52 @@ FUNCTION void calcObjectiveFunction()
   //RETURN_ARRAYS_DECREMENT();
   //return(0.5*n*log(2.*pi)+sum(log(std))+sum(elem_div(SS,2.*var)));
 
+FUNCTION void calcPriors()
+  // |---------------------------------------------------------------------------------|
+  // | PRIORS FOR LEADING PARAMETERS p(theta)
+  // |---------------------------------------------------------------------------------|
+  // | - theta_prior is a switch to determine which statistical distribution to use.
+  // |
+  dvariable ptmp; 
+  dvar_vector priors(1,npar);
+  priors.initialize();
+  
+  for(i=1;i<=n_theta;i++)
+  {
+    ptmp = 0;
+    for(j=1;j<=ipar_vector(i);j++)
+    {
+      if( active(theta(i)) )
+      {
+        switch(theta_prior(i))
+        {
+        case 1:   //normal
+          ptmp += dnorm(theta(i,j),theta_control(i,6),theta_control(i,7));
+          break;
+          
+        case 2:   //lognormal CHANGED RF found an error in dlnorm prior. rev 116
+          ptmp += dlnorm(theta(i,j),theta_control(i,6),theta_control(i,7));
+          break;
+          
+        case 3:   //beta distribution (0-1 scale)
+          double lb,ub;
+          lb=theta_lb(i);
+          ub=theta_ub(i);
+          ptmp += dbeta((theta(i,j)-lb)/(ub-lb),theta_control(i,6),theta_control(i,7));
+          break;
+          
+        case 4:   //gamma distribution
+          ptmp += dgamma(theta(i,j),theta_control(i,6),theta_control(i,7));
+          break;
+          
+        default:  //uniform density
+          ptmp += log(1./(theta_control(i,3)-theta_control(i,2)));
+          break;
+        }
+      }
+    }
+    priors(i) = ptmp; 
+  }
 
 
 GLOBALS_SECTION
