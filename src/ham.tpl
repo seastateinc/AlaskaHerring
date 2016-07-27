@@ -1033,12 +1033,13 @@ FUNCTION void calcObjectiveFunction()
   //}
 
 
-  f = sum(nll) + sum(penll) + fpen;
+  f = sum(nll) + sum(penll) + sum(calcPriors()) + fpen;
 
   if(DEBUG_FLAG){
     COUT(f);
     COUT(nll);
     COUT(penll);
+    COUT(calcPriors());
     if(fpen > 0 ){COUT(fpen);}
   }  
 
@@ -1052,52 +1053,57 @@ FUNCTION void calcObjectiveFunction()
   //RETURN_ARRAYS_DECREMENT();
   //return(0.5*n*log(2.*pi)+sum(log(std))+sum(elem_div(SS,2.*var)));
 
-FUNCTION void calcPriors()
+FUNCTION dvar_vector calcPriors()
   // |---------------------------------------------------------------------------------|
   // | PRIORS FOR LEADING PARAMETERS p(theta)
   // |---------------------------------------------------------------------------------|
   // | - theta_prior is a switch to determine which statistical distribution to use.
   // |
   dvariable ptmp; 
-  dvar_vector priors(1,npar);
+  dvar_vector priors(1,n_theta);
   priors.initialize();
-  
-  for(i=1;i<=n_theta;i++)
+
+  for(int i=1;i<=n_theta;i++)
   {
     ptmp = 0;
-    for(j=1;j<=ipar_vector(i);j++)
-    {
+    // for(j=1;j<=ipar_vector(i);j++)
+    // {
       if( active(theta(i)) )
       {
-        switch(theta_prior(i))
+        switch(theta_iprior(i))
         {
         case 1:   //normal
-          ptmp += dnorm(theta(i,j),theta_control(i,6),theta_control(i,7));
+          ptmp += dnorm(theta(i),theta_p1(i),theta_p2(i));
           break;
           
         case 2:   //lognormal CHANGED RF found an error in dlnorm prior. rev 116
-          ptmp += dlnorm(theta(i,j),theta_control(i,6),theta_control(i,7));
+          ptmp += dlnorm(theta(i),theta_p1(i),theta_p2(i));
           break;
           
         case 3:   //beta distribution (0-1 scale)
           double lb,ub;
           lb=theta_lb(i);
           ub=theta_ub(i);
-          ptmp += dbeta((theta(i,j)-lb)/(ub-lb),theta_control(i,6),theta_control(i,7));
+          ptmp += dbeta((theta(i)-lb)/(ub-lb),theta_p1(i),theta_p2(i));
           break;
           
         case 4:   //gamma distribution
-          ptmp += dgamma(theta(i,j),theta_control(i,6),theta_control(i,7));
+          ptmp += dgamma(theta(i),theta_p1(i),theta_p2(i));
           break;
           
         default:  //uniform density
-          ptmp += log(1./(theta_control(i,3)-theta_control(i,2)));
+          if(theta_lb(i) > theta_ub(i)){
+            ptmp += log(1./(theta_lb(i)-theta_ub(i)));
+          } else {
+            ptmp += log(1./(theta_ub(i)-theta_lb(i)));
+          }
           break;
         }
       }
-    }
+    // }
     priors(i) = ptmp; 
   }
+  return(priors);
 
 
 GLOBALS_SECTION

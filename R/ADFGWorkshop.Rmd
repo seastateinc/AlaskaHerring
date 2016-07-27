@@ -19,6 +19,11 @@ output:
 ## Objective
 The overarching objective of this 3-day workshop is to introduce the proposed changes I'm recommending for the Sitka Herring ASA model and to discuss how it can be used and modified for other Alaska herring stocks. In its current form, the ASA model uses a weighted least squares approach for parameter estimation and quantifying uncertainty. I'm proposing changes that would bring the ASA model into a more modern statistical realm, where data weighting issues and additional structural assumptions can be explored jointly. Uncertainty in short-term forecasts are easily quantified and integrated into a decision making framework for managers. The proposed changes can accommodate both Bayesian and maximum likelihood estimation.
 
+```{R,message=FALSE,echo=FALSE,fig.cap="Figure. Marginal posterior densities for the average annual fishing mortatlity rate for Sitka herring stocks.",fig.height=4}
+	source("ham.R")
+	plot.ft.post(D)
+```
+
 ##Who am I?
 
 Steve Martell
@@ -27,7 +32,7 @@ Sea State Inc
 
 steve@seastateinc.com
 
-[Code Repository:](https://github.com/seastateinc/AlaskaHerring)
+[Code Repository:](https://github.com/seastateinc/AlaskaHerring) for this project.
 
 ----
 
@@ -156,6 +161,32 @@ img <- readPNG("herringsetic0.png")
 - Retrospective Analysis.
 
 [output](ham.html)
+
+
+#### Wrap up
+
+#### Questions?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ----
 
