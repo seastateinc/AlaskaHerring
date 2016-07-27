@@ -155,6 +155,8 @@ img <- readPNG("herringsetic0.png")
 - Sitka 2015 Assessment.
 - Retrospective Analysis.
 
+<!-- [output](ham.html) -->
+
 ----
 
 # Day 2
