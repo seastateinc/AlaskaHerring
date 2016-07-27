@@ -14,10 +14,6 @@ output:
 # Overview
 The following output is based on the R-scripts in ham.R, and references therein.  This document is produced using RMarkdown, where code chunks are directly embedded, and the document is dynamic in the sense that if the data, model, code, or parameter in the model changes, these figures, tables and summaries are automatically updated.
 
-#Lucie
-Hi Dad.
-
-![I though it was important that you admit you're a Brony](mylittlepony.jpeg)
 
 ----
 # Directory Structure
@@ -25,16 +21,16 @@ Hi Dad.
 The main root directory for this project is called HAM (short for Herring Age Model).
 
 	HAM
-		- R
-		- build
-			- release
-			- debug
 		- models_2015
 			- craig
 			- seymour
 			- sitka
 			- tenakee
 		- src
+			- build
+				- release
+				- debug
+		- R
 		ReadMe.md
 		Makefile
 
@@ -185,4 +181,8 @@ where the 123 is the random number seed for generating a unique sequence of rand
 You can easily write an R-script, or makefile, to automate the process of running many simulations, reading the results, and producing summary statistics and plots.
 
 
+#Lucie
+Hi Dad.
+
+![I though it was important that you admit you're a Brony](mylittlepony.jpeg)
 
