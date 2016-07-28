@@ -5,6 +5,7 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   html_document:
     fig_caption: true
+    toc: true
     toc_float: true
     code_folding: show
 ---
@@ -122,5 +123,18 @@ The following output is based on the Maximum likelihood estimates contained in t
 				tbl_df()
 	pander(as.data.frame(df))
 ```
+
+## Residuals
+```{r,message=FALSE,warning=FALSE}
+	plot.resd(D,nm="resd_cm_comp")
+	plot.resd(D,nm="resd_sp_comp")
+```
+
+
+
+
+
+
+
 
 
