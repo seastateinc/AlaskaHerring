@@ -13,6 +13,7 @@ output:
 
 ```{r,message=FALSE,warning=TRUE}
 	.BASE <- "../models_2015/sitka/ham"
+	.CRAG <- "../models_2015/craig/ham"
 	library(ggplot2)
 	library(dplyr)
 	library(tidyr)
@@ -21,6 +22,7 @@ output:
 	source("./globals.R")
 	source("ham.R")
 	D <- read.admb(.BASE)
+	C <- read.admb(.CRAG)
 ```
 
 
@@ -33,8 +35,9 @@ The first six elements in the following code snippet shows the first and last ye
 
 ```{r,message=FALSE,warning=FALSE}
 	# source("ham.R")
-	pander(D[1:6])
+	pander(cbind(D[1:6],C[1:6]))
 ```
+
 
 ## Total Annual Catch
 
