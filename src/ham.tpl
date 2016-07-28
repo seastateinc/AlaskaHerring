@@ -178,9 +178,8 @@ DATA_SECTION
 // | END OF DATA FILE
 // |---------------------------------------------------------------------------|
 	init_int dat_eof; 
-	init_adstring dat_seof; 
 	!! if(dat_eof != 999){cout<<"Error reading data file, aborting."<<endl; exit(1);}
-	!! if(dat_seof != "eof"){cout<<"Error reading data file, aborting."<<endl; exit(1);}
+	
 
 
 
