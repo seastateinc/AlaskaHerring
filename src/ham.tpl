@@ -554,7 +554,7 @@ FUNCTION void runForecast()
 	dvariable fore_rt;	// sage recruits
 	dvariable fore_sb;	// spawning biomass
 	dvariable fore_vb;  // vulnerable biomass
-	dvariable ghl;
+	dvariable ghl;			// guidline harvest level
 	dvar_vector fore_nj(sage,nage);	//numbers-at-age
 	dvar_vector fore_cj(sage,nage); //catch-at-age
 
@@ -564,9 +564,9 @@ FUNCTION void runForecast()
 	fore_sb = fore_nj * elem_prod(mat(nyr),data_sp_waa(nyr)(sage,nage));
 
 	// GHL for pyr
-	double ssb_threshold = 5000;
-	double target_hr = 0.2;
-	dvariable hr = (0.2 + 0.8*fore_sb / ssb_threshold);
+	double ssb_threshold = dMiscCont(3);
+	double target_hr = dMiscCont(4);
+	dvariable hr = (0.2 + 0.8*fore_sb / dMiscCont(5));
 	if( hr > target_hr) {
 		hr = 0.2;
 	} else if( fore_sb < ssb_threshold ) {
