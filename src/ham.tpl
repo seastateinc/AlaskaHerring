@@ -657,17 +657,33 @@ FUNCTION void calcNaturalMortality()
 	int iyr = mod_syr;
 	int jyr;
 	Mij.initialize();
+	switch(mort_type) {
+		case 1:	// constant M within block.
+			for(int h = 1; h <= nMortBlocks; h++){
+				dvariable mi = mfexp(log_natural_mortality + log_m_devs(h));
+				
+				jyr = h != nMortBlocks?nMortBlockYear(h):nMortBlockYear(h)-retro_yrs;
+				// fill mortality array by block
+				do{
+					Mij(iyr++) = mi;
+				} while(iyr <= jyr);
+			}
+		break;
+		case 2: // cubic spline  
+			dvector iiyr = dvector((nMortBlockYear - mod_syr)/(mod_nyr-mod_syr));
+			dvector jjyr(mod_syr,mod_nyr);
+			jjyr.fill_seqadd(0,double(1.0/(mod_nyr-mod_syr)));
+			dvar_vector mi = log_natural_mortality + log_m_devs;
+			vcubic_spline_function cubic_spline_m(iiyr,mi);
+			dvar_vector mtmp = cubic_spline_m(jjyr);
+			for(int i=mod_syr; i <= mod_nyr; i++)
+			{
+				Mij(i) = mfexp(mtmp(i));
+			}
+		break;
+	}
 	
-	for(int h = 1; h <= nMortBlocks; h++){
-		dvariable mi = mfexp(log_natural_mortality + log_m_devs(h));
-		
-		jyr = h != nMortBlocks ? nMortBlockYear(h) : nMortBlockYear(h)-retro_yrs;
-		// fill mortality array by block
-		do{
-			Mij(iyr++) = mi;
-		} while(iyr <= jyr);
-	}   
-	//COUT(Mij)
+	
 
 FUNCTION void calcSelectivity()
 	/**
@@ -1281,6 +1297,9 @@ REPORT_SECTION
 // Selectivity and vulnerable proportion-at-age.
 	REPORT(Sij);
 	REPORT(Qij);
+
+// Natural mortality
+	REPORT(Mij);
 
 // Residuals
 	REPORT(resd_egg_dep);

@@ -45,10 +45,10 @@
   1
 ## Phase for estimation if nMortBlocks > 1
   2
-## nMortBlocks
-  2
+## nMortBlocks, or Nodes in the case of cubic spline interpolation
+  4
 ## The terminal year of each block
-  1999  2015
+ 1988 1994 1999 2015
 ## —————————————————————————————————————————————————————————————————————————— ##
 
 
