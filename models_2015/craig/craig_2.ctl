@@ -75,10 +75,12 @@
 ##                        OTHER MISCELLANEOUS CONTROLS                        ##
 ## —————————————————————————————————————————————————————————————————————————— ##
 ## number of controls to read in.
-2
+5
 ## Value    # - Description
 0.90718     # - Catch Scaler (convert from short tons to metric tons)
-1           # - Condition on Catch = 0, Condition of Effort = 1
-
+1           # - Condition on Catch = 0, Condition of Ft = 1
+25000       # - harvest threshold
+0.20        # - target harvest rate
+20000       # - threshold denominator
 ## EOF
 999
