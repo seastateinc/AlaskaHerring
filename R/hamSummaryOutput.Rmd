@@ -133,6 +133,21 @@ The following output is based on the Maximum likelihood estimates contained in t
 	plot.resd(D,nm="resd_sp_comp")
 ```
 
+#Guideline harvest limit
+The GHL is `r prettyNum(D$ghl,big.mark=",")` metric tons.
+
+```{r,message=FALSE,warning=FALSE}
+	df=data.frame(par=D$fit$name,est=D$fit$est,std=D$fit$std)
+	row = which(grepl("projected",D$fit$name))
+	mu <- df[row,2]
+	sd <- df[row,3]
+	ssb <- seq(0.5*mu,1.5*mu,length=100)
+	plot(ssb,pnorm(ssb,mu,sd),type="l",xlab="2017 Projected Spawning Biomass (mt)")
+	abline(v=25000)
+```
+
+The probability that the spawning biomass in 2017 will fall below the 25,000 mt threshold is `r round(pnorm(25000,mu,sd),3)`.
+
 #Bayesian output
 
 ## Spawning stock biomass
@@ -143,13 +158,10 @@ The marginal posterior densities for the mature spawning stock biomass.
 ```
 <!-- The marginal posterior distribution for the terminal year `r D$mod_nyr`. -->
 
-```{r,message=FALSE,warning=FALSE}
+```{r,message=FALSE,warning=FALSE,fig.cap="Marginal posterior density for the 2015 spawning stock biomass."}
 	ps <- as.data.frame(D$post.samp.ssb)/1000
 	ggplot(ps,aes(x=year2015,y=..scaled..)) + geom_density() +
 	labs(x="2015 Spawning stock biomass (1000 mt)",y="Marginal pdf") 
-	# # print(head(ps))
-	# sb <- D$post.samp.ssb[,dim(ps)[2]]/1000
-	# qplot(sb,geom="density",adjust=1,ylim=c(0,NA),xlab="2015 Spawning biomass (1000 mt)")
 ```
 
 

@@ -378,10 +378,16 @@ PARAMETER_SECTION
 // |---------------------------------------------------------------------------|
 // | VARIABLES
 // |---------------------------------------------------------------------------|
+// |- fore_sb spawning biomass
+// |- fore_sb vulnerable biomass
+// |- ghl guidline harvest level
 	number ro;  
 	number reck;
 	number so;  
 	number beta;
+	number fore_sb;		
+	number fore_vb;  	
+	number ghl;				
 
 
 // |---------------------------------------------------------------------------|
@@ -434,6 +440,9 @@ PARAMETER_SECTION
 
 	number fpen;
 	sdreport_number sd_terminal_ssb;
+	sdreport_number sd_forecast_ssb;
+	sdreport_number sd_projected_ssb;
+
 
 PRELIMINARY_CALCS_SECTION
 
@@ -552,9 +561,7 @@ FUNCTION void runForecast()
 	int nyr = mod_nyr;
 	int pyr = nyr+1;
 	dvariable fore_rt;	// sage recruits
-	dvariable fore_sb;	// spawning biomass
-	dvariable fore_vb;  // vulnerable biomass
-	dvariable ghl;			// guidline harvest level
+
 	dvar_vector fore_nj(sage,nage);	//numbers-at-age
 	dvar_vector fore_cj(sage,nage); //catch-at-age
 
@@ -562,6 +569,7 @@ FUNCTION void runForecast()
 	fore_nj = Nij(pyr); fore_nj(sage) = fore_rt;
 	fore_vb = fore_nj * elem_prod(Sij(nyr),data_cm_waa(nyr)(sage,nage));
 	fore_sb = fore_nj * elem_prod(mat(nyr),data_sp_waa(nyr)(sage,nage));
+	sd_forecast_ssb = fore_sb;
 
 	// GHL for pyr
 	double ssb_threshold = dMiscCont(3);
@@ -586,6 +594,7 @@ FUNCTION void runForecast()
 	fore_nj = elem_prod(fore_nj - fore_cj,mfexp(-Mij(nyr)));
 	fore_nj(sage) = so * ssb(pyr+1-sage) * exp(-beta*ssb(pyr-sage));
 	fore_sb = fore_nj * elem_prod(mat(nyr),data_sp_waa(nyr)(sage,nage));
+	sd_projected_ssb = fore_sb;
 
 FUNCTION void writePosteriorSamples()
 	/**
@@ -1390,6 +1399,11 @@ REPORT_SECTION
 	REPORT(resd_sp_comp);
 	REPORT(resd_cm_comp);
 	
+// Forecast output
+	REPORT(fore_sb);
+	REPORT(fore_vb);
+	REPORT(ghl);
+
 // Initial parameter values from simulation studies.
 	REPORT(theta_ival);
 
