@@ -10,7 +10,7 @@ library(dplyr)
 library(tidyr)
 
 # Read in the data from the model report, par, and cor files.
-source("./globals.R")
+source(file.path("./globals.R"))
 D <- read.admb("../models_2015/sitka/ham")
 C <- read.admb("../models_2015/craig/ham")
 

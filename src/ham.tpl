@@ -223,6 +223,7 @@ DATA_SECTION
 // |---------------------------------------------------------------------------|
 // | Controls for natural mortality rate deviations in each block.
 // |---------------------------------------------------------------------------|
+	init_int mort_type;
 	init_int mort_dev_phz;
 	init_int nMortBlocks;
 	init_ivector nMortBlockYear(1,nMortBlocks);

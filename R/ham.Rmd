@@ -3,11 +3,11 @@ title: Herring Assessment Model (Input/Output for Sitka)
 author: Sea State Inc
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
-  pdf_document:
+  html_document:
     toc: true
-    # toc_float: true
+    toc_float: true
     fig_caption: true
-    # code_folding: show
+    code_folding: show
 ---
 ----
 

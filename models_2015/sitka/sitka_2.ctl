@@ -1,21 +1,21 @@
 ## —————————————————————————————————————————————————————————————————————————— ##
 ##                  DESIGN MATRIX FOR PARAMETER CONTROLS                      ##
-##  Prior descriptions   Parameter values                                     ##                                                       ##
+##  Prior descriptions   Parameter values                                     ##                                                                            ##
 ##  -0 uniform           (0,0)                                                ##
 ##  -1 normal            (p1=mu,p2=sig)                                       ##
 ##  -2 lognormal         (p1=log(mu),p2=sig)                                  ##
 ##  -3 beta              (p1=alpha,p2=beta)                                   ##
 ##  -4 gamma             (p1=alpha,p2=beta)                                   ##
 ## —————————————————————————————————————————————————————————————————————————— ##
-## init   lower   upper    est  prior
-## valu   bound   bound    phz   type     p1    p2   # PARAMETER                               ##
+##  init  lower   upper    est  prior
+## value  bound   bound    phz   type     p1    p2   # PARAMETER              ##
 ## —————————————————————————————————————————————————————————————————————————— ##
-  -1.05   -6.79    1.00      2      1  -0.69  0.05   # log_natural_mortality
-   7.50   -6.00   12.00      1      0      0     0   # log_rinit
-   7.50   -6.00   12.00      1      0      0     0   # log_rbar
-   7.50   -6.00   12.00      2      0      0     0   # log_ro
-   1.50    0.00   12.00      2      0      0     0   # log_reck
-   0.40    0.00    1.00      2      0      0     0   # sigma_r
+   -1.05   -6.79    1.00      2      1  -0.69  0.05   # log_natural_mortality
+    7.50   -6.00   12.00      1      0      0     0   # log_rinit
+    7.50   -6.00   12.00      1      0      0     0   # log_rbar
+    7.50   -6.00   12.00      2      0      0     0   # log_ro
+    1.50    0.00   12.00      2      0      0     0   # log_reck
+    0.40    0.00    1.00     -2      0      0     0   # sigma_r
 ## —————————————————————————————————————————————————————————————————————————— ##
 
 
@@ -37,9 +37,14 @@
 
 ## —————————————————————————————————————————————————————————————————————————— ##
 ##            CONTROLS FOR TIME-VARYING LN(NATURAL MORTALITY DEVS)            ##
+## KEY:
+##  Type: 1 = constant M
+##  Type: 2 = interpolated using cubic spline.
 ## —————————————————————————————————————————————————————————————————————————— ##
+## Type
+  1
 ## Phase for estimation if nMortBlocks > 1
-  -2
+  2
 ## nMortBlocks
   2
 ## The terminal year of each block
