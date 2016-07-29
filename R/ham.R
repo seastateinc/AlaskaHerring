@@ -12,6 +12,11 @@ library(tidyr)
 # Read in the data from the model report, par, and cor files.
 source(file.path("./globals.R"))
 D <- read.admb("../models_2015/sitka/ham")
+sb.file <- "../models_2015/sitka/ssb.ps"
+if(file.exists(sb.file)){
+	D$post.samp.ssb=read.table("../models_2015/sitka/ssb.ps")
+	colnames(D$post.samp.ssb) <- paste0("year",D$year)
+}
 C <- read.admb("../models_2015/craig/ham")
 
 # ---------------------------------------------------------------------------- #
@@ -65,6 +70,9 @@ plot.comp <- function(D=D, nm = "data_cm_comp",...) {
 plot.ssb <- function(D=D){
 	qplot(D$year,D$ssb/1000,geom="line") + ylim(c(0,NA)) +
 	labs(x="Year",y="Female Spawning Stock Biomass (1000 mt)")
+	
+	
+
 }
 
 plot.datafit <- function(D=D, sfx="egg_dep", fit=FALSE) {
@@ -157,7 +165,20 @@ plot.ft.post <- function(D=D) {
 	scale_x_discrete(breaks=seq(D$mod_syr,D$mod_nyr,by=5))
 
 }
+plot.ssb.post <- function(D=D) {
+	# if(file.exists(sb.file)){
+		
+		ssb.ps <- D$post.samp.ssb
+		colnames(ssb.ps) <- paste(D$year)
+		df <- gather(ssb.ps,Year,SSB)
+		ggplot(df,aes(Year,SSB/1000)) + 
+		geom_violin(alpha=0.25,fill="steel blue",size=0.25,
+	            draw_quantiles = c(0.25, 0.5, 0.75)) +
+		ylim(c(0,NA)) + labs(x="Year",y="Spawning Stock Biomass (1000 t)") +
+		scale_x_discrete(breaks=seq(D$mod_syr,D$mod_nyr,by=5))
 
+	# }
+}
 
 # ---------------------------------------------------------------------------- #
 # PLOTS FOR DATA SECTION

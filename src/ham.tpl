@@ -301,10 +301,11 @@ DATA_SECTION
 // | RETROSPECTIVE ADJUSTMENTS
 // |---------------------------------------------------------------------------|
 	!! mod_nyr = mod_nyr - retro_yrs;
+	int nf;
+	!! nf = 0;
 
 INITIALIZATION_SECTION
 	theta theta_ival;
-	
 
 
 PARAMETER_SECTION
@@ -324,6 +325,7 @@ PARAMETER_SECTION
 	number log_rbar;
 	number log_ro;
 	number log_reck;
+	number log_sigma_r;
 	init_bounded_dev_vector log_rinit_devs(sage+1,nage,-15.0,15.0,2);
 	init_bounded_dev_vector log_rbar_devs(mod_syr,mod_nyr+1,-15.0,15.0,2);
 
@@ -372,6 +374,14 @@ PARAMETER_SECTION
 	LOCAL_CALCS
 		if(b_simulation_flag) log_ft_pars = log(0.1);
 	END_CALCS
+
+// |---------------------------------------------------------------------------|
+// | VARIABLES
+// |---------------------------------------------------------------------------|
+	number ro;  
+	number reck;
+	number so;  
+	number beta;
 
 
 // |---------------------------------------------------------------------------|
@@ -483,8 +493,7 @@ PROCEDURE_SECTION
 	
 	if( dMiscCont(2) ) {
 		calcFishingMortalitiy();
-		if(DEBUG_FLAG) 
-		cout<<"--> Ok after calcFishingMortalitiy          <--"<<endl;  
+		if(DEBUG_FLAG) cout<<"--> Ok after calcFishingMortalitiy          <--"<<endl;  
 	}
 
 	initializeStateVariables();
@@ -510,13 +519,84 @@ PROCEDURE_SECTION
 		if(DEBUG_FLAG) cout<<"--> Ok after calcCatchResiduals           <--"<<endl; 
 	// }
 
-	calcObjectiveFunction();
+	calcObjectiveFunction(); nf++;
 	if(DEBUG_FLAG) cout<<"--> Ok after calcObjectiveFunction          <--"<<endl;
-	
+
 	sd_terminal_ssb = ssb(mod_nyr);
+
+	if( last_phase() ) {
+		runForecast();
+	}
+
+	if(mceval_phase()) {
+		writePosteriorSamples();
+	}
 
 // |---------------------------------------------------------------------------|
 
+FUNCTION void runForecast()
+	/** 
+	Conduct a 1-year ahead forcasts based on SR
+	PSUEDOCODE:
+		-1 declare variables for forcasting.
+			* recruitment, spawning biomass, numbers-at-age
+			* selectivity curve
+		-2 Calculate F-at-age conditional on harvest rule.
+			* harvest_rate = 20% || set TAC option
+		-3 Update state variables from pyr=mod_nyr+1 to pyr+2
+			* recruitment based on ssb(pyr-sage)
+		-4 Compute GHLs given threshold and target harvest rate
+			* user specifies threshold and harvest rate in control file.
+
+	**/
+	int nyr = mod_nyr;
+	int pyr = nyr+1;
+	dvariable fore_rt;	// sage recruits
+	dvariable fore_sb;	// spawning biomass
+	dvariable fore_vb;  // vulnerable biomass
+	dvariable ghl;
+	dvar_vector fore_nj(sage,nage);	//numbers-at-age
+	dvar_vector fore_cj(sage,nage); //catch-at-age
+
+	fore_rt = so * ssb(pyr-sage) * exp(-beta*ssb(pyr-sage));
+	fore_nj = Nij(pyr); fore_nj(sage) = fore_rt;
+	fore_vb = fore_nj * elem_prod(Sij(nyr),data_cm_waa(nyr)(sage,nage));
+	fore_sb = fore_nj * elem_prod(mat(nyr),data_sp_waa(nyr)(sage,nage));
+
+	// GHL for pyr
+	double ssb_threshold = 5000;
+	double target_hr = 0.2;
+	dvariable hr = (0.2 + 0.8*fore_sb / ssb_threshold);
+	if( hr > target_hr) {
+		hr = 0.2;
+	} else if( fore_sb < ssb_threshold ) {
+		hr = 0.0;
+	}
+
+	ghl = hr * fore_vb;
+	//cout<<"harvest rate = "<<hr<<" GHL = "<<ghl<<endl;
+
+	// update state variables to pyr+1 so you can predict
+	// the effect of the 2016 fishery on the 2017 spawning stock.
+	// predicted catch-at-age
+	dvar_vector pa = elem_prod(fore_nj,Sij(nyr));
+	pa /= sum(pa);
+	dvariable wbar = pa * data_cm_waa(nyr)(sage,nage);
+	fore_cj = ghl/wbar * pa;
+	fore_nj = elem_prod(fore_nj - fore_cj,mfexp(-Mij(nyr)));
+	fore_nj(sage) = so * ssb(pyr+1-sage) * exp(-beta*ssb(pyr-sage));
+	fore_sb = fore_nj * elem_prod(mat(nyr),data_sp_waa(nyr)(sage,nage));
+
+FUNCTION void writePosteriorSamples()
+	/**
+	- This function is only envoked when the -mceval
+		command line option is implemented.
+	*/
+	if(nf==1){
+		ofstream ofs("ssb.ps");
+	}
+	ofstream ofs("ssb.ps",ios::app);
+	ofs<<ssb<<endl;
 	
 FUNCTION void runSimulationModel(const int& rseed)
 	/*
@@ -584,6 +664,8 @@ FUNCTION void runSimulationModel(const int& rseed)
 
 	// 7) update state variables conditioned on the observed catch data.
 	updateStateVariables();
+
+	// 7a) calcSpawningRecruitment
 	calcSpawningStockRecruitment();
 	
 	// 8) calculate age-composition residuals and over-write input data in memory.
@@ -633,6 +715,7 @@ FUNCTION void initializeModelParameters()
 	log_rbar              = theta(3);
 	log_ro                = theta(4);
 	log_reck              = theta(5);
+	log_sigma_r						= theta(6);
 	// COUT(theta);
 
 
@@ -884,10 +967,10 @@ FUNCTION void calcSpawningStockRecruitment()
 	// Ricker stock-recruitment function 
 	// so = reck/phiE; where reck > 1.0
 	// beta = log(reck)/(ro * phiE)
-	dvariable ro   = mfexp(log_ro);
-	dvariable reck = mfexp(log_reck);
-	dvariable so   = reck/phie;
-	dvariable beta = log(reck) / (ro * phie);
+	ro   = mfexp(log_ro);
+	reck = mfexp(log_reck);
+	so   = reck/phie;
+	beta = log(reck) / (ro * phie);
 
 	spawners = ssb(mod_syr,mod_nyr-sage+1).shift(rec_syr);
 	recruits = elem_prod( so*spawners , mfexp(-beta*spawners) );
@@ -1008,8 +1091,7 @@ FUNCTION void calcObjectiveFunction()
 	nll(4) = dnorm(resd_mileday,std_mileday);
 
 	// Negative loglikelihood for stock-recruitment data
-	dvector std_rec(rec_syr,mod_nyr+1);
-	std_rec = 0.6;
+	dvariable std_rec = sqrt(1.0/exp(log_sigma_r));
 	nll(5) = dnorm(resd_rec,std_rec);
 	
 	// Negative loglikelihood for catch data
