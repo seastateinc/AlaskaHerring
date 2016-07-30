@@ -302,6 +302,7 @@ DATA_SECTION
 // |---------------------------------------------------------------------------|
 	!! mod_nyr = mod_nyr - retro_yrs;
 	int nf;
+
 	!! nf = 0;
 
 INITIALIZATION_SECTION
@@ -574,14 +575,14 @@ FUNCTION void runForecast()
 	// GHL for pyr
 	double ssb_threshold = dMiscCont(3);
 	double target_hr = dMiscCont(4);
-	dvariable hr = (0.2 + 0.8*fore_sb / dMiscCont(5));
+	dvariable hr = (2.0 + 8.0*fore_sb / dMiscCont(5))/100.0;
 	if( hr > target_hr) {
-		hr = 0.2;
+		hr = target_hr;
 	} else if( fore_sb < ssb_threshold ) {
 		hr = 0.0;
 	}
 
-	ghl = hr * fore_vb;
+	ghl = hr * fore_sb;
 	//cout<<"harvest rate = "<<hr<<" GHL = "<<ghl<<endl;
 
 	// update state variables to pyr+1 so you can predict
@@ -737,6 +738,12 @@ FUNCTION void initializeMaturitySchedules()
 		dvariable mat_b = mat_params(h,2);
 
 		jyr = h != nMatBlocks ? nMatBlockYear(h) : nMatBlockYear(h)-retro_yrs;
+		// if( h != nMatBlocks ){
+		// 	jyr = nMatBlockYear(h);
+		// } else {
+		// 	jyr = nMatBlockYear(h) - retro_yrs;
+		// }
+
 		// fill maturity array using logistic function
 		do{
 			mat(iyr++) = plogis(age,mat_a,mat_b);
@@ -1330,6 +1337,116 @@ GLOBALS_SECTION
 	RETURN_ARRAYS_DECREMENT();
 	return(nloglike);
 	}
+	double dicValue;
+	double dicNoPar;
+ 	void function_minimizer::mcmc_eval(void)
+ 	{
+ 		// |---------------------------------------------------------------------------|
+ 		// | Added DIC calculation.  Martell, Jan 29, 2013                             |
+ 		// |---------------------------------------------------------------------------|
+ 		// | DIC = pd + dbar
+ 		// | pd  = dbar - dtheta  (Effective number of parameters)
+ 		// | dbar   = expectation of the likelihood function (average f)
+ 		// | dtheta = expectation of the parameter sample (average y) 
+
+ 	  gradient_structure::set_NO_DERIVATIVES();
+ 	  initial_params::current_phase=initial_params::max_number_phases;
+ 	  uistream * pifs_psave = NULL;
+
+ 	#if defined(USE_LAPLACE)
+ 	#endif
+
+ 	#if defined(USE_LAPLACE)
+ 	    initial_params::set_active_random_effects();
+ 	    int nvar1=initial_params::nvarcalc(); 
+ 	#else
+ 	  int nvar1=initial_params::nvarcalc(); // get the number of active parameters
+ 	#endif
+ 	  int nvar;
+	  
+ 	  pifs_psave= new
+ 	    uistream((char*)(ad_comm::adprogram_name + adstring(".psv")));
+ 	  if (!pifs_psave || !(*pifs_psave))
+ 	  {
+ 	    cerr << "Error opening file "
+ 	            << (char*)(ad_comm::adprogram_name + adstring(".psv"))
+ 	       << endl;
+ 	    if (pifs_psave)
+ 	    {
+ 	      delete pifs_psave;
+ 	      pifs_psave=NULL;
+ 	      return;
+ 	    }
+ 	  }
+ 	  else
+ 	  {     
+ 	    (*pifs_psave) >> nvar;
+ 	    if (nvar!=nvar1)
+ 	    {
+ 	      cout << "Incorrect value for nvar in file "
+ 	           << "should be " << nvar1 << " but read " << nvar << endl;
+ 	      if (pifs_psave)
+ 	      {
+ 	        delete pifs_psave;
+ 	        pifs_psave=NULL;
+ 	      }
+ 	      return;
+ 	    }
+ 	  }
+  
+ 	  int nsamp = 0;
+ 	  double sumll = 0;
+ 	  independent_variables y(1,nvar);
+ 	  independent_variables sumy(1,nvar);
+
+ 	  do
+ 	  {
+ 	    if (pifs_psave->eof())
+ 	    {
+ 	      break;
+ 	    }
+ 	    else
+ 	    {
+ 	      (*pifs_psave) >> y;
+ 	      sumy = sumy + y;
+ 	      if (pifs_psave->eof())
+ 	      {
+ 	      	double dbar = sumll/nsamp;
+ 	      	int ii=1;
+ 	      	y = sumy/nsamp;
+ 	      	initial_params::restore_all_values(y,ii);
+ 	        initial_params::xinit(y);   
+ 	        double dtheta = 2.0 * get_monte_carlo_value(nvar,y);
+ 	        double pd     = dbar - dtheta;
+ 	        double dic    = pd + dbar;
+ 	        dicValue      = dic;
+ 	        dicNoPar      = pd;
+
+ 	        cout<<"Number of posterior samples    = "<<nsamp    <<endl;
+ 	        cout<<"Expectation of log-likelihood  = "<<dbar     <<endl;
+ 	        cout<<"Expectation of theta           = "<<dtheta   <<endl;
+ 	        cout<<"Number of estimated parameters = "<<nvar1    <<endl;
+ 		    	cout<<"Effective number of parameters = "<<dicNoPar <<endl;
+ 		    	cout<<"DIC                            = "<<dicValue <<endl;
+ 	        break;
+ 	      }
+ 	      int ii=1;
+ 	      initial_params::restore_all_values(y,ii);
+ 	      initial_params::xinit(y);   
+ 	      double ll = 2.0 * get_monte_carlo_value(nvar,y);
+ 	      sumll    += ll;
+ 	      nsamp++;
+ 	      // cout<<sumy(1,3)/nsamp<<" "<<get_monte_carlo_value(nvar,y)<<endl;
+ 	    }
+ 	  }
+ 	  while(1);
+ 	  if (pifs_psave)
+ 	  {
+ 	    delete pifs_psave;
+ 	    pifs_psave=NULL;
+ 	  }
+ 	  return;
+ 	}
 
 REPORT_SECTION
 // Write out Raw Data (Useful for simulation studies)
@@ -1407,7 +1524,8 @@ REPORT_SECTION
 // Initial parameter values from simulation studies.
 	REPORT(theta_ival);
 
-
+FINAL_SECTION
+	system("cp ham.rep run1.rep");
 
 
 

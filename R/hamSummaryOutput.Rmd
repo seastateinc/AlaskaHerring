@@ -131,7 +131,14 @@ The following output is based on the Maximum likelihood estimates contained in t
 ```{r,message=FALSE,warning=FALSE}
 	plot.resd(D,nm="resd_cm_comp")
 	plot.resd(D,nm="resd_sp_comp")
+	plot.datafit(D,fit=TRUE)
 ```
+
+## Natural mortality.
+```{r,message=FALSE,warning=FALSE}
+	plot(D$year,rowMeans(D$Mij),type="l",xlab="Year",ylab="Natural Mortality Rate")
+```
+
 
 #Guideline harvest limit
 The GHL is `r prettyNum(D$ghl,big.mark=",")` metric tons.
@@ -154,7 +161,7 @@ The probability that the spawning biomass in 2017 will fall below the 25,000 mt 
 The marginal posterior densities for the mature spawning stock biomass.
 
 ```{r,message=FALSE,warning=FALSE,fig.cap="Marginal posterior densities for female spawning stock biomass."}
-	plot.ssb.post(D)
+	# plot.ssb.post(D)
 ```
 <!-- The marginal posterior distribution for the terminal year `r D$mod_nyr`. -->
 

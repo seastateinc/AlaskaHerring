@@ -11,13 +11,14 @@ library(tidyr)
 
 # Read in the data from the model report, par, and cor files.
 source(file.path("./globals.R"))
-D <- read.admb("../models_2015/sitka/ham")
-sb.file <- "../models_2015/sitka/ssb.ps"
+# D <- read.admb("../models_2015/sitka/ham")
+# sb.file <- "../models_2015/sitka/ssb.ps"
+D <- read.admb("../models_2015/craig/ham")
+sb.file <- "../models_2015/craig/ssb.ps"
 if(file.exists(sb.file)){
-	D$post.samp.ssb=read.table("../models_2015/sitka/ssb.ps")
+	D$post.samp.ssb=read.table(sb.file)
 	colnames(D$post.samp.ssb) <- paste0("year",D$year)
 }
-C <- read.admb("../models_2015/craig/ham")
 
 # ---------------------------------------------------------------------------- #
 # DATA SECTION

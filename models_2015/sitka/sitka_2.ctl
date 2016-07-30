@@ -15,7 +15,7 @@
     7.50   -6.00   12.00      1      0      0     0   # log_rbar
     7.50   -6.00   12.00      2      0      0     0   # log_ro
     1.50    0.00   12.00      2      0      0     0   # log_reck
-   -0.91   -9.00    1.00      2      0      0     0   # log_sigma_r
+    0.91   -9.00    1.00     -2      0      0     0   # log_sigma_r
 ## —————————————————————————————————————————————————————————————————————————— ##
 
 
@@ -42,13 +42,13 @@
 ##  Type: 2 = interpolated using cubic spline.
 ## —————————————————————————————————————————————————————————————————————————— ##
 ## Type
-  1
+  2
 ## Phase for estimation if nMortBlocks > 1
   2
 ## nMortBlocks, or Nodes in the case of cubic spline interpolation
   4
 ## The terminal year of each block
- 1988 1994 1999 2015
+ 1977 1998 2002 2007
 ## —————————————————————————————————————————————————————————————————————————— ##
 
 
@@ -60,13 +60,15 @@
 ## - Each selectivity block can have different functional forms based on selType
 ## - LEGEND:
 ##   - SelType = 1, logistic selectivity, 2 parameters.
+##   - SelType = 2, logistic with 50% & 95% parameters
 ##  nSelexblocks
-    2
+    3
 ## —————————————————————————————————————————————————————————————————————————— ##
 ##  Gear  Sel     sel   sel   age   year  phz    | start end
 ##  Index Type    mu    sd    nodes nodes mirror | block block
 ## —————————————————————————————————————————————————————————————————————————— ##
-    1     1       3.0   0.5   0     0      2        1980  2000
+    1     1       3.0   0.5   0     0     -1        1971  1980
+    1     1       5.0   0.3   0     0      2        1981  2000
     1     1       5.0   0.3   0     0      2        2001  2015
 ## —————————————————————————————————————————————————————————————————————————— ##
 
@@ -80,7 +82,7 @@
 0.90718     # - Catch Scaler (convert from short tons to metric tons)
 1           # - Condition on Catch = 0, Condition of Ft = 1
 25000       # - harvest threshold
-0.20        # - target harvest rate
+0.10        # - target harvest rate
 20000       # - threshold denominator
 ## EOF
 999
