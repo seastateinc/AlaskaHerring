@@ -24,7 +24,7 @@ I would recommend using Git and Github, as they serve as valuable tools for vers
 
 ## To Do List
 
-- [ ] Improve Numerical Stability:
+- [x] Improve Numerical Stability:
 	- [x] Parameter transformations to log-space
 	- [x] Design matrix for estimated parameters (ival, lb, ub, phz, bayes)
 	- [x] Develop option to condition the model on F and fit to catch.
@@ -40,12 +40,14 @@ I would recommend using Git and Github, as they serve as valuable tools for vers
 	- [x] OBSM::calcAgeCompResiduals
 	- [x] OBSM::calcEggMiledaySurveyResiduals
 	- [x] OBSM::catchObservationModel
-	- [ ] STAT::calcObjectiveFunction
-		- [ ] STAT::penaltyFunctions
-		- [ ] STAT::negativeLogLikelihoods
-		- [ ] STAT::constraintFunctions
-		- [ ] STAT::calculateDIC
-	- [ ] FORE::
+	- [x] STAT::calcObjectiveFunction
+		- [x] STAT::penaltyFunctions
+		- [x] STAT::negativeLogLikelihoods
+		- [x] STAT::constraintFunctions
+		- [x] STAT::calculateDIC
+	- [ ] FORE::runForecast
+		- [ ] FORE::ghlCalc
+		- [ ] FORE::calcTAC
 
 - [ ] Control file reorganization
 	- [x] add design matrix to control parameter bounds and phases. 
