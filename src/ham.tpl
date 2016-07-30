@@ -1525,7 +1525,7 @@ REPORT_SECTION
 	REPORT(theta_ival);
 
 FINAL_SECTION
-	system("cp ham.rep run1.rep");
+	//system("cp ham.rep run1.rep");
 
 
 

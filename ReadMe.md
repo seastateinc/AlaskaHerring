@@ -3,6 +3,7 @@ Steve Martell.
 May 12, 2016
 Jun 29, 2016
 Jul 20, 2016
+Jul 29, 2016
 ----
 
 ## Introduction
@@ -54,7 +55,7 @@ I would recommend using Git and Github, as they serve as valuable tools for vers
 	- [x] add contrls for time varying maturity
 	- [x] add contrls for time varying natural mortality rate deviations.
 	- [x] add design matrix for selectivity parameter controls.
-	- [ ] add Miscellaneous controls for appending.
+	- [x] add Miscellaneous controls for appending.
 
 
 - [ ] Simulation model:
@@ -62,7 +63,7 @@ I would recommend using Git and Github, as they serve as valuable tools for vers
 	- [x] Add FUNCTION runSimulationModel
 		- [x] Get and use True Parameter values
 		- [x] Generate random variables | random number seed.
-		- [ ] Run population dynamics model conditioned on catch & process errors.
+		- [ ] Population dynamics conditioned on catch & S-R curve.
 		- [x] Cache observation model results into data variables.
 		- [x] Add observation errors.
 		- [x] Allow Alaska Herring Assessment to continue with parameter estimation.
