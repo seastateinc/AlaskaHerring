@@ -663,7 +663,7 @@ FUNCTION void runSimulationModel(const int& rseed)
 
 	// Not sure if the following should be done. It should produce a less
 	// biased MLE of the average recruitment, but uncertainty is biased downwards.
-	// ensure random deviates satisfy ∑ dev = 0 constraint.
+	// ensure random deviates satisfy sum dev = 0 constraint.
 	// log_m_devs -= mean(log_m_devs);
 	// log_rbar_devs -= mean(log_rbar_devs);
 	// log_rinit_devs -= mean(log_rinit_devs);
