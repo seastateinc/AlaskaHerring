@@ -19,6 +19,12 @@ Go to the [Github code repository for Ham](https://github.com/seastateinc/Alaska
 
 I would recommend using Git and Github, as they serve as valuable tools for version control, and tracking code changes over time.  Its perfectly fine to just download the zip file; however, using Git is far more efficient for incorporating code changes and working in groups.
 
+## R-scripts
+The R-scripts directory has two important files:
+	1. modelList.txt
+	2. R4HAM.R
+
+The modelList.txt file is a list of models that R4HAM.R will read into R.
 
 
 ----
