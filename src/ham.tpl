@@ -1246,8 +1246,19 @@ GLOBALS_SECTION
 	template<typename T>
 	dvar_vector plogis(const dvector x, T location, T scale)
 	{
-		return(1.0 / (1.0 + exp(-(x-location)/scale)));
+		return(1.0 / (1.0 + mfexp(-(x-location)/scale)));
 	}
+
+	dvar_vector plogis(const dvector x, dvariable location, dvariable scale)
+	{
+		return(1.0 / (1.0 + mfexp(-(x-location)/scale)));
+	}
+
+	dvar_vector plogis(const dvector x, prevariable location, prevariable scale)
+	{
+		return(1.0 / (1.0 + mfexp(-(x-location)/scale)));
+	}
+
 
 
 	dvariable dmvlogistic(const dmatrix o, const dvar_matrix& p,dvar_matrix& nu, double& tau2,const double minp)

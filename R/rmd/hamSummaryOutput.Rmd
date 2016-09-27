@@ -52,6 +52,7 @@ The first six elements in the following code snippet shows the first and last ye
 
 ## Empirical Weight-at-age
 The weight-at-age data have the units of grams.  There are two input weight-at-age matrixes, the first is for the observed spawning weight-at-age, and the second is the observed commercial catch weight-at-age.  The row dimensions of each matrix are from dat_syr -- dat_nyr.
+
 ```{r,message=FALSE,warning=FALSE}
 	colnames(D[['data_sp_waa']]) <- c("Year",paste(D$sage:D$nage))
 	plot.waa(D)
@@ -69,6 +70,7 @@ The next two blocks of data input correspond to the Commercial age composition a
 ```{r,message=FALSE,warning=FALSE,fig.cap="Commercial age-proportions where the area of each circle is proportional to the proportion-at-age in a given year and the colors are unique to each cohort.",fig.height=3}
 	plot.comp(D,nm = "data_cm_comp")
 ```
+
 ```{r,message=FALSE,warning=FALSE}
 	colnames(D[['data_cm_comp']]) <- c("Year",paste(D$sage:D$nage))
 	pander(D$data_cm_comp)
