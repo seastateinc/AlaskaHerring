@@ -70,12 +70,14 @@ $(runsims):
 sim: $(EXEC) $(setsims) $(runsims)
 	touch SIMSDONE
 
-clean:
-	@rm -f $(EXEC) 
+dust:
 	@rm -f admodel.cov
 	@rm -f admodel.hes
 	@rm -f admodel.dep
-	@rm -f fmin.log
+	@rm -f fmin.log variance
+
+clean: dust
+	@rm -f $(EXEC) 
 	@rm -f $(EXEC).rep $(EXEC).par ham.[bcehmrpls]*
 	@rm -r rets ||:
 	@rm -r sims ||:
@@ -83,3 +85,5 @@ clean:
 	@rm -f retro
 	@rm -f RETRODONE
 	@rm -f SIMSDONE
+	@rm -f ders.dat makdirs derivatives 
+	@rm -f ssb.ps
