@@ -15,8 +15,8 @@ compile:
 	make --directory="src" 
 
 run:
-	make --directory="models_2015/sitka" run
-	make --directory="models_2015/craig" run
+	make --directory="models_2015/sitka" all
+	make --directory="models_2015/craig" all
 
 retro:
 	make --directory="models_2015/sitka" retro NRET=5

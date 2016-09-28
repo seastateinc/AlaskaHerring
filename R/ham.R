@@ -69,10 +69,13 @@ plot.comp <- function(D=D, nm = "data_cm_comp",...) {
 
 
 plot.ssb <- function(D=D){
-	qplot(D$year,D$ssb/1000,geom="line") + ylim(c(0,NA)) +
+	#qplot(D$year,D$ssb/1000,geom="line") + ylim(c(0,NA)) +
+	#labs(x="Year",y="Female Spawning Stock Biomass (1000 mt)")
+	
+	df <- data.frame(year=seq(D$mod_syr,D$mod_nyr),ssb=D$ssb)
+	ggplot(df,aes(year,ssb/1000)) +geom_line() + ylim(c(0,NA)) + 
 	labs(x="Year",y="Female Spawning Stock Biomass (1000 mt)")
-	
-	
+
 
 }
 
