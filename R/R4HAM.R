@@ -23,6 +23,7 @@ library(tidyr)
 #	OTHER R-SRCIPTS
 #
 source(file.path("globals.R"))
+source(file.path("plotIndex.R"))
 source(file.path("ham.R"))
 
 
@@ -77,7 +78,12 @@ data.Plots <- lapply(M,plot.all.data)
 plot.all.output <- function(D) {
 	p.output <- NULL
 	p.output$ssb <- plot.ssb(D)
-	p.output$datafit <- plot.datafit(D,fit=TRUE)  
+	p.output$egg <- plot.eggIndex(D,fit=TRUE)  
+	p.output$resd_cct <- plot.resd(D,nm="resd_catch")
+	p.output$resd_egg <- plot.resd(D,nm="resd_egg_dep")
+	p.output$resd_rec <- plot.resd(D,nm="resd_rec")
+	p.output$resd_csp <- plot.resd(D,nm="resd_sp_comp")
+	p.output$resd_ccm <- plot.resd(D,nm="resd_cm_comp")
 
 	cat("Finished plot.all.output\n")
 	return(p.output)

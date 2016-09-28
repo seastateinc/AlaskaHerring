@@ -89,8 +89,10 @@ plot.datafit <- function(D=D, sfx="egg_dep", fit=FALSE) {
 	colnames(pred) <- c("year","pred")
 
 	df   <- right_join(data,pred) %>%
+					mutate(ln.index=log(index)) %>%
 					mutate(std = 1.96*sqrt(log(log.se+1))) %>%
-					mutate(lower=index-std*index,upper=index+std*index) %>%
+					mutate(lower=exp(ln.index-std*ln.index),
+					       upper=exp(ln.index+std*ln.index)) %>%
 					tbl_df()
 
 	# print(head(df))
@@ -120,7 +122,7 @@ plot.resd <- function(D=D, nm = "resd_cm_comp", ...) {
 
 	} else if( grepl("egg",nm) ) {
 		df <- as.data.frame(cbind(D[['year']],D[[nm]]))
-		colnames(df) <- c("Year","Residual")
+		colnames(df) <- c("Year","Residual (Egg deposition)")
 
 		ggplot(df,aes(Year,Residual)) + geom_point() +
 		geom_segment(aes(x = Year, xend = Year, y = 0, 
@@ -128,14 +130,14 @@ plot.resd <- function(D=D, nm = "resd_cm_comp", ...) {
 
 	} else if( grepl("rec",nm) ) {
 		df <- as.data.frame(cbind(D[['rec_years']],D[[nm]]))
-		colnames(df) <- c("Year","Residual")
+		colnames(df) <- c("Year","Residual (Recruitment deviations)")
 
 		ggplot(df,aes(Year,Residual)) + geom_point() +
 		geom_segment(aes(x = Year, xend = Year, y = 0, 
 		                 yend = Residual),data=df,size=0.2)
 	} else if( grepl("catch",nm) ) {
 		df <- as.data.frame(cbind(D[['year']],D[[nm]]))
-		colnames(df) <- c("Year","Residual")
+		colnames(df) <- c("Year","Residual (Catch)")
 
 		ggplot(df,aes(Year,Residual)) + geom_point() +
 		geom_segment(aes(x = Year, xend = Year, y = 0, 
