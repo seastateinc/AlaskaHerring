@@ -31,7 +31,8 @@ plot.eggIndex <- function(D, sfx="egg_dep",fit=FALSE) {
 
 	p <- ggplot(df,aes(year,index)) +
 	geom_pointrange(aes(ymin=lci,ymax=uci),size=0.5,fatten=1) +
-	labs(x="Year",y="Egg Deposition (trillions)")
+	labs(x="Year",y="Egg Deposition (trillions)") +
+	ggtitle(D$Model)
 
 	if(fit) {
 		p <- p + geom_line(aes(year,pred),color="blue")

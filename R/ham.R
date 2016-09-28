@@ -33,7 +33,7 @@ plot.catch <- function(D=D, nm = "data_ct_raw",...) {
 
 	ggplot(df,aes(Year,Catch)) +
 		geom_pointrange(aes(ymin = lower, ymax = upper),size=0.5,fatten=2) + 
-		labs(x="Year",...)
+		labs(x="Year",...) + ggtitle(D$Model)
 }
 
 
@@ -49,7 +49,7 @@ plot.waa <- function(D=D, nm = "data_sp_waa",...) {
 		geom_point(alpha=0.5,aes(fill=Cohort),show.legend=FALSE,size=0.5) +
 		labs(x="Year",y="Weight-at-age (grams)",color="Cohort") +
 		guides(col = guide_legend(ncol = 9)) +
-		theme(legend.position="bottom")
+		theme(legend.position="bottom") +ggtitle(D$Model)
 }
 
 plot.comp <- function(D=D, nm = "data_cm_comp",...) {
@@ -63,7 +63,7 @@ plot.comp <- function(D=D, nm = "data_cm_comp",...) {
 	ggplot(gdf,aes(Year,Age,color=Cohort)) + 
 		geom_point(alpha=0.5,aes(size=abs(Proportion)),show.legend=FALSE) +
 		scale_size_area(max_size=8) + 
-		labs(x="Year",...)
+		labs(x="Year",...) + ggtitle(D$Model)
 }
 
 
@@ -74,11 +74,13 @@ plot.ssb <- function(D=D){
 	
 	df <- data.frame(year=seq(D$mod_syr,D$mod_nyr),ssb=D$ssb)
 	ggplot(df,aes(year,ssb/1000)) +geom_line() + ylim(c(0,NA)) + 
-	labs(x="Year",y="Female Spawning Stock Biomass (1000 mt)")
+	labs(x="Year",y="Female Spawning Stock Biomass (1000 mt)") +
+	ggtitle(D$Model)
 
 
 }
 
+# Deprecate
 plot.datafit <- function(D=D, sfx="egg_dep", fit=FALSE) {
 	data <- paste0("data_",sfx)
 	data <- as.data.frame(D[[data]])
@@ -100,9 +102,14 @@ plot.datafit <- function(D=D, sfx="egg_dep", fit=FALSE) {
 	ggplot(df,aes(year,index)) + 
 	geom_pointrange(aes(ymin = lower, ymax = upper),size=0.5,fatten=2) +
 	labs(x="Year",y="Egg Deposition (trillions)") +
+	ggtitle(D$Model) +
 	if(fit) geom_line(aes(year,pred),alpha=0.8) 
 
 }
+
+
+
+
 
 plot.resd <- function(D=D, nm = "resd_cm_comp", ...) {
 
@@ -118,30 +125,37 @@ plot.resd <- function(D=D, nm = "resd_cm_comp", ...) {
 		ggplot(gdf,aes(Year,Age,color=factor(sign(Residual)))) + 
 			geom_point(alpha=0.5,aes(size=abs(Residual)),show.legend=TRUE) +
 			scale_size_area(max_size=8) + 
-			labs(x="Year",color="Sign",size="Residual",...)
+			labs(x="Year",color="Sign",size="Residual",...)+
+			ggtitle(D$Model)
 
 	} else if( grepl("egg",nm) ) {
 		df <- as.data.frame(cbind(D[['year']],D[[nm]]))
-		colnames(df) <- c("Year","Residual (Egg deposition)")
+		colnames(df) <- c("Year","Residual")
 
 		ggplot(df,aes(Year,Residual)) + geom_point() +
 		geom_segment(aes(x = Year, xend = Year, y = 0, 
-		                 yend = Residual),data=df,size=0.2)
+		                 yend = Residual),data=df,size=0.2) +
+		labs(y="Residual (egg deposition)")+
+		ggtitle(D$Model)
 
 	} else if( grepl("rec",nm) ) {
 		df <- as.data.frame(cbind(D[['rec_years']],D[[nm]]))
-		colnames(df) <- c("Year","Residual (Recruitment deviations)")
+		colnames(df) <- c("Year","Residual")
 
 		ggplot(df,aes(Year,Residual)) + geom_point() +
 		geom_segment(aes(x = Year, xend = Year, y = 0, 
-		                 yend = Residual),data=df,size=0.2)
+		                 yend = Residual),data=df,size=0.2)+
+		labs(y="Residual (recruitment deviation)")+
+		ggtitle(D$Model)
 	} else if( grepl("catch",nm) ) {
 		df <- as.data.frame(cbind(D[['year']],D[[nm]]))
-		colnames(df) <- c("Year","Residual (Catch)")
+		colnames(df) <- c("Year","Residual")
 
 		ggplot(df,aes(Year,Residual)) + geom_point() +
 		geom_segment(aes(x = Year, xend = Year, y = 0, 
-		                 yend = Residual),data=df,size=0.2)
+		                 yend = Residual),data=df,size=0.2)+
+		labs(y="Residual (commercial catch)") +
+		ggtitle(D$Model)
 	}
 }
 

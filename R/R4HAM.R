@@ -77,6 +77,7 @@ data.Plots <- lapply(M,plot.all.data)
 
 plot.all.output <- function(D) {
 	p.output <- NULL
+	p.output$label <- D$Model
 	p.output$ssb <- plot.ssb(D)
 	p.output$egg <- plot.eggIndex(D,fit=TRUE)  
 	p.output$resd_cct <- plot.resd(D,nm="resd_catch")
