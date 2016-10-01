@@ -108,16 +108,39 @@
   \begin{abstract}
     This document describes the proposed changes that have been made to the Age-structured assessment model for Alaska herring stocks. This was a contract project between the State of Alaska's Department of Fish and Game and Steven Martell at Sea State Inc.
 
-    The objective of this project was to review and modify the existing AD Model Builder Code for the Age-structured model for Alaska herring stocks (version 0.1 Jan 2015).  The overarching objective of the modifications are:  to improve numerical stability, ease of use, general flexibility for alternative structural assumptions, and estimation of observation and process error variance to better quantify uncertainty. The following list of bullets summarise the changes that have been implmented to date:
+    The objective of this project was to review and modify the existing AD Model Builder Code for the Age-structured model for Alaska herring stocks (version 0.1 Jan 2015).  The overarching objective of the modifications are:  to improve numerical stability, ease of use, general flexibility for alternative structural assumptions, and estimation of observation and process error variance to better quantify uncertainty. The following list of bullets summarizes the proposed changes that have been implemented to date:
 
     \begin{itemize}
       \item Modifications to the Input Data File.  Users can now specify estimates of observation error for each annual observation for: catch, egg surveys, mile milt days, and composition data.
-      \item Modifications to the Control file.  Changes to the control file now allow users to estimate or fix parameters, change the phase of estimation, apply informative priors of various statistical distributions, all without having to recompile the code.  This permits rapid exploration (even automated) of alternative hypotheses and structural assumptions that are repeatable.
-      \item Added controls for the addition of time varying natural mortality rates, blocks of time-varying maturity, a flexible system from implmenting a wide variety of selectivity options including time-varying blocks, or continuous non-parametric functions (i.e., cubic splines).
+      \item Modifications to the Control file.  Changes to the control file now allow users to estimate or fix parameters, change the phase of estimation, set initial parameter values, apply informative priors of various statistical distributions, all without having to recompile the code.  This permits rapid exploration (even automated) of alternative hypotheses and structural assumptions that are repeatable.
+      \item Added controls for the addition of time varying natural mortality rates, blocks of time-varying maturity, a flexible system from implementing a wide variety of selectivity options including time-varying blocks, or continuous non-parametric functions (i.e., cubic splines). The control file is also structured so it can expand with new model features, or custom outputs, that develop in the future.
+      \item Custom command line options were added to the code. Two options were added to permit rapid simulation testing (\texttt{-sim} option), and automate the procedures of conducting retrospective analysis without having to make any potentially dangerous modifications to input files (the \texttt{-retro }option). 
+      \item Many of the previous routines in the current version of the stock assessment model have been broken down into smaller functions.  This both reduces the amount of redundant code that currently exists and makes the code easier to read and understand by humans.
+      \item The model has 5 major components:
+        \begin{enumerate}
+          \item Inputs (includes data and controls that specifies model structure).
+          \item Population dynamics: a collection of sub-models that relate to the biology (e.g., natural mortality, maturity, stock-recruitment).
+          \item Observation dynamics: a collection of sub-models that relate how fishing mortality interacts with population model (e.g., fisheries selectivity, fishing mortality, predicted egg abundance index, predicted composition data).
+          \item Statistical criterion: or the objective function that relates the observations to the predicted observations based on population and observation model dynamics.
+          \item Outputs; including and not limited to parameter estimates, convergence criterion, derived management quantities and residuals.
+        \end{enumerate}
+      \item There are a few structural differences being proposed in this model that relate to how selectivity is modeled, the observation error assumed in the composition data, and variance terms that relate to both process error and observation error.
+        \begin{itemize}
+          \item To avoid breaking the derivative chain in calculating the objective function and its gradient, use of the max function to re-scale the selectivities should be avoided.  Often you can get away with it in very simple models where selectivity is very well informed, but can soon become problematic when your jointly estimating additional parameters that are confounded with selectivity (e.g., time-varying natural mortality).  To do so, the propose change rescales the selectivity vector for ages such that it has a mean of 1.0 
+          \item The previous generation used a least-square estimator for the age-composition proportions. The proposed changes implemented in this model assume the age-proportion data are logistic-normal, and these data are weighted by the conditional maximum likelihood estimate of the variance (i.e., objectively weighted).  Alternatives likelihood formulations are also easily implemented in future iterations.
+          \item Lastly, each catch and survey observation in the input data file also has an associated log standard error associated with it (approximately the coefficient of variation).  In cases where it is possible to estimate a standard error in the data using bootstrap procedures, the inter-annual variation in observation error can now be specified.  In addition, the process error term permits recruitment variation around a stock-recruitment relationship. Currently the Ricker model is implemented, with the option to implement the Beverton-Holt model annotated in the code. 
+        \end{itemize}
+        \item Additional elements were also introduced in the objective function calculation to improve the overall estimation robustness.  These include penalties that are only implemented in the initial phases to set up initial gradients that will get key population parameters in the ``ball park''. These penalties can then be relaxed (or set = 0) in  the terminal phases.
+        \item Of significant difference is the use of informative prior distributions (or sometimes less informative) for population parameters including: natural mortality, initial recruitment, average recruitment, unfished recruitment, steepness of the stock recruitment relationship, and the variance in the recruitment deviations (process error).  The only option for including priors in the previous generation was to fix a parameter value (which implies the variance is 0, or very informative).  For example, having the option to estimate natural mortality where the prior mean is set at the original fixed value and assume some arbitrary CV can often reduce model confounding in cases where there are one-way trips in the relative abundance data. Comparing the marginal posterior density and prior density will shed light on how informative the data are about the parameters.
+        \item Model selection criterion can also be evaluated using  Deviance Information Criterion (DIC).  This criterion is calculated using the posterior sample values generated from one of AD Model Builders built-in sampling routines (e.g., The Metropolis Hastings Algorithm).
     \end{itemize}
+
+    Lastly, a few R-scripts have been developed for the purposes of conducting simulation-estimation experiments for self-testing to examine for potential bias in the estimators, and exploring options for correcting any such bias.
+
 
   \end{abstract}
 
+  \tableofcontents
 
   \section{Introduction} % (fold)
   \label{sec:introduction}
@@ -317,7 +340,7 @@
     \label{ssub:initial_state_variables_}
     
     In this routine, the objective is to set the initial values for the numbers-at-age matrix $N_{i,j}$.  Specifically, the row dimensions of the matrix are from the start year to the terminal year + 1, the column dimensions are the ages.  This routine first calculates the survivorship to age $j$ based on natural mortality rates, then initializes the first row of $N_{i,j}$ matrix using the average initial recruitment and deviations around that average recruitment multiplied by the survivorship at age $j$.  The source code also includes the taylor series for the plus group:
-    \lstinputlisting[language=C++, firstline=704, lastline=733]{../../src/ham.tpl}
+    \lstinputlisting[language=C++, firstline=831, lastline=851]{../../src/ham.tpl}
 
     The survivorship calculation \texttt{lx} correspondds to \eqref{eq.survivorship} in Table \ref{tab:PopulationDynamics}, and the numbers-at-age in the initial year and age-3 recruits corresponds to \eqref{eq.initialnumbersatage} and \eqref{eq.initialrecruits}, respectively.
     % subsubsection initial_state_variables_ (end)
@@ -325,7 +348,7 @@
     \subsubsection{Update state variables} % (fold)
     \label{ssub:update_state_variables}
     In this routine, the numbers-at-age are propagated in time, where the-age specific survival rate is partitioned into two periods: a fishing period, and a period of natural mortality.  The ASA model currently in use for Sitka sound herring assumes a pulse fishery.  At the start of each time step, the model first calculates the predicted catch-at-age in numbers in year $i$. This is done by first converting the catch weight to catch in numbers by dividing by the predicted average of the catch.  This corresponds to the \texttt{wbar} variable in the following code chunk (note the dependencey on predicted proportions-at-age):
-    \lstinputlisting[language=C++, firstline=736, lastline=799]{../../src/ham.tpl}
+    \lstinputlisting[language=C++, firstline=863, lastline=926]{../../src/ham.tpl}
     Once the catch-at-age data is calculated, the pulse fishery proceeds by subtracting the $C_{ij}$  from the $N_{i,j}$.  The last two steps correspond to step 4 in the annotated code chunk. The last steps the survive the remaining numbers-at-age using the natural mortality rate in year $i$. Then finally, update the numbers-at-age $j$ to $j+1$ in year $i$ to year $i+1$, including the plus group for the terminal age-group.
     % subsubsection update_state_variables (end)
 
@@ -337,7 +360,7 @@
 
     The source code for the stock-recruitment relationship is well annotated and describes some of the derivations:
     \begin{small}
-    \lstinputlisting[language=C++, firstline=802, lastline=867]{../../src/ham.tpl}
+    \lstinputlisting[language=C++, firstline=929, lastline=998]{../../src/ham.tpl}
       
     \end{small}
 
@@ -351,28 +374,28 @@
     \subsubsection{Age composition} % (fold)
     \label{ssub:age_composition}
     The predicted age-composition is based on the vulnerable proportions at age $Q_{i,j}$ in \eqref{eq.predQij}.  The residual difference is used to compute the negative log likelihood in the objective function.  The code for the age composition residual calculation is as follows:
-    \lstinputlisting[language=C++, firstline=871, lastline=894]{../../src/ham.tpl}
+    \lstinputlisting[language=C++, firstline=1001, lastline=1022]{../../src/ham.tpl}
     Note that both the residual difference between the commercial and spawning samples are calculated in this routine.  If there are missing data for a given year (denoted by a -9.0 in the data file), then the residual difference is set to 0 for that year and there is no contribution to the negative log likelihood.
     % subsubsection age_composition (end)
 
     \subsubsection{Egg deposition} % (fold)
     \label{ssub:egg_deposition}
     The observation model for the egg deposition data treats these observations as estimates of absolute abundance.  Therefore, there is no associated scaling parameter that is estimated. The observation errors in the egg deposition data are assumed to be lognormal.  The predicted age-deposition data is based on the female (assuming a 50:50 sex ratio) mature numbers-at-age multiplied by the fecundity at age.  The annotated source code is as follows:
-    \lstinputlisting[language=C++, firstline=896, lastline=911]{../../src/ham.tpl}
+    \lstinputlisting[language=C++, firstline=1026, lastline=1041]{../../src/ham.tpl}
 
     % subsubsection egg_deposition (end)
 
     \subsubsection{Aerial surveys} % (fold)
     \label{ssub:aerial_surveys}
     Indicies from aerial surveys, or mile milt days, are treated as relative abundance data.  The underlying assumption in this observation model is that the observation errors are log normal, and that the index is proportional to the spawning stock biomass.  Note that the code does not estimate the coefficient, rather the conditional maximum likelihood estimate of the scaling coefficent is used \citep[see][for a full explanation]{walters1994calculation}.  The annotated code follows:
-     \lstinputlisting[language=C++, firstline=913, lastline=934]{../../src/ham.tpl}
+     \lstinputlisting[language=C++, firstline=1043, lastline=1064]{../../src/ham.tpl}
     % subsubsection aerial_surveys (end)
 
     \subsubsection{Predicted catch} % (fold)
     \label{ssub:predicted_catch}
     In the case where the model is conditioned on effort and fitted to the catch time serie data, the predicted catch is the sum of products betwen the catch-at-age in numbers and the observed weight-at-age in the commercial fishery.
     We further assume observation errors are lognormal. The source code follows:
-    \lstinputlisting[language=C++, firstline=936, lastline=947]{../../src/ham.tpl}
+    \lstinputlisting[language=C++, firstline=1066, lastline=1078]{../../src/ham.tpl}
     % subsubsection predicted_catch (end)
   % subsection observation_models (end)
 
@@ -402,7 +425,7 @@
     \end{table}
 
     The source code for the negative loglikelihoods follows:
-    \lstinputlisting[language=C++, firstline=959, lastline=989]{../../src/ham.tpl}
+    \lstinputlisting[language=C++, firstline=1079, lastline=1120]{../../src/ham.tpl}
     
     For the composition data, the multivariate logistic likelihood is currently implemented, as this is a self-scaling likelihood.  A good reference for this particular likelihood and how its implemented in AD Model Builder can be found in \cite{schnute1995influence}.  More recent work on the weighting of composition data is available in \cite{francis2011data}.  The function \texttt{dmvlogistic} requires 5 arguments: the observed and predicted composition matrixes, a matrix for returning the residuals, a variable for the conditional MLE of the variance of the observation errors, and a threshold value called \texttt{minp}. The multivariate logistic likelihood does not accommodate 0 observations for age proportions.  Therefore there are two options for dealing with 0s: 1) add a small constant to all observed and predicted observations and re-normalize, or 2) pool the adjacent cohorts if the observed proportion is less than some minimum observed proportion.  The first option is widely used in programs such as stock synthesis, and is akin to manufacturing data.  If a particular cohort is relatively weak, and only partially selected, the sample size required to observed just one individual of a certain age in a given year could be infinitely large.  Instead of adding a constant, option 2 pools the data such that the likelihood of ages, for example, 3-4 are evaluated jointly, rather than the likelihood of age-3 plus the likelihood of age-4.  This pooling of the data and predictions does not require the addition of a constant that could potentially bias the result.  A good practice that I've found is to just set \texttt{minp=0}, and then conduct sensitivity tests using where proportions less than 1\% or 2\% etc are pooled into the adjacent cohort.
 
@@ -411,7 +434,7 @@
     \subsubsection{Penalties} % (fold)
     \label{ssub:penalties}
     Currently the code for the penalties is as follows:
-    \lstinputlisting[language=C++, firstline=995, lastline=1011]{../../src/ham.tpl}
+    \lstinputlisting[language=C++, firstline=1124, lastline=1140]{../../src/ham.tpl}
 
     The penalties are implemented in a phased approach, where in the initial phases of parameter estimation, the penalties initially have small standard deviations. This increases the overall efficiency of the non-linear search routine to help resolve the overall scaling. Then in the terminal phase, these penalties are relaxed (increased variance) such that they provide little or no influence on the gradient structure.  A similar strategy is also used with the recruitment deviation parameters.
     % subsubsection penalties (end)

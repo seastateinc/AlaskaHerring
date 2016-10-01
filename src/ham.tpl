@@ -983,8 +983,11 @@ FUNCTION void calcSpawningStockRecruitment()
 	// Ricker stock-recruitment function 
 	// so = reck/phiE; where reck > 1.0
 	// beta = log(reck)/(ro * phiE)
+
+	// Beverton Holt use:
+	// beta = (reck - 1.0)/(ro *phiE)
 	ro   = mfexp(log_ro);
-	reck = mfexp(log_reck);
+	reck = mfexp(log_reck) + 1.0;
 	so   = reck/phie;
 	beta = log(reck) / (ro * phie);
 
