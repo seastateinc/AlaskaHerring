@@ -220,16 +220,16 @@ DATA_SECTION
 // | 	- SJDM Added option to specify fixed maturity for each block.
 // | 
 	init_int nMatBlocks;
-	init_matrix maturity_cont(1,4,1,nMatBlocks);
+	init_matrix maturity_cont(1,nMatBlocks,1,4);
 	vector mat_a50;
 	vector mat_a95;
 	ivector mat_phz(1,nMatBlocks);
 	ivector nMatBlockYear(1,nMatBlocks);
 	LOCAL_CALCS
-		mat_a50 = maturity_cont(1);
-		mat_a95 = maturity_cont(2);
-		mat_phz = ivector(maturity_cont(3));
-		nMatBlockYear = ivector(maturity_cont(4));
+		mat_a50 = column(maturity_cont,1);
+		mat_a95 = column(maturity_cont,2);
+		mat_phz = ivector(column(maturity_cont,3));
+		nMatBlockYear = ivector(column(maturity_cont,4));
 	END_CALCS
 
 

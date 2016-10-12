@@ -310,15 +310,15 @@ model_data::model_data(int argc,char * argv[]) : ad_comm(argc,argv)
  theta_p1 = column(theta_DM,6);
  theta_p2 = column(theta_DM,7);
   nMatBlocks.allocate("nMatBlocks");
-  maturity_cont.allocate(1,4,1,nMatBlocks,"maturity_cont");
+  maturity_cont.allocate(1,nMatBlocks,1,4,"maturity_cont");
   mat_a50.allocate();
   mat_a95.allocate();
   mat_phz.allocate(1,nMatBlocks);
   nMatBlockYear.allocate(1,nMatBlocks);
-		mat_a50 = maturity_cont(1);
-		mat_a95 = maturity_cont(2);
-		mat_phz = ivector(maturity_cont(3));
-		nMatBlockYear = ivector(maturity_cont(4));
+		mat_a50 = column(maturity_cont,1);
+		mat_a95 = column(maturity_cont,2);
+		mat_phz = ivector(column(maturity_cont,3));
+		nMatBlockYear = ivector(column(maturity_cont,4));
   mort_type.allocate("mort_type");
   mort_dev_phz.allocate("mort_dev_phz");
   nMortBlocks.allocate("nMortBlocks");
@@ -403,15 +403,15 @@ model_parameters::model_parameters(int sz,int argc,char * argv[]) :
   #ifndef NO_AD_INITIALIZE
     mat.initialize();
   #endif
-		cout<<"Good to here"<<endl;
-		cout<<mat_params(1)<<endl;
+		//cout<<"Good to here"<<endl;
+		//cout<<mat_params(1)<<endl;
 		if( !global_parfile ) {
 			for(int h = 1; h <= nMatBlocks; h++){
 				mat_params(h,1) = mat_a50(h);
 				mat_params(h,2) = mat_a95(h);				
 			}
 		}
-		cout<<mat_params(1)<<endl;
+		//cout<<mat_params(1)<<endl;
 		
   log_m_devs.allocate(1,nMortBlocks,-15.0,15.0,mort_dev_phz,"log_m_devs");
   Mij.allocate(mod_syr,mod_nyr,sage,nage,"Mij");
