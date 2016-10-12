@@ -216,9 +216,22 @@ DATA_SECTION
 // |---------------------------------------------------------------------------|
 // | Controls for time-varying maturity
 // |---------------------------------------------------------------------------|
-	init_int mat_phz;
+// | Oct 12, 2016:
+// | 	- SJDM Added option to specify fixed maturity for each block.
+// | 
 	init_int nMatBlocks;
-	init_ivector nMatBlockYear(1,nMatBlocks);
+	init_matrix maturity_cont(1,4,1,nMatBlocks);
+	vector mat_a50;
+	vector mat_a95;
+	ivector mat_phz(1,nMatBlocks);
+	ivector nMatBlockYear(1,nMatBlocks);
+	LOCAL_CALCS
+		mat_a50 = maturity_cont(1);
+		mat_a95 = maturity_cont(2);
+		mat_phz = ivector(maturity_cont(3));
+		nMatBlockYear = ivector(maturity_cont(4));
+	END_CALCS
+
 
 // |---------------------------------------------------------------------------|
 // | Controls for natural mortality rate deviations in each block.
@@ -334,10 +347,24 @@ PARAMETER_SECTION
 // |---------------------------------------------------------------------------|
 // | MATURITY PARAMETERS
 // |---------------------------------------------------------------------------|
+// | TO BE DEPRECATED
 // | - mat_params[1] -> Age at 50% maturity
 // | - mat_params[2] -> Slope at 50% maturity
-	init_bounded_matrix mat_params(1,nMatBlocks,1,2,0,10,mat_phz);
+	init_bounded_vector_vector mat_params(1,nMatBlocks,1,2,0,100,mat_phz);
+	//init_bounded_matrix mat_params(1,nMatBlocks,1,2,0,10,mat_phz);
 	matrix mat(mod_syr,mod_nyr,sage,nage);
+	LOCAL_CALCS
+		//cout<<"Good to here"<<endl;
+		//cout<<mat_params(1)<<endl;
+		if( !global_parfile ) {
+			for(int h = 1; h <= nMatBlocks; h++){
+				mat_params(h,1) = mat_a50(h);
+				mat_params(h,2) = mat_a95(h);				
+			}
+		}
+		//cout<<mat_params(1)<<endl;
+		
+	END_CALCS
 
 // |---------------------------------------------------------------------------|
 // | NATURAL MORTALITY PARAMETERS
@@ -734,8 +761,8 @@ FUNCTION void initializeMaturitySchedules()
 	int jyr;
 	mat.initialize();
 	for(int h = 1; h <= nMatBlocks; h++) {
-		dvariable mat_a = mat_params(h,1);
-		dvariable mat_b = mat_params(h,2);
+		dvariable mat_a50 = mat_params(h,1);
+		dvariable mat_a95 = mat_params(h,2);
 
 		jyr = h != nMatBlocks ? nMatBlockYear(h) : nMatBlockYear(h)-retro_yrs;
 		// if( h != nMatBlocks ){
@@ -746,7 +773,7 @@ FUNCTION void initializeMaturitySchedules()
 
 		// fill maturity array using logistic function
 		do{
-			mat(iyr++) = plogis(age,mat_a,mat_b);
+			mat(iyr++) = plogis95(age,mat_a50,mat_a95);
 		} while(iyr <= jyr);  
 	}
 	
@@ -1262,6 +1289,11 @@ GLOBALS_SECTION
 		return(1.0 / (1.0 + mfexp(-(x-location)/scale)));
 	}
 
+	template<typename T>
+	dvar_vector plogis95(const dvector x, T a50, T a95)
+	{
+		return(1.0 / (1.0 + mfexp(-log(19)*(x-a50)/(a95-a50))));
+	}
 
 
 	dvariable dmvlogistic(const dmatrix o, const dvar_matrix& p,dvar_matrix& nu, double& tau2,const double minp)

@@ -39,9 +39,12 @@ class model_data : public ad_comm{
   ivector theta_iprior;
   dvector theta_p1;
   dvector theta_p2;
-  data_int mat_phz;
   data_int nMatBlocks;
-  data_ivector nMatBlockYear;
+  data_matrix maturity_cont;
+  dvector mat_a50;
+  dvector mat_a95;
+  ivector mat_phz;
+  ivector nMatBlockYear;
   data_int mort_type;
   data_int mort_dev_phz;
   data_int nMortBlocks;
@@ -110,7 +113,7 @@ private:
   param_number log_sigma_r;
   param_init_bounded_dev_vector log_rinit_devs;
   param_init_bounded_dev_vector log_rbar_devs;
-  param_init_bounded_matrix mat_params;
+  param_init_bounded_vector_vector mat_params;
   param_matrix mat;
   param_init_bounded_dev_vector log_m_devs;
   param_matrix Mij;

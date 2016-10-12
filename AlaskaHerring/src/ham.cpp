@@ -24,6 +24,11 @@
 	{
 		return(1.0 / (1.0 + mfexp(-(x-location)/scale)));
 	}
+	template<typename T>
+	dvar_vector plogis95(const dvector x, T a50, T a95)
+	{
+		return(1.0 / (1.0 + mfexp(-log(19)*(x-a50)/(a95-a50))));
+	}
 	dvariable dmvlogistic(const dmatrix o, const dvar_matrix& p,dvar_matrix& nu, double& tau2,const double minp)
 	{ //returns the negative loglikelihood using the MLE for the variance
 	/*
@@ -304,9 +309,16 @@ model_data::model_data(int argc,char * argv[]) : ad_comm(argc,argv)
  theta_iprior = ivector(column(theta_DM,5));
  theta_p1 = column(theta_DM,6);
  theta_p2 = column(theta_DM,7);
-  mat_phz.allocate("mat_phz");
   nMatBlocks.allocate("nMatBlocks");
-  nMatBlockYear.allocate(1,nMatBlocks,"nMatBlockYear");
+  maturity_cont.allocate(1,4,1,nMatBlocks,"maturity_cont");
+  mat_a50.allocate();
+  mat_a95.allocate();
+  mat_phz.allocate(1,nMatBlocks);
+  nMatBlockYear.allocate(1,nMatBlocks);
+		mat_a50 = maturity_cont(1);
+		mat_a95 = maturity_cont(2);
+		mat_phz = ivector(maturity_cont(3));
+		nMatBlockYear = ivector(maturity_cont(4));
   mort_type.allocate("mort_type");
   mort_dev_phz.allocate("mort_dev_phz");
   nMortBlocks.allocate("nMortBlocks");
@@ -386,11 +398,21 @@ model_parameters::model_parameters(int sz,int argc,char * argv[]) :
   #endif
   log_rinit_devs.allocate(sage+1,nage,-15.0,15.0,2,"log_rinit_devs");
   log_rbar_devs.allocate(mod_syr,mod_nyr+1,-15.0,15.0,2,"log_rbar_devs");
-  mat_params.allocate(1,nMatBlocks,1,2,0,10,mat_phz,"mat_params");
+  mat_params.allocate(1,nMatBlocks,1,2,0,100,mat_phz,"mat_params");
   mat.allocate(mod_syr,mod_nyr,sage,nage,"mat");
   #ifndef NO_AD_INITIALIZE
     mat.initialize();
   #endif
+		cout<<"Good to here"<<endl;
+		cout<<mat_params(1)<<endl;
+		if( !global_parfile ) {
+			for(int h = 1; h <= nMatBlocks; h++){
+				mat_params(h,1) = mat_a50(h);
+				mat_params(h,2) = mat_a95(h);				
+			}
+		}
+		cout<<mat_params(1)<<endl;
+		
   log_m_devs.allocate(1,nMortBlocks,-15.0,15.0,mort_dev_phz,"log_m_devs");
   Mij.allocate(mod_syr,mod_nyr,sage,nage,"Mij");
   #ifndef NO_AD_INITIALIZE
@@ -783,8 +805,8 @@ void model_parameters::initializeMaturitySchedules()
 	int jyr;
 	mat.initialize();
 	for(int h = 1; h <= nMatBlocks; h++) {
-		dvariable mat_a = mat_params(h,1);
-		dvariable mat_b = mat_params(h,2);
+		dvariable mat_a50 = mat_params(h,1);
+		dvariable mat_a95 = mat_params(h,2);
 		jyr = h != nMatBlocks ? nMatBlockYear(h) : nMatBlockYear(h)-retro_yrs;
 		// if( h != nMatBlocks ){
 		// 	jyr = nMatBlockYear(h);
@@ -793,7 +815,7 @@ void model_parameters::initializeMaturitySchedules()
 		// }
 		// fill maturity array using logistic function
 		do{
-			mat(iyr++) = plogis(age,mat_a,mat_b);
+			mat(iyr++) = plogis95(age,mat_a50,mat_a95);
 		} while(iyr <= jyr);  
 	}
 }
