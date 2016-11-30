@@ -27,12 +27,16 @@ if(file.exists(sb.file)){
 plot.catch <- function(D=D, nm = "data_ct_raw",...) {
 	df <- as.data.frame(D[[nm]])
 	colnames(df) <- c("Year","Catch","log.se")
+	z  <- 1.96
 	df <- df %>% 
+				mutate(ln.ct = log(Catch)) %>%
+				mutate(lci = exp(ln.ct - z*log.se),
+				       uci = exp(ln.ct + z*log.se)) %>%
 				mutate(std = 1.96*sqrt(log(log.se+1))) %>%
 				mutate(lower=Catch-std*Catch,upper=Catch+std*Catch)
 
 	ggplot(df,aes(Year,Catch)) +
-		geom_pointrange(aes(ymin = lower, ymax = upper),size=0.5,fatten=2) + 
+		geom_pointrange(aes(ymin = lci, ymax = uci),size=0.5,fatten=2) + 
 		labs(x="Year",...) + ggtitle(D$Model)
 }
 

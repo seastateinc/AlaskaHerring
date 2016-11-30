@@ -56,7 +56,7 @@ The modelList.txt file is a list of models that R4HAM.R will read into R.
 		- [ ] FORE::ghlCalc
 		- [ ] FORE::calcTAC
 
-- [ ] Control file reorganization
+- [x] Control file reorganization
 	- [x] add design matrix to control parameter bounds and phases. 
 	- [x] add contrls for time varying maturity
 	- [x] add contrls for time varying natural mortality rate deviations.
