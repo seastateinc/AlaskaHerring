@@ -21,3 +21,4 @@
 \contentsline {subsection}{\numberline {3.7}Objective function}{19}{subsection.3.7}
 \contentsline {subsubsection}{\numberline {3.7.1}Negative loglikelihoods}{19}{subsubsection.3.7.1}
 \contentsline {subsubsection}{\numberline {3.7.2}Penalties}{21}{subsubsection.3.7.2}
+\contentsline {section}{\numberline {4}Simulation example}{21}{section.4}

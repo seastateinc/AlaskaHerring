@@ -121,12 +121,12 @@
           \item Inputs (includes data and controls that specifies model structure).
           \item Population dynamics: a collection of sub-models that relate to the biology (e.g., natural mortality, maturity, stock-recruitment).
           \item Observation dynamics: a collection of sub-models that relate how fishing mortality interacts with population model (e.g., fisheries selectivity, fishing mortality, predicted egg abundance index, predicted composition data).
-          \item Statistical criterion: or the objective function that relates the observations to the predicted observations based on population and observation model dynamics.
+          \item Statistical criterion: the objective function that relates estimated model parameters to differences between observed and predicted variables.
           \item Outputs; including and not limited to parameter estimates, convergence criterion, derived management quantities and residuals.
         \end{enumerate}
       \item There are a few structural differences being proposed in this model that relate to how selectivity is modeled, the observation error assumed in the composition data, and variance terms that relate to both process error and observation error.
         \begin{itemize}
-          \item To avoid breaking the derivative chain in calculating the objective function and its gradient, use of the max function to re-scale the selectivities should be avoided.  Often you can get away with it in very simple models where selectivity is very well informed, but can soon become problematic when your jointly estimating additional parameters that are confounded with selectivity (e.g., time-varying natural mortality).  To do so, the propose change rescales the selectivity vector for ages such that it has a mean of 1.0 
+          \item To avoid breaking the derivative chain in calculating the objective function and its gradient, use of the max function to re-scale the selectivities should be avoided.  Often you can get away with it in very simple models where selectivity is very well informed, but can soon become problematic when your jointly estimating additional parameters that are confounded with selectivity (e.g., time-varying natural mortality).  To do so, the proposed change rescales the selectivity vector for ages such that it has a mean of 1. 
           \item The previous generation used a least-square estimator for the age-composition proportions. The proposed changes implemented in this model assume the age-proportion data are logistic-normal, and these data are weighted by the conditional maximum likelihood estimate of the variance (i.e., objectively weighted).  Alternatives likelihood formulations are also easily implemented in future iterations.
           \item Lastly, each catch and survey observation in the input data file also has an associated log standard error associated with it (approximately the coefficient of variation).  In cases where it is possible to estimate a standard error in the data using bootstrap procedures, the inter-annual variation in observation error can now be specified.  In addition, the process error term permits recruitment variation around a stock-recruitment relationship. Currently the Ricker model is implemented, with the option to implement the Beverton-Holt model annotated in the code. 
         \end{itemize}
@@ -484,9 +484,21 @@
 
 
   
-
-
+  \section{Simulation example} % (fold)
+  \label{sec:simulation_example}
   
+  Built into the assessment model code is a command line option that conducts a simulation experiment.  In this experiment, the input parameter values are known, and simulated observations are generated with known error distributions. The model then proceed to esimate the model parameters using the non-linear optimization procedures.  any potential biases can be detected by comparing the estimated values with the true values. 
+
+  For this simulation example, the data from the Sitka herring stock will be used.
+
+
+  % section simulation_example (end)
+
+
+  \section{Example Assessment: Sitka herring} % (fold)
+  \label{sec:example_assessment_sitka_herring}
+  
+  % section example_assessment_sitka_herring (end)
 
 
   \bibliographystyle{apalike}

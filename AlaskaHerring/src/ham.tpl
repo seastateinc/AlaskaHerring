@@ -373,7 +373,7 @@ PARAMETER_SECTION
 	!! int phz; phz = dMiscCont(2)==0?-1:1;
 	init_bounded_vector log_ft_pars(mod_syr,mod_nyr,-30.,3.0,phz);
 	LOCAL_CALCS
-		if(b_simulation_flag) log_ft_pars = log(0.1);
+		if(b_simulation_flag) log_ft_pars = log(0.2);
 	END_CALCS
 
 // |---------------------------------------------------------------------------|
@@ -468,7 +468,7 @@ PRELIMINARY_CALCS_SECTION
 			exit(1);
 		}
 
-	} else if ( b_simulation_flag && rseed < 0){
+	} else if ( b_simulation_flag && rseed < 0 ){
 		runSimulationModel(rseed);
 	}
 
