@@ -1,6 +1,7 @@
 EXEC=ham
 DAT=sitka_2.dat
 CTL=sitka_2.ctl
+PIN=sim0.pin
 
 TPLS=../../src/$(EXEC).tpl
 DATA=$(EXEC).dat
@@ -15,17 +16,17 @@ else
 endif
 
 
-all: $(EXEC) $(EXEC).rep
+all: $(TPLS) $(EXEC) $(EXEC).rep
 
 $(EXEC): $(DIST)
 	ln -s $(DIST) $@
 
 
-
 $(EXEC).rep: $(EXEC) $(DATA) $(DAT) $(CTL)
 	./$(EXEC) -ind $(DATA) $(ARGS)
 
-
+$(TPLS):
+	make --directory "../../"
 
 run: $(DATA) 
 	./$(EXEC) -ind $(DATA) $(ARGS)
@@ -61,11 +62,11 @@ runsims := $(foreach dir,$(simdirs),$(dir)/runsims)
 
 $(setsims):
 	mkdir -p sims/$(@D);
-	cp $(EXEC) $(DATA) $(DAT) $(CTL) Makefile sims/$(@D);
+	cp $(EXEC) $(DATA) $(DAT) $(CTL) $(PIN) Makefile sims/$(@D);
 	cd $(@D); touch setsims
 
 $(runsims):
-	cd sims/$(@D); make run ARGS="-sim -$(@D)";
+	cd sims/$(@D); make run ARGS="-sim -$(@D) -ainp $(PIN)";
 
 sim: $(EXEC) $(setsims) $(runsims)
 	touch SIMSDONE

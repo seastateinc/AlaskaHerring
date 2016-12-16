@@ -76,8 +76,22 @@ plot.ssb <- function(D=D){
 	#qplot(D$year,D$ssb/1000,geom="line") + ylim(c(0,NA)) +
 	#labs(x="Year",y="Female Spawning Stock Biomass (1000 mt)")
 	
-	df <- data.frame(year=seq(D$mod_syr,D$mod_nyr),ssb=D$ssb)
-	ggplot(df,aes(year,ssb/1000)) +geom_line() + ylim(c(0,NA)) + 
+	# df <- data.frame(year=seq(D$mod_syr,D$mod_nyr),ssb=D$ssb)
+	# ggplot(df,aes(year,ssb/1000)) +geom_line() + ylim(c(0,NA)) + 
+	# labs(x="Year",y="Female Spawning Stock Biomass (1000 mt)") +
+	# ggtitle(D$Model)
+
+
+	id <- grep("sd_ssb",D$fit$names)
+
+	ssb.df <- data.frame(year=seq(D$mod_syr,D$mod_nyr),
+	                     SSB = D$fit$est[id]/1000,
+	                     sdSSB = D$fit$std[id]/1000) %>% 
+						mutate(lci=SSB-1.96*sdSSB,uci=SSB+1.96*sdSSB)
+
+	ggplot(ssb.df,aes(year,SSB)) + 
+	geom_line() +
+	geom_ribbon(aes(x=year,ymin=lci,ymax=uci),alpha=0.15)+
 	labs(x="Year",y="Female Spawning Stock Biomass (1000 mt)") +
 	ggtitle(D$Model)
 
@@ -161,6 +175,22 @@ plot.resd <- function(D=D, nm = "resd_cm_comp", ...) {
 		labs(y="Residual (commercial catch)") +
 		ggtitle(D$Model)
 	}
+}
+
+plot.ft <- function(D) {
+	id <- grep("log_ft_pars",D$fit$names)
+	log.ft.mle <- D$fit$est[id]
+	log.ft.std <- D$fit$std[id]
+
+	df <- data.frame(Year=D$year,Ft = exp(log.ft.mle),
+	                 lci = exp(log.ft.mle-1.96*log.ft.std),
+	                 uci = exp(log.ft.mle+1.96*log.ft.std))
+
+	ggplot(df,aes(Year,Ft)) + geom_line() + 
+		geom_ribbon(aes(x=Year,ymin=lci,ymax=uci),alpha=0.15)+
+		labs(y="Instantaneous fishing mortality") + 
+		ggtitle(D$Model)
+
 }
 
 

@@ -1,6 +1,13 @@
 #Plot observed and predicted data.
 
-plot.eggIndex <- function(D, sfx="egg_dep",fit=FALSE) { 
+plot.eggIndex <- function(D, sfx="egg_dep",fit=FALSE,log.scale=FALSE) { 
+	
+	if(sfx=="egg_dep") {
+		ylbl <-  "Egg Deposition log(trillions)"
+	} else if (sfx=="catch") {
+		ylbl <-  "Catch (mt)"
+	}
+
 	# Observed data
 	data <- paste0("data_",sfx)
 	data <- as.data.frame(D[[data]])
@@ -31,11 +38,15 @@ plot.eggIndex <- function(D, sfx="egg_dep",fit=FALSE) {
 
 	p <- ggplot(df,aes(year,index)) +
 	geom_pointrange(aes(ymin=lci,ymax=uci),size=0.5,fatten=1) +
-	labs(x="Year",y="Egg Deposition (trillions)") +
+	labs(x="Year",y=ylbl) +
 	ggtitle(D$Model)
 
 	if(fit) {
 		p <- p + geom_line(aes(year,pred),color="blue")
+	}
+
+	if(log.scale) {
+		p <- p + scale_y_log10() + labs(y= ylbl )
 	}
 	return(p)
 }
