@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  16 DEC 2016 14:43
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  16 DEC 2016 15:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -726,7 +726,7 @@ LaTeX Font Info:    Font shape `U/lasy/b/n' in size <6> not available
 \openout4 = `TechnicalDoc.toc'.
 
  [4]
-Overfull \hbox (3.96089pt too wide) in paragraph at lines 216--217
+Overfull \hbox (3.96089pt too wide) in paragraph at lines 218--219
 []\OT1/cmr/m/n/12 The catch-at-age data is in-ter-nally de-rived in the model [
 ] con-di-tional on the numbers-
  []
@@ -742,32 +742,32 @@ File: lstlang1.sty 2014/09/06 1.5e listings language file
 File: lstmisc.sty 2014/09/06 1.5e (Carsten Heinz)
 )
 (../../src/ham.tpl
-LaTeX Font Info:    Try loading font information for OML+cmr on input line 811.
+LaTeX Font Info:    Try loading font information for OML+cmr on input line 812.
 
  (/usr/local/texlive/2015/texmf-dist/tex/latex/base/omlcmr.fd
 File: omlcmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <10> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 811.
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 812.
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 811.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 812.
 LaTeX Font Info:    Font shape `U/lasy/b/n' in size <5> not available
-(Font)              Font shape `U/lasy/m/n' tried instead on input line 815.
+(Font)              Font shape `U/lasy/m/n' tried instead on input line 816.
 ) (../../src/ham.tpl [8]) (../../src/ham.tpl
 LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 858.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 859.
  [9]) (../../src/ham.tpl) [10]
 [11] (../../src/ham.tpl) (../../src/ham.tpl [12] [13]) (../../src/ham.tpl
 [14]
 LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <10> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 1059.
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 1060.
 
  [15]) (../../src/ham.tpl) [16] (../../src/ham.tpl) (../../src/ham.tpl
 [17]) (../../src/ham.tpl)
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-(../../src/ham.tpl [18]) [19] (../../src/ham.tpl) [20] [21]
+(../../src/ham.tpl [18]) [19] (../../src/ham.tpl) [20]
 (/usr/local/texlive/2015/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2014/09/06 1.5e listings language file
 )
@@ -777,50 +777,50 @@ File: lstlang2.sty 2014/09/06 1.5e listings language file
 (/usr/local/texlive/2015/texmf-dist/tex/latex/listings/lstlang3.sty
 File: lstlang3.sty 2014/09/06 1.5e listings language file
 )
-(../../models_2015/sitka/sim0.pin) [22]
-<./figs/SitkaSimulationSSBs.png, id=755, 2106.87125pt x 2106.87125pt>
+(../../models_2015/sitka/sim0.pin) [21]
+<./figs/SitkaSimulationSSBs.png, id=758, 2106.87125pt x 2106.87125pt>
 File: ./figs/SitkaSimulationSSBs.png Graphic file (type png)
 
 <use ./figs/SitkaSimulationSSBs.png>
-Package pdftex.def Info: ./figs/SitkaSimulationSSBs.png used on input line 541.
+Package pdftex.def Info: ./figs/SitkaSimulationSSBs.png used on input line 543.
 
 (pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
 
-<./figs/SitkaSimulationFs.png, id=757, 2106.87125pt x 2106.87125pt>
+<./figs/SitkaSimulationFs.png, id=760, 2106.87125pt x 2106.87125pt>
 File: ./figs/SitkaSimulationFs.png Graphic file (type png)
 
 <use ./figs/SitkaSimulationFs.png>
-Package pdftex.def Info: ./figs/SitkaSimulationFs.png used on input line 548.
+Package pdftex.def Info: ./figs/SitkaSimulationFs.png used on input line 550.
 (pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
- [23] [24 <./figs/SitkaSimulationSSBs.png>]
-[25 <./figs/SitkaSimulationFs.png>]
-<./figs/SitkaCatch.png, id=787, 2106.87125pt x 2106.87125pt>
+ [22] [23 <./figs/SitkaSimulationSSBs.png>]
+[24 <./figs/SitkaSimulationFs.png>]
+<./figs/SitkaCatch.png, id=790, 2106.87125pt x 2106.87125pt>
 File: ./figs/SitkaCatch.png Graphic file (type png)
 
 <use ./figs/SitkaCatch.png>
-Package pdftex.def Info: ./figs/SitkaCatch.png used on input line 586.
+Package pdftex.def Info: ./figs/SitkaCatch.png used on input line 588.
 (pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
 
-<./figs/SitkaLogEggIndex.png, id=789, 2106.87125pt x 2106.87125pt>
+<./figs/SitkaLogEggIndex.png, id=792, 2106.87125pt x 2106.87125pt>
 File: ./figs/SitkaLogEggIndex.png Graphic file (type png)
 
 <use ./figs/SitkaLogEggIndex.png>
-Package pdftex.def Info: ./figs/SitkaLogEggIndex.png used on input line 596.
+Package pdftex.def Info: ./figs/SitkaLogEggIndex.png used on input line 598.
 (pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
 
-<./figs/SitkaWeightAtAge.png, id=792, 2106.87125pt x 2106.87125pt>
+<./figs/SitkaWeightAtAge.png, id=795, 2106.87125pt x 2106.87125pt>
 File: ./figs/SitkaWeightAtAge.png Graphic file (type png)
 
 <use ./figs/SitkaWeightAtAge.png>
-Package pdftex.def Info: ./figs/SitkaWeightAtAge.png used on input line 606.
+Package pdftex.def Info: ./figs/SitkaWeightAtAge.png used on input line 608.
 (pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
 
-<./figs/SitkCmWeightAtAge.png, id=793, 2106.87125pt x 2106.87125pt>
+<./figs/SitkCmWeightAtAge.png, id=796, 2106.87125pt x 2106.87125pt>
 File: ./figs/SitkCmWeightAtAge.png Graphic file (type png)
 
 <use ./figs/SitkCmWeightAtAge.png>
-Package pdftex.def Info: ./figs/SitkCmWeightAtAge.png used on input line 613.
+Package pdftex.def Info: ./figs/SitkCmWeightAtAge.png used on input line 615.
 (pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
-
-<./figs/SitkaSpAgeComps.png, id=796, 2106.87125pt x 2106.87125pt>
+ [25]
+<./figs/SitkaSpAgeComps.png, id=808, 2106.87125pt x 2106.87125pt>
 File: ./fi
