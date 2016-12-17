@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  16 DEC 2016 15:31
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  16 DEC 2016 17:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -726,16 +726,18 @@ LaTeX Font Info:    Font shape `U/lasy/b/n' in size <6> not available
 \openout4 = `TechnicalDoc.toc'.
 
  [4]
-Overfull \hbox (3.96089pt too wide) in paragraph at lines 218--219
+Overfull \hbox (3.96089pt too wide) in paragraph at lines 220--221
 []\OT1/cmr/m/n/12 The catch-at-age data is in-ter-nally de-rived in the model [
 ] con-di-tional on the numbers-
  []
 
-[5] [6] [7
+[5] [6] [7] [8
 
-] (/usr/local/texlive/2015/texmf-dist/tex/latex/listings/lstlang1.sty
+]
+(/usr/local/texlive/2015/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2014/09/06 1.5e listings language file
-) (/usr/local/texlive/2015/texmf-dist/tex/latex/listings/lstlang1.sty
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2014/09/06 1.5e listings language file
 )
 (/usr/local/texlive/2015/texmf-dist/tex/latex/listings/lstmisc.sty
@@ -753,21 +755,25 @@ LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 812.
 LaTeX Font Info:    Font shape `U/lasy/b/n' in size <5> not available
 (Font)              Font shape `U/lasy/m/n' tried instead on input line 816.
-) (../../src/ham.tpl [8]) (../../src/ham.tpl
+) (../../src/ham.tpl [9]) (../../src/ham.tpl
 LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 859.
- [9]) (../../src/ham.tpl) [10]
-[11] (../../src/ham.tpl) (../../src/ham.tpl [12] [13]) (../../src/ham.tpl
-[14]
-LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <10> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 1060.
-
- [15]) (../../src/ham.tpl) [16] (../../src/ham.tpl) (../../src/ham.tpl
-[17]) (../../src/ham.tpl)
+ [10]) (../../src/ham.tpl)
+[11]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-(../../src/ham.tpl [18]) [19] (../../src/ham.tpl) [20]
+(../../src/ham.tpl [12]) (../../src/ham.tpl [13]) [14] (../../src/ham.tpl
+[15]
+LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <10> not available
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 1060.
+
+) (../../src/ham.tpl [16]) (../../src/ham.tpl) [17] (../../src/ham.tpl)
+(../../src/ham.tpl) [18]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+(../../src/ham.tpl) [19] (../../src/ham.tpl [20])
 (/usr/local/texlive/2015/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2014/09/06 1.5e listings language file
 )
@@ -777,50 +783,188 @@ File: lstlang2.sty 2014/09/06 1.5e listings language file
 (/usr/local/texlive/2015/texmf-dist/tex/latex/listings/lstlang3.sty
 File: lstlang3.sty 2014/09/06 1.5e listings language file
 )
-(../../models_2015/sitka/sim0.pin) [21]
-<./figs/SitkaSimulationSSBs.png, id=758, 2106.87125pt x 2106.87125pt>
+(../../models_2015/sitka/sim0.pin [21]) [22]
+<./figs/SitkaSimulationSSBs.png, id=768, 2106.87125pt x 2106.87125pt>
 File: ./figs/SitkaSimulationSSBs.png Graphic file (type png)
 
 <use ./figs/SitkaSimulationSSBs.png>
-Package pdftex.def Info: ./figs/SitkaSimulationSSBs.png used on input line 543.
+Package pdftex.def Info: ./figs/SitkaSimulationSSBs.png used on input line 546.
 
 (pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
 
-<./figs/SitkaSimulationFs.png, id=760, 2106.87125pt x 2106.87125pt>
+<./figs/SitkaSimulationFs.png, id=770, 2106.87125pt x 2106.87125pt>
 File: ./figs/SitkaSimulationFs.png Graphic file (type png)
 
 <use ./figs/SitkaSimulationFs.png>
-Package pdftex.def Info: ./figs/SitkaSimulationFs.png used on input line 550.
+Package pdftex.def Info: ./figs/SitkaSimulationFs.png used on input line 553.
 (pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
- [22] [23 <./figs/SitkaSimulationSSBs.png>]
-[24 <./figs/SitkaSimulationFs.png>]
-<./figs/SitkaCatch.png, id=790, 2106.87125pt x 2106.87125pt>
+
+<./figs/SitkaCatch.png, id=773, 2106.87125pt x 2106.87125pt>
 File: ./figs/SitkaCatch.png Graphic file (type png)
 
 <use ./figs/SitkaCatch.png>
-Package pdftex.def Info: ./figs/SitkaCatch.png used on input line 588.
+Package pdftex.def Info: ./figs/SitkaCatch.png used on input line 591.
 (pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
+ [23] [24 <./figs/SitkaSimulationSSBs.png>] [25 <./figs/SitkaSimulationFs.png>]
 
-<./figs/SitkaLogEggIndex.png, id=792, 2106.87125pt x 2106.87125pt>
+<./figs/SitkaLogEggIndex.png, id=793, 2106.87125pt x 2106.87125pt>
 File: ./figs/SitkaLogEggIndex.png Graphic file (type png)
 
 <use ./figs/SitkaLogEggIndex.png>
-Package pdftex.def Info: ./figs/SitkaLogEggIndex.png used on input line 598.
+Package pdftex.def Info: ./figs/SitkaLogEggIndex.png used on input line 601.
 (pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
 
-<./figs/SitkaWeightAtAge.png, id=795, 2106.87125pt x 2106.87125pt>
+<./figs/SitkaWeightAtAge.png, id=796, 2106.87125pt x 2106.87125pt>
 File: ./figs/SitkaWeightAtAge.png Graphic file (type png)
 
 <use ./figs/SitkaWeightAtAge.png>
-Package pdftex.def Info: ./figs/SitkaWeightAtAge.png used on input line 608.
+Package pdftex.def Info: ./figs/SitkaWeightAtAge.png used on input line 611.
 (pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
 
-<./figs/SitkCmWeightAtAge.png, id=796, 2106.87125pt x 2106.87125pt>
+<./figs/SitkCmWeightAtAge.png, id=797, 2106.87125pt x 2106.87125pt>
 File: ./figs/SitkCmWeightAtAge.png Graphic file (type png)
 
 <use ./figs/SitkCmWeightAtAge.png>
-Package pdftex.def Info: ./figs/SitkCmWeightAtAge.png used on input line 615.
+Package pdftex.def Info: ./figs/SitkCmWeightAtAge.png used on input line 618.
 (pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
- [25]
-<./figs/SitkaSpAgeComps.png, id=808, 2106.87125pt x 2106.87125pt>
-File: ./fi
+
+<./figs/SitkaSpAgeComps.png, id=800, 2106.87125pt x 2106.87125pt>
+File: ./figs/SitkaSpAgeComps.png Graphic file (type png)
+
+<use ./figs/SitkaSpAgeComps.png>
+Package pdftex.def Info: ./figs/SitkaSpAgeComps.png used on input line 627.
+(pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
+
+<./figs/SitkaCmAgeComps.png, id=801, 2106.87125pt x 2106.87125pt>
+File: ./figs/SitkaCmAgeComps.png Graphic file (type png)
+
+<use ./figs/SitkaCmAgeComps.png>
+Package pdftex.def Info: ./figs/SitkaCmAgeComps.png used on input line 634.
+(pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
+ [26] [27] [28 <./figs/SitkaCatch.png>]
+[29 <./figs/SitkaLogEggIndex.png>] [30 <./figs/SitkaWeightAtAge.png>] [31 <./fi
+gs/SitkCmWeightAtAge.png>] [32 <./figs/SitkaSpAgeComps.png>] [33 <./figs/SitkaC
+mAgeComps.png>] <./figs/ssb.png, id=853, 2106.87125pt x 2106.87125pt>
+File: ./figs/ssb.png Graphic file (type png)
+
+<use ./figs/ssb.png>
+Package pdftex.def Info: ./figs/ssb.png used on input line 668.
+(pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
+ <./figs/ft.png, id=856, 2106.87125pt x 2106.87125pt>
+File: ./figs/ft.png Graphic file (type png)
+
+<use ./figs/ft.png>
+Package pdftex.def Info: ./figs/ft.png used on input line 677.
+(pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
+
+<./figs/Sitka_Fcompare.png, id=858, 2106.87125pt x 2106.87125pt>
+File: ./figs/Sitka_Fcompare.png Graphic file (type png)
+
+<use ./figs/Sitka_Fcompare.png>
+Package pdftex.def Info: ./figs/Sitka_Fcompare.png used on input line 686.
+(pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
+
+<./figs/ctfit.png, id=861, 2106.87125pt x 2106.87125pt>
+File: ./figs/ctfit.png Graphic file (type png)
+ <use ./figs/ctfit.png>
+Package pdftex.def Info: ./figs/ctfit.png used on input line 697.
+(pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
+
+<./figs/resd_cct.png, id=862, 2106.87125pt x 2106.87125pt>
+File: ./figs/resd_cct.png Graphic file (type png)
+
+<use ./figs/resd_cct.png>
+Package pdftex.def Info: ./figs/resd_cct.png used on input line 704.
+(pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
+
+<./figs/logegg.png, id=864, 2106.87125pt x 2106.87125pt>
+File: ./figs/logegg.png Graphic file (type png)
+
+<use ./figs/logegg.png>
+Package pdftex.def Info: ./figs/logegg.png used on input line 713.
+(pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
+
+<./figs/resd_egg.png, id=866, 2106.87125pt x 2106.87125pt>
+File: ./figs/resd_egg.png Graphic file (type png)
+
+<use ./figs/resd_egg.png>
+Package pdftex.def Info: ./figs/resd_egg.png used on input line 722.
+(pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
+ [34
+
+]
+<./figs/resd_rec.png, id=879, 2106.87125pt x 2106.87125pt>
+File: ./figs/resd_rec.png Graphic file (type png)
+
+<use ./figs/resd_rec.png>
+Package pdftex.def Info: ./figs/resd_rec.png used on input line 733.
+(pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
+
+<./figs/resd_csp.png, id=882, 2106.87125pt x 2106.87125pt>
+File: ./figs/resd_csp.png Graphic file (type png)
+
+<use ./figs/resd_csp.png>
+Package pdftex.def Info: ./figs/resd_csp.png used on input line 742.
+(pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
+
+<./figs/resd_ccm.png, id=883, 2106.87125pt x 2106.87125pt>
+File: ./figs/resd_ccm.png Graphic file (type png)
+
+<use ./figs/resd_ccm.png>
+Package pdftex.def Info: ./figs/resd_ccm.png used on input line 750.
+(pdftex.def)             Requested size: 469.74986pt x 469.75502pt.
+ [35] [36 <./figs/ssb.png>] [37 <./figs/ft.png>]
+[38 <./figs/Sitka_Fcompare.png>] [39 <./figs/ctfit.png>] [40 <./figs/resd_cct.p
+ng>] [41 <./figs/logegg.png>] [42 <./figs/resd_egg.png>] [43 <./figs/resd_rec.p
+ng>] [44 <./figs/resd_csp.png>] [45 <./figs/resd_ccm.png>] [46
+
+]
+(./TechnicalDoc.bbl [47])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 788.
+ [48]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 788.
+ (./TechnicalDoc.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 788.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 788.
+Package rerunfilecheck Info: File `TechnicalDoc.out' has not changed.
+(rerunfilecheck)             Checksum: 18327E7FDB0F73ECF10661EFF3D33F10;2128.
+
+
+LaTeX Warning: There were multiply-defined labels.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 788.
+ ) 
+Here is how much of TeX's memory you used:
+ 10669 strings out of 493089
+ 148121 string characters out of 6134842
+ 352142 words of memory out of 5000000
+ 13361 multiletter control sequences out of 15000+600000
+ 22184 words of font info for 88 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 35i,18n,61p,1812b,2512s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
+></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
+</usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
+/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></
+usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></u
+sr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr
+/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/l
+ocal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/loc
+al/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local
+/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/te
+xlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texli
+ve/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texliv
+e/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/
+2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/20
+15/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/201
+5/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2015
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmti7.pfb></usr/local/texlive/2015/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
+Output written on TechnicalDoc.pdf (48 pages, 5806683 bytes).
+PDF statistics:
+ 1138 PDF objects out of 1200 (max. 8388607)
+ 1022 compressed objects within 11 object streams
+ 565 named destinations out of 1000 (max. 500000)
+ 339 words of extra memory for PDF output out of 10000 (max. 10000000)
+
